@@ -57,6 +57,27 @@ final class InstanceRepository
         return $row === false ? null : Instance::fromRow($row);
     }
 
+    /**
+     * Die Mandantenbedingung steht auch hier, nicht nur in findAll() — sonst
+     * wäre eine geratene uid der Weg an ihr vorbei.
+     */
+    public function findByUid(int $uid, int $tenant = 1): ?Instance
+    {
+        $qb = $this->connectionPool->getQueryBuilderForTable(self::TABLE);
+        $row = $qb
+            ->select('*')
+            ->from(self::TABLE)
+            ->where(
+                $qb->expr()->eq('uid', $qb->createNamedParameter($uid, ParameterType::INTEGER)),
+                $qb->expr()->eq('tenant', $qb->createNamedParameter($tenant, ParameterType::INTEGER)),
+            )
+            ->setMaxResults(1)
+            ->executeQuery()
+            ->fetchAssociative();
+
+        return $row === false ? null : Instance::fromRow($row);
+    }
+
     public function create(int $tenant, string $title, string $instanceUrl, string $tokenHash): int
     {
         $connection = $this->connectionPool->getConnectionForTable(self::TABLE);

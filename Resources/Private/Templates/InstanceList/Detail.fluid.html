@@ -1,0 +1,115 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      data-namespace-typo3-fluid="true">
+
+<f:layout name="Module" />
+
+<f:section name="Content">
+
+    <p><a href="{listUri}" class="btn btn-default btn-sm">&larr; Alle Instanzen</a></p>
+
+    <h1>{instance.title}</h1>
+
+    <div class="mb-3">
+        <span class="badge badge-{instance.stateSeverity}">{instance.stateLabel}</span>
+        <span class="badge badge-secondary">TYPO3 {instance.typo3Version}</span>
+        <span class="badge badge-secondary">PHP {instance.phpVersion}</span>
+        <span class="badge badge-secondary">{instance.database}</span>
+        <span class="badge badge-secondary">{instance.context}</span>
+    </div>
+
+    <div class="table-fit mb-4">
+        <table class="table">
+            <tbody>
+                <tr><th style="width:16rem">Adresse</th><td>{instance.url}</td></tr>
+                <tr><th>Zuletzt gemeldet</th><td>
+                    <f:if condition="{instance.lastSeen}">
+                        <f:then><f:format.date format="d.m.Y H:i:s">@{instance.lastSeen}</f:format.date></f:then>
+                        <f:else><span class="text-body-secondary">noch nie</span></f:else>
+                    </f:if>
+                </td></tr>
+                <tr><th>Inventar erstellt</th><td>{generatedAt}</td></tr>
+                <tr><th>Agent-Version</th><td>{instance.agentVersion}</td></tr>
+                <tr><th>Schemaversion</th><td>{schemaVersion}</td></tr>
+                <tr><th>Veränderungen bisher</th><td>
+                    {snapshotCount} <span class="text-body-secondary">Snapshots — es wird nur
+                    gespeichert, wenn sich etwas geändert hat</span>
+                </td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <f:if condition="{inventoryJson}">
+        <f:then>
+
+            <h2>Provider</h2>
+            <f:for each="{providers}" as="provider">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <span class="badge badge-{provider.severity}">{provider.status}</span>
+                        <code>{provider.key}</code>
+                    </div>
+                    <div class="card-body">
+                        <f:if condition="{provider.message}">
+                            <div class="callout callout-{provider.severity} mb-3">
+                                <div class="callout-content">
+                                    <div class="callout-body">
+                                        {provider.message}
+                                        <f:if condition="{provider.reason}">
+                                            <br><code>{provider.reason}</code>
+                                        </f:if>
+                                    </div>
+                                </div>
+                            </div>
+                        </f:if>
+
+                        <f:if condition="{provider.json}">
+                            <f:then>
+                                <pre style="max-height:22rem;overflow:auto;margin:0"><code>{provider.json}</code></pre>
+                            </f:then>
+                            <f:else>
+                                <p class="text-body-secondary mb-0">Keine Daten geliefert.</p>
+                            </f:else>
+                        </f:if>
+                    </div>
+                </div>
+            </f:for>
+
+            <h2>Vollständiges Inventar</h2>
+            <p class="text-body-secondary">Unverändert so, wie der Agent es geschickt hat.</p>
+            <pre style="max-height:32rem;overflow:auto"><code>{inventoryJson}</code></pre>
+
+            <f:if condition="{history}">
+                <h2>Veränderungen</h2>
+                <div class="table-fit">
+                    <table class="table table-striped">
+                        <thead><tr><th>Zeitpunkt</th><th>Fingerabdruck</th></tr></thead>
+                        <tbody>
+                            <f:for each="{history}" as="entry">
+                                <tr>
+                                    <td class="col-nowrap">
+                                        <f:format.date format="d.m.Y H:i:s">@{entry.crdate}</f:format.date>
+                                    </td>
+                                    <td><code class="text-body-secondary">{entry.fingerprint -> f:format.crop(maxCharacters: 16, append: '…')}</code></td>
+                                </tr>
+                            </f:for>
+                        </tbody>
+                    </table>
+                </div>
+            </f:if>
+
+        </f:then>
+        <f:else>
+            <div class="callout callout-warning">
+                <div class="callout-content">
+                    <div class="callout-title">Noch kein Inventar</div>
+                    <div class="callout-body">
+                        <p class="mb-0">Diese Instanz ist verbunden, hat aber noch nichts gemeldet.
+                           Im Backend-Modul der Instanz oder per <code>caretaker2:push</code> auslösen.</p>
+                    </div>
+                </div>
+            </div>
+        </f:else>
+    </f:if>
+
+</f:section>
+</html>

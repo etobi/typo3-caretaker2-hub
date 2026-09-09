@@ -7,9 +7,12 @@ namespace Caretaker2\Hub\Controller;
 use Caretaker2\Hub\Domain\EnrollmentService;
 use Caretaker2\Hub\Domain\Instance;
 use Caretaker2\Hub\Domain\InstanceRepository;
+use Caretaker2\Hub\Domain\SnapshotRepository;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Attribute\AsController;
+use TYPO3\CMS\Backend\Routing\UriBuilder;
+use TYPO3\CMS\Core\Http\RedirectResponse;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 
 /**
@@ -22,13 +25,59 @@ use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 #[AsController]
 final class InstanceListController
 {
+    private const ROUTE = 'caretaker2_instances';
+
     public function __construct(
         private readonly ModuleTemplateFactory $moduleTemplateFactory,
         private readonly InstanceRepository $instances,
         private readonly EnrollmentService $enrollment,
+        private readonly SnapshotRepository $snapshots,
+        private readonly UriBuilder $uriBuilder,
     ) {}
 
     public function handleRequest(ServerRequestInterface $request): ResponseInterface
+    {
+        $instanceId = (int)($request->getQueryParams()['instance'] ?? 0);
+        if ($instanceId > 0) {
+            return $this->detail($request, $instanceId);
+        }
+
+        return $this->list($request);
+    }
+
+    /**
+     * Das vollständige Inventar einer Instanz, so wie der Agent es geliefert
+     * hat — inklusive der Provider, die nichts liefern konnten.
+     */
+    private function detail(ServerRequestInterface $request, int $instanceId): ResponseInterface
+    {
+        $instance = $this->instances->findByUid($instanceId);
+        if ($instance === null) {
+            return new RedirectResponse((string)$this->uriBuilder->buildUriFromRoute(self::ROUTE));
+        }
+
+        $view = $this->moduleTemplateFactory->create($request);
+        $view->setTitle('Caretaker2', $instance->title);
+
+        $inventory = $this->snapshots->findLatestInventory($instanceId);
+
+        $view->assignMultiple([
+            'instance' => $this->present($instance, time()),
+            'listUri' => (string)$this->uriBuilder->buildUriFromRoute(self::ROUTE),
+            'providers' => $this->describeProviders($inventory),
+            'inventoryJson' => $inventory === null
+                ? null
+                : json_encode($inventory, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            'generatedAt' => $inventory['generatedAt'] ?? null,
+            'schemaVersion' => $inventory['schemaVersion'] ?? null,
+            'history' => $this->snapshots->findHistory($instanceId),
+            'snapshotCount' => $this->snapshots->countForInstance($instanceId),
+        ]);
+
+        return $view->renderResponse('InstanceList/Detail');
+    }
+
+    private function list(ServerRequestInterface $request): ResponseInterface
     {
         $view = $this->moduleTemplateFactory->create($request);
         $view->setTitle('Caretaker2', 'Instanzen');
@@ -62,6 +111,10 @@ final class InstanceListController
 
         return [
             'uid' => $instance->uid,
+            'detailUri' => (string)$this->uriBuilder->buildUriFromRoute(
+                self::ROUTE,
+                ['instance' => $instance->uid]
+            ),
             'title' => $instance->title,
             'url' => $instance->instanceUrl,
             'typo3Version' => $instance->typo3Version,
@@ -90,6 +143,41 @@ final class InstanceListController
         }
 
         return $summary;
+    }
+
+    /**
+     * Der Providerstatus mit Grund und Klartext. Das ist der Punkt, an dem
+     * "keine Daten" sichtbar von "keine Befunde" unterscheidbar wird — hier
+     * steht, warum etwas fehlt.
+     *
+     * @param array<string, mixed>|null $inventory
+     * @return list<array<string, mixed>>
+     */
+    private function describeProviders(?array $inventory): array
+    {
+        $providers = $inventory['providers'] ?? null;
+        if (!is_array($providers)) {
+            return [];
+        }
+
+        $out = [];
+        foreach ($providers as $key => $entry) {
+            $status = is_array($entry) ? (string)($entry['status'] ?? 'unavailable') : 'unavailable';
+            $data = is_array($entry) ? ($entry['data'] ?? null) : null;
+
+            $out[] = [
+                'key' => (string)$key,
+                'status' => $status,
+                'severity' => ['ok' => 'success', 'degraded' => 'warning'][$status] ?? 'danger',
+                'reason' => is_array($entry) ? ($entry['reason'] ?? null) : null,
+                'message' => is_array($entry) ? ($entry['message'] ?? null) : null,
+                'json' => $data === null
+                    ? null
+                    : json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            ];
+        }
+
+        return $out;
     }
 
     private function stateLabel(string $state): string
