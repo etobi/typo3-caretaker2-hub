@@ -390,6 +390,42 @@
             <trans-unit id="trigger.unchanged">
                 <source>The instance reported, unchanged.</source>
             </trans-unit>
+            <trans-unit id="finding.type.report">
+                <source>TYPO3 check</source>
+            </trans-unit>
+            <trans-unit id="list.findings.report">
+                <source>Findings from TYPO3's own checks</source>
+            </trans-unit>
+            <trans-unit id="scheduler.title">
+                <source>Scheduled evaluation</source>
+            </trans-unit>
+            <trans-unit id="scheduler.missing">
+                <source>No scheduler task for %s. Without it nothing is evaluated and the findings stay as they are.</source>
+            </trans-unit>
+            <trans-unit id="scheduler.create">
+                <source>Create the missing tasks</source>
+            </trans-unit>
+            <trans-unit id="scheduler.unavailable">
+                <source>The scheduler extension is not installed. Alternatively call %s from cron.</source>
+            </trans-unit>
+            <trans-unit id="scheduler.created">
+                <source>%s scheduler task created.</source>
+            </trans-unit>
+            <trans-unit id="scheduler.createdMany">
+                <source>%s scheduler tasks created.</source>
+            </trans-unit>
+            <trans-unit id="detail.pending.title">
+                <source>Evaluation pending</source>
+            </trans-unit>
+            <trans-unit id="detail.pending.changed">
+                <source>New data has arrived that has not been judged yet. The findings below are from %s; the scheduler catches up within a few minutes.</source>
+            </trans-unit>
+            <trans-unit id="detail.pending.never">
+                <source>This instance has not been evaluated yet. The scheduler gets to it within a few minutes.</source>
+            </trans-unit>
+            <trans-unit id="detail.findings.count.report">
+                <source>%s from TYPO3's own checks</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>

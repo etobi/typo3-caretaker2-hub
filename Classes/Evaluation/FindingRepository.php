@@ -183,7 +183,7 @@ final class FindingRepository
      */
     public function countsForInstance(int $instance, int $tenant = 1): array
     {
-        $counts = ['security' => 0, 'update_safe' => 0, 'update_major' => 0, 'abandoned' => 0, 'unassessable' => 0];
+        $counts = ['security' => 0, 'update_safe' => 0, 'update_major' => 0, 'abandoned' => 0, 'unassessable' => 0, 'report' => 0];
 
         foreach ($this->rowsForInstance($instance, $tenant) as $row) {
             if ((int)$row['acknowledged'] === 1) {
@@ -228,7 +228,7 @@ final class FindingRepository
         $counts = [];
         foreach ($rows as $row) {
             $uid = (int)$row['instance'];
-            $counts[$uid] ??= ['security' => 0, 'securityHigh' => 0, 'typo3Unsupported' => 0, 'phpUnsupported' => 0, 'update_safe' => 0, 'update_major' => 0, 'abandoned' => 0, 'unassessable' => 0];
+            $counts[$uid] ??= ['security' => 0, 'securityHigh' => 0, 'typo3Unsupported' => 0, 'phpUnsupported' => 0, 'update_safe' => 0, 'update_major' => 0, 'abandoned' => 0, 'unassessable' => 0, 'report' => 0];
 
             $type = (string)$row['finding_type'];
             $amount = (int)$row['amount'];

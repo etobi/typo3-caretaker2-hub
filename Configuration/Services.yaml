@@ -4,6 +4,13 @@ services:
     autoconfigure: true
     public: false
 
+  # Wie die Provider im Agent: Jede Klasse, die EvaluatorInterface
+  # implementiert, wird automatisch mitgeprüft — auch aus einer fremden
+  # Extension.
+  _instanceof:
+    Caretaker2\Hub\Evaluation\EvaluatorInterface:
+      tags: ['caretaker2.evaluator']
+
   Caretaker2\Hub\:
     resource: '../Classes/*'
     exclude:
@@ -14,11 +21,17 @@ services:
       - '../Classes/Evaluation/Finding.php'
       - '../Classes/Evaluation/EvaluationResult.php'
       - '../Classes/Evaluation/EvaluationException.php'
+      - '../Classes/Evaluation/EvaluatorInterface.php'
+      - '../Classes/Scheduler/SchedulerTaskException.php'
 
   cache.caretaker2:
     class: TYPO3\CMS\Core\Cache\Frontend\FrontendInterface
     factory: ['@TYPO3\CMS\Core\Cache\CacheManager', 'getCache']
     arguments: ['caretaker2']
+
+  Caretaker2\Hub\Evaluation\EvaluationService:
+    arguments:
+      $evaluators: !tagged_iterator caretaker2.evaluator
 
   Caretaker2\Hub\Domain\Typo3MajorVersions:
     arguments:

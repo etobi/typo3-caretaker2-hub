@@ -6,18 +6,28 @@ namespace Caretaker2\Hub\Evaluation;
 
 use Caretaker2\Hub\Domain\Instance;
 use Caretaker2\Hub\Domain\InstanceRepository;
-use Caretaker2\Hub\Domain\PhpVersions;
-use Caretaker2\Hub\Domain\Typo3MajorVersions;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 
-final class EvaluationService
+/**
+ * Runs every evaluator over an instance and stores what they found.
+ *
+ * The service itself judges nothing — it collects. Each evaluator is asked in
+ * turn, and one that throws costs only its own findings: the failure becomes an
+ * unassessable finding and the rest still run. Anything else would let a
+ * network hiccup in the composer evaluation hide an end-of-life PHP.
+ */
+final class EvaluationService implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
+    /**
+     * @param iterable<EvaluatorInterface> $evaluators
+     */
     public function __construct(
-        private readonly ComposerEvaluator $evaluator,
-        private readonly FindingFactory $factory,
+        private readonly iterable $evaluators,
         private readonly FindingRepository $findings,
         private readonly InstanceRepository $instances,
-        private readonly Typo3MajorVersions $majorVersions,
-        private readonly PhpVersions $phpVersions,
     ) {}
 
     /**
@@ -31,17 +41,14 @@ final class EvaluationService
             throw new EvaluationException('Für diese Instanz liegt noch kein Inventar vor.');
         }
 
-        $result = $this->evaluator->evaluate($instance->uid, $instance->tenant, $inventory);
+        $findings = [];
+        foreach ($this->evaluators as $evaluator) {
+            foreach ($this->runOne($evaluator, $instance, $inventory) as $finding) {
+                $findings[] = $finding;
+            }
+        }
 
-        $counts = $this->findings->replaceForInstance(
-            $instance->uid,
-            $instance->tenant,
-            array_merge(
-                $this->factory->fromResult($result),
-                $this->versionFindings($instance),
-                $this->phpFindings($instance)
-            )
-        );
+        $counts = $this->findings->replaceForInstance($instance->uid, $instance->tenant, $findings);
 
         $this->instances->update($instance->uid, [
             'needs_evaluation' => 0,
@@ -52,130 +59,34 @@ final class EvaluationService
     }
 
     /**
-     * Der Support-Status der TYPO3-Fassung. Anders als die Composer-Befunde
-     * hängt er nicht an der Instanz, sondern am Kalender: Eine unveränderte
-     * Installation wird allein dadurch verwundbar, dass ein Datum verstreicht.
-     *
+     * @param array<string, mixed> $inventory
      * @return list<Finding>
      */
-    private function versionFindings(Instance $instance): array
+    private function runOne(EvaluatorInterface $evaluator, Instance $instance, array $inventory): array
     {
-        if ($instance->typo3Major <= 0) {
-            return [];
-        }
+        try {
+            return $evaluator->evaluate($instance, $inventory);
+        } catch (\Throwable $e) {
+            $this->logger?->warning('Evaluator fehlgeschlagen', [
+                'evaluator' => $evaluator->key(),
+                'instance' => $instance->uid,
+                'exception' => $e,
+            ]);
 
-        $status = $this->majorVersions->statusOf(
-            $instance->typo3Version !== '' ? $instance->typo3Version : (string)$instance->typo3Major
-        );
-        $version = 'TYPO3 ' . $instance->typo3Major;
-
-        // Im ELTS-Zeitraum, aber auf dem letzten frei veroeffentlichten Stand:
-        // die Instanz bekommt nichts. Das wiegt schwerer als ELTS zu fahren.
-        if ($status['status'] === Typo3MajorVersions::STATUS_ELTS_UNPATCHED) {
             return [new Finding(
-                type: Finding::TYPE_TYPO3_ELTS_UNPATCHED,
-                severity: 'high',
-                identifier: 'typo3-' . $instance->typo3Major,
-                package: 'typo3/cms-core',
-                installedVersion: $instance->typo3Version,
-                latestVersion: $status['latest'],
+                type: Finding::TYPE_UNASSESSABLE,
+                severity: 'info',
+                identifier: 'evaluator-' . $evaluator->key(),
+                package: '',
+                installedVersion: '',
+                latestVersion: '',
                 title: sprintf(
-                    '%s wird regulär nicht mehr gepflegt, und %s ist das letzte frei veröffentlichte Release. Sicherheitsupdates gibt es seither nur über ELTS%s — diese Instanz erhält keine.',
-                    $version,
-                    $status['lastPublic'],
-                    $status['eltsUntil'] !== null ? ', noch bis ' . date('d.m.Y', $status['eltsUntil']) : ''
+                    'Die Auswertung "%s" ist abgebrochen und hat nichts beigetragen: %s',
+                    $evaluator->key(),
+                    $e->getMessage()
                 ),
                 link: '',
             )];
         }
-
-        if ($status['status'] === Typo3MajorVersions::STATUS_ELTS) {
-            return [new Finding(
-                type: Finding::TYPE_TYPO3_ELTS,
-                severity: 'medium',
-                identifier: 'typo3-' . $instance->typo3Major,
-                package: 'typo3/cms-core',
-                installedVersion: $instance->typo3Version,
-                latestVersion: '',
-                title: sprintf(
-                    '%s wird regulär nicht mehr gepflegt. Sicherheitsupdates gibt es nur noch über ELTS%s.',
-                    $version,
-                    $status['eltsUntil'] !== null ? ', bis ' . date('d.m.Y', $status['eltsUntil']) : ''
-                ),
-                link: '',
-            )];
-        }
-
-        if ($status['status'] === Typo3MajorVersions::STATUS_UNSUPPORTED) {
-            return [new Finding(
-                type: Finding::TYPE_TYPO3_UNSUPPORTED,
-                severity: 'high',
-                identifier: 'typo3-' . $instance->typo3Major,
-                package: 'typo3/cms-core',
-                installedVersion: $instance->typo3Version,
-                latestVersion: '',
-                title: sprintf(
-                    '%s erhält keine Sicherheitsupdates mehr%s.',
-                    $version,
-                    $status['eltsUntil'] !== null ? ' — auch ELTS endete am ' . date('d.m.Y', $status['eltsUntil']) : ''
-                ),
-                link: 'https://typo3.org/cms/roadmap',
-            )];
-        }
-
-        return [];
-    }
-
-    /**
-     * Dasselbe Argument wie bei der TYPO3-Fassung, nur eine Ebene tiefer: Ein
-     * PHP-Zweig ohne Sicherheitsfixes reißt die Anwendung auf, ganz gleich wie
-     * gepflegt sie selbst ist.
-     *
-     * @return list<Finding>
-     */
-    private function phpFindings(Instance $instance): array
-    {
-        if ($instance->phpVersion === '') {
-            return [];
-        }
-
-        $status = $this->phpVersions->statusOf($instance->phpVersion);
-        $branch = 'PHP ' . $status['cycle'];
-
-        if ($status['status'] === PhpVersions::STATUS_EOL) {
-            return [new Finding(
-                type: Finding::TYPE_PHP_EOL,
-                severity: 'high',
-                identifier: 'php-' . $status['cycle'],
-                package: 'php',
-                installedVersion: $instance->phpVersion,
-                latestVersion: $status['latest'],
-                title: sprintf(
-                    '%s erhält keine Sicherheitsfixes mehr%s.',
-                    $branch,
-                    $status['eolUntil'] !== null ? ' — der Zweig endete am ' . date('d.m.Y', $status['eolUntil']) : ''
-                ),
-                link: 'https://www.php.net/supported-versions.php',
-            )];
-        }
-
-        if ($status['status'] === PhpVersions::STATUS_SECURITY) {
-            return [new Finding(
-                type: Finding::TYPE_PHP_SECURITY_ONLY,
-                severity: 'medium',
-                identifier: 'php-' . $status['cycle'],
-                package: 'php',
-                installedVersion: $instance->phpVersion,
-                latestVersion: $status['latest'],
-                title: sprintf(
-                    '%s bekommt nur noch Sicherheitsfixes%s.',
-                    $branch,
-                    $status['eolUntil'] !== null ? ', bis ' . date('d.m.Y', $status['eolUntil']) : ''
-                ),
-                link: 'https://www.php.net/supported-versions.php',
-            )];
-        }
-
-        return [];
     }
 }

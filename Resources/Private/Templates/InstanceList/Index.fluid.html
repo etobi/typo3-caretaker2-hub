@@ -8,6 +8,37 @@
 
     <h1><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.heading"/></h1>
 
+    <f:if condition="{message}">
+        <div class="callout callout-{messageSeverity}">
+            <div class="callout-content">
+                <div class="callout-body">{message}</div>
+            </div>
+        </div>
+    </f:if>
+
+    <f:if condition="{missingTasks}">
+        <div class="callout callout-warning">
+            <div class="callout-content">
+                <div class="callout-title"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:scheduler.title"/></div>
+                <div class="callout-body">
+                    <f:if condition="{schedulerAvailable}">
+                        <f:then>
+                            <p><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:scheduler.missing" arguments="{0: '{missingTasks}'}"/></p>
+                            <form method="post" class="mb-0">
+                                <button type="submit" name="installTasks" value="1" class="btn btn-default">
+                                    <f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:scheduler.create"/>
+                                </button>
+                            </form>
+                        </f:then>
+                        <f:else>
+                            <p class="mb-0"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:scheduler.unavailable" arguments="{0: '{missingTasks}'}"/></p>
+                        </f:else>
+                    </f:if>
+                </div>
+            </div>
+        </div>
+    </f:if>
+
     <f:if condition="{enrollmentCode}">
         <div class="callout callout-success">
             <div class="callout-content">
@@ -123,6 +154,9 @@
                                         </f:if>
                                         <f:if condition="{instance.findings.update_major}">
                                             <span class="badge badge-info" title="{f:translate(key: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.findings.updateMajor')}">{instance.findings.update_major}</span>
+                                        </f:if>
+                                        <f:if condition="{instance.findings.report}">
+                                            <span class="badge badge-secondary" title="{f:translate(key: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.findings.report')}">{instance.findings.report}</span>
                                         </f:if>
                                     </td>
                                     <td class="col-nowrap">

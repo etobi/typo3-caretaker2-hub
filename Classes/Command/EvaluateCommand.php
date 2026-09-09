@@ -31,11 +31,15 @@ final class EvaluateCommand extends Command
         $this
             ->setDescription('Wertet die Composer-Daten der Instanzen aus und schreibt Befunde')
             ->addOption('instance', 'i', InputOption::VALUE_REQUIRED, 'Nur diese Instanz auswerten')
+            // Voreinstellung ist die Warteschlange, nicht der Rundumschlag: Der
+            // Befehl läuft im Scheduler alle fünf Minuten, und v14 speichert
+            // für einen Konsolen-Task keine Optionen mit — was voreingestellt
+            // ist, ist damit auch das, was tatsächlich läuft.
             ->addOption(
-                'pending',
-                'p',
+                'all',
+                'a',
                 InputOption::VALUE_NONE,
-                'Nur Instanzen auswerten, deren Inventar sich geändert hat oder deren Auswertung zu alt ist'
+                'Alle Instanzen auswerten, unabhängig von Änderung und Alter'
             )
             ->addOption(
                 'max-age',
@@ -61,13 +65,13 @@ final class EvaluateCommand extends Command
 
         if ($only !== null) {
             $instances = array_values(array_filter([$this->instances->findByUid((int)$only)]));
-        } elseif ($input->getOption('pending')) {
+        } elseif ($input->getOption('all')) {
+            $instances = $this->instances->findAll();
+        } else {
             $instances = $this->instances->findPendingEvaluation(
                 max(1, (int)$input->getOption('max-age')) * 3600,
                 max(1, (int)$input->getOption('limit'))
             );
-        } else {
-            $instances = $this->instances->findAll();
         }
 
         if ($instances === []) {

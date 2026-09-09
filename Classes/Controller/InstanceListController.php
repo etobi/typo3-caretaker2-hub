@@ -12,9 +12,9 @@ use Caretaker2\Hub\Domain\PhpVersions;
 use Caretaker2\Hub\Domain\SnapshotRepository;
 use Caretaker2\Hub\Domain\TriggerClient;
 use Caretaker2\Hub\Domain\Typo3MajorVersions;
-use Caretaker2\Hub\Evaluation\EvaluationException;
-use Caretaker2\Hub\Evaluation\EvaluationService;
 use Caretaker2\Hub\Evaluation\FindingRepository;
+use Caretaker2\Hub\Scheduler\HubTaskInstaller;
+use Caretaker2\Hub\Scheduler\SchedulerTaskException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Attribute\AsController;
@@ -53,13 +53,13 @@ final class InstanceListController
         private readonly UriBuilder $uriBuilder,
         private readonly TriggerClient $triggerClient,
         private readonly FindingRepository $findings,
-        private readonly EvaluationService $evaluation,
         private readonly PageRenderer $pageRenderer,
         private readonly GroupRepository $groups,
         private readonly Typo3MajorVersions $majorVersions,
         private readonly PhpVersions $phpVersions,
         private readonly ComponentFactory $components,
         private readonly IconFactory $icons,
+        private readonly HubTaskInstaller $tasks,
     ) {}
 
     public function handleRequest(ServerRequestInterface $request): ResponseInterface
@@ -125,22 +125,6 @@ final class InstanceListController
             $messageSeverity = 'info';
         }
 
-        if (!$readOnly && $request->getMethod() === 'POST' && ($request->getParsedBody()['evaluate'] ?? null) !== null) {
-            try {
-                $counts = $this->evaluation->evaluate($instance);
-                $message = $this->ll(
-                    'message.evaluated',
-                    $counts['added'],
-                    $counts['kept'],
-                    $counts['resolved']
-                );
-                $messageSeverity = 'success';
-            } catch (EvaluationException $e) {
-                $message = $e->getMessage();
-                $messageSeverity = 'danger';
-            }
-        }
-
         if (!$readOnly && $request->getMethod() === 'POST' && ($request->getParsedBody()['trigger'] ?? null) !== null) {
             [$ok, $message] = $this->triggerClient->trigger($instance);
             $messageSeverity = $ok ? 'success' : 'warning';
@@ -157,7 +141,6 @@ final class InstanceListController
 
         if (!$readOnly) {
             $this->addSubmitButton($view, 'caretaker2-actions', 'trigger', $this->ll('detail.button.refresh'), 'actions-refresh');
-            $this->addSubmitButton($view, 'caretaker2-actions', 'evaluate', $this->ll('detail.button.evaluate'), 'actions-search');
         }
 
         $view->getDocHeaderComponent()->setBreadcrumbContext(
@@ -201,6 +184,10 @@ final class InstanceListController
             'snapshotCount' => $this->snapshots->countForInstance($instanceId),
             'message' => $message,
             'messageSeverity' => $messageSeverity,
+            // Nothing here is evaluated on the spot — the scheduler does that.
+            // Saying so beats letting someone read stale findings as current.
+            'evaluationPending' => $instance->needsEvaluation || $instance->evaluatedAt === 0,
+            'evaluatedAt' => $instance->evaluatedAt,
             'findings' => $this->presentFindings($open),
             'acknowledgedFindings' => $this->presentFindings($acknowledged),
             'findingCounts' => $this->findings->countsForInstance($instanceId),
@@ -218,6 +205,22 @@ final class InstanceListController
         $enrollmentCode = null;
         if ($request->getMethod() === 'POST' && ($request->getParsedBody()['createCode'] ?? null) !== null) {
             $enrollmentCode = $this->enrollment->createCode();
+        }
+
+        $message = null;
+        $messageSeverity = 'info';
+
+        if ($request->getMethod() === 'POST' && ($request->getParsedBody()['installTasks'] ?? null) !== null) {
+            try {
+                $created = $this->tasks->installMissing();
+                $message = $created === 1
+                    ? $this->ll('scheduler.created', $created)
+                    : $this->ll('scheduler.createdMany', $created);
+                $messageSeverity = 'success';
+            } catch (SchedulerTaskException $e) {
+                $message = $e->getMessage();
+                $messageSeverity = 'danger';
+            }
         }
 
         $view->assign('hubUrl', $this->publicHubUrl($request));
@@ -271,6 +274,10 @@ final class InstanceListController
             'showGroupHeadings' => count($groups) > 1 || ($groups[0]['uid'] ?? 0) !== 0,
             'summary' => $this->summarize($instances, $now),
             'enrollmentCode' => $enrollmentCode,
+            'schedulerAvailable' => $this->tasks->isAvailable(),
+            'missingTasks' => implode(', ', $this->tasks->missing()),
+            'message' => $message,
+            'messageSeverity' => $messageSeverity,
         ]);
 
         return $view->renderResponse('InstanceList/Index');
@@ -440,7 +447,7 @@ final class InstanceListController
         $types = [
             'security', 'update_safe', 'update_major', 'abandoned', 'unassessable',
             'typo3_elts', 'typo3_elts_unpatched', 'php_security_only', 'php_eol',
-            'typo3_unsupported',
+            'typo3_unsupported', 'report',
         ];
         $typeLabels = [];
         foreach ($types as $type) {

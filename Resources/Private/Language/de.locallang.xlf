@@ -519,6 +519,54 @@
                 <source>The instance reported, unchanged.</source>
                 <target>Die Instanz hat gemeldet, unverändert.</target>
             </trans-unit>
+            <trans-unit id="finding.type.report" approved="yes">
+                <source>TYPO3 check</source>
+                <target>TYPO3-Prüfung</target>
+            </trans-unit>
+            <trans-unit id="list.findings.report" approved="yes">
+                <source>Findings from TYPO3's own checks</source>
+                <target>Befunde aus TYPO3s eigenen Prüfungen</target>
+            </trans-unit>
+            <trans-unit id="scheduler.title" approved="yes">
+                <source>Scheduled evaluation</source>
+                <target>Automatische Auswertung</target>
+            </trans-unit>
+            <trans-unit id="scheduler.missing" approved="yes">
+                <source>No scheduler task for %s. Without it nothing is evaluated and the findings stay as they are.</source>
+                <target>Kein Scheduler-Task für %s. Ohne ihn wird nichts ausgewertet, und die Befunde bleiben stehen, wie sie sind.</target>
+            </trans-unit>
+            <trans-unit id="scheduler.create" approved="yes">
+                <source>Create the missing tasks</source>
+                <target>Fehlende Tasks anlegen</target>
+            </trans-unit>
+            <trans-unit id="scheduler.unavailable" approved="yes">
+                <source>The scheduler extension is not installed. Alternatively call %s from cron.</source>
+                <target>Die Extension scheduler ist nicht installiert. Alternativ %s per Cron aufrufen.</target>
+            </trans-unit>
+            <trans-unit id="scheduler.created" approved="yes">
+                <source>%s scheduler task created.</source>
+                <target>%s Scheduler-Task angelegt.</target>
+            </trans-unit>
+            <trans-unit id="scheduler.createdMany" approved="yes">
+                <source>%s scheduler tasks created.</source>
+                <target>%s Scheduler-Tasks angelegt.</target>
+            </trans-unit>
+            <trans-unit id="detail.pending.title" approved="yes">
+                <source>Evaluation pending</source>
+                <target>Auswertung steht aus</target>
+            </trans-unit>
+            <trans-unit id="detail.pending.changed" approved="yes">
+                <source>New data has arrived that has not been judged yet. The findings below are from %s; the scheduler catches up within a few minutes.</source>
+                <target>Es sind neue Daten eingetroffen, die noch nicht bewertet wurden. Die Befunde unten stammen vom %s; der Scheduler holt das binnen weniger Minuten nach.</target>
+            </trans-unit>
+            <trans-unit id="detail.pending.never" approved="yes">
+                <source>This instance has not been evaluated yet. The scheduler gets to it within a few minutes.</source>
+                <target>Diese Instanz wurde noch nicht ausgewertet. Der Scheduler kommt binnen weniger Minuten dazu.</target>
+            </trans-unit>
+            <trans-unit id="detail.findings.count.report" approved="yes">
+                <source>%s from TYPO3's own checks</source>
+                <target>%s aus TYPO3s Prüfungen</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

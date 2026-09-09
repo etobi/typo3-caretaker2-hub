@@ -16,6 +16,7 @@ final readonly class Finding
     public const TYPE_TYPO3_UNSUPPORTED = 'typo3_unsupported';
     public const TYPE_PHP_SECURITY_ONLY = 'php_security_only';
     public const TYPE_PHP_EOL = 'php_eol';
+    public const TYPE_REPORT = 'report';
 
     public function __construct(
         public string $type,
