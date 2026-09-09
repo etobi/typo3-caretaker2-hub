@@ -40,7 +40,9 @@ use TYPO3\CMS\Core\Page\PageRenderer;
 #[AsController]
 final class InstanceListController
 {
-    private const LL = 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:';
+    private const LANGUAGE_FILE = 'EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf';
+
+    private const LL = 'LLL:' . self::LANGUAGE_FILE . ':';
     private const ROUTE = 'caretaker2_instances';
 
     private const MAX_RENDERED_VALUE_BYTES = 8192;
@@ -134,6 +136,9 @@ final class InstanceListController
             $instance = $this->instances->findByUid($instanceId) ?? $instance;
         }
 
+        // The modals are built in JavaScript, so their labels have to travel
+        // with the page rather than through the Fluid template.
+        $this->pageRenderer->addInlineLanguageLabelFile(self::LANGUAGE_FILE);
         $this->pageRenderer->loadJavaScriptModule('@caretaker2/hub/acknowledge.js');
 
         $view = $this->moduleTemplateFactory->create($request);
@@ -226,6 +231,7 @@ final class InstanceListController
         $view->assign('hubUrl', $this->publicHubUrl($request));
 
         $enrollUri = (string)$this->uriBuilder->buildUriFromRoute('ajax_caretaker2_enrollment_code');
+        $this->pageRenderer->addInlineLanguageLabelFile(self::LANGUAGE_FILE);
         $this->pageRenderer->loadJavaScriptModule('@caretaker2/hub/enroll.js');
 
         $view->addButtonToButtonBar(

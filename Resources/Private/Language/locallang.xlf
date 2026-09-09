@@ -426,6 +426,60 @@
             <trans-unit id="detail.findings.count.report">
                 <source>%s from TYPO3's own checks</source>
             </trans-unit>
+            <trans-unit id="js.cancel">
+                <source>Cancel</source>
+            </trans-unit>
+            <trans-unit id="js.close">
+                <source>Close</source>
+            </trans-unit>
+            <trans-unit id="js.copy">
+                <source>Copy</source>
+            </trans-unit>
+            <trans-unit id="js.copy.done">
+                <source>Copied</source>
+            </trans-unit>
+            <trans-unit id="js.copy.unavailable">
+                <source>Copying not available</source>
+            </trans-unit>
+            <trans-unit id="js.copy.failed">
+                <source>Copying failed</source>
+            </trans-unit>
+            <trans-unit id="js.copy.manually">
+                <source>Please select the value by hand.</source>
+            </trans-unit>
+            <trans-unit id="js.ack.nothingSelected">
+                <source>Nothing selected</source>
+            </trans-unit>
+            <trans-unit id="js.ack.nothingSelectedBody">
+                <source>Tick the rows that are to be acknowledged first.</source>
+            </trans-unit>
+            <trans-unit id="js.ack.title">
+                <source>Acknowledge findings</source>
+            </trans-unit>
+            <trans-unit id="js.ack.introOne">
+                <source>You are acknowledging one finding. Acknowledged findings leave the traffic light for good — there is no deadline. If one gets more severe later, it comes back on its own.</source>
+            </trans-unit>
+            <trans-unit id="js.ack.introMany">
+                <source>You are acknowledging %s findings. Acknowledged findings leave the traffic light for good — there is no deadline. If one gets more severe later, it comes back on its own.</source>
+            </trans-unit>
+            <trans-unit id="js.ack.noteLabel">
+                <source>Why are they being ignored?</source>
+            </trans-unit>
+            <trans-unit id="js.ack.notePlaceholder">
+                <source>e.g. customer will not pay for a major update, rebuild planned for Q2</source>
+            </trans-unit>
+            <trans-unit id="js.ack.confirm">
+                <source>Acknowledge</source>
+            </trans-unit>
+            <trans-unit id="js.enroll.intro">
+                <source>Enter both in the Caretaker2 backend module of the instance. The code is valid for %s minutes and can be redeemed exactly once.</source>
+            </trans-unit>
+            <trans-unit id="js.enroll.failed">
+                <source>Could not create a code</source>
+            </trans-unit>
+            <trans-unit id="js.enroll.failedBody">
+                <source>Please try again. If it stays that way, the reason is in the hub's log.</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>

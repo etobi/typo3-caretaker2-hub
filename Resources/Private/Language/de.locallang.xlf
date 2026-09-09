@@ -567,6 +567,78 @@
                 <source>%s from TYPO3's own checks</source>
                 <target>%s aus TYPO3s Prüfungen</target>
             </trans-unit>
+            <trans-unit id="js.cancel" approved="yes">
+                <source>Cancel</source>
+                <target>Abbrechen</target>
+            </trans-unit>
+            <trans-unit id="js.close" approved="yes">
+                <source>Close</source>
+                <target>Schließen</target>
+            </trans-unit>
+            <trans-unit id="js.copy" approved="yes">
+                <source>Copy</source>
+                <target>Kopieren</target>
+            </trans-unit>
+            <trans-unit id="js.copy.done" approved="yes">
+                <source>Copied</source>
+                <target>Kopiert</target>
+            </trans-unit>
+            <trans-unit id="js.copy.unavailable" approved="yes">
+                <source>Copying not available</source>
+                <target>Kopieren nicht verfügbar</target>
+            </trans-unit>
+            <trans-unit id="js.copy.failed" approved="yes">
+                <source>Copying failed</source>
+                <target>Kopieren nicht möglich</target>
+            </trans-unit>
+            <trans-unit id="js.copy.manually" approved="yes">
+                <source>Please select the value by hand.</source>
+                <target>Bitte den Wert von Hand markieren.</target>
+            </trans-unit>
+            <trans-unit id="js.ack.nothingSelected" approved="yes">
+                <source>Nothing selected</source>
+                <target>Nichts ausgewählt</target>
+            </trans-unit>
+            <trans-unit id="js.ack.nothingSelectedBody" approved="yes">
+                <source>Tick the rows that are to be acknowledged first.</source>
+                <target>Bitte zuerst die Zeilen ankreuzen, die quittiert werden sollen.</target>
+            </trans-unit>
+            <trans-unit id="js.ack.title" approved="yes">
+                <source>Acknowledge findings</source>
+                <target>Befunde quittieren</target>
+            </trans-unit>
+            <trans-unit id="js.ack.introOne" approved="yes">
+                <source>You are acknowledging one finding. Acknowledged findings leave the traffic light for good — there is no deadline. If one gets more severe later, it comes back on its own.</source>
+                <target>Sie quittieren einen Befund. Quittierte Befunde verschwinden dauerhaft aus der Ampel — ohne Frist. Wird einer später schwerwiegender, taucht er von selbst wieder auf.</target>
+            </trans-unit>
+            <trans-unit id="js.ack.introMany" approved="yes">
+                <source>You are acknowledging %s findings. Acknowledged findings leave the traffic light for good — there is no deadline. If one gets more severe later, it comes back on its own.</source>
+                <target>Sie quittieren %s Befunde. Quittierte Befunde verschwinden dauerhaft aus der Ampel — ohne Frist. Wird einer später schwerwiegender, taucht er von selbst wieder auf.</target>
+            </trans-unit>
+            <trans-unit id="js.ack.noteLabel" approved="yes">
+                <source>Why are they being ignored?</source>
+                <target>Warum werden sie ignoriert?</target>
+            </trans-unit>
+            <trans-unit id="js.ack.notePlaceholder" approved="yes">
+                <source>e.g. customer will not pay for a major update, rebuild planned for Q2</source>
+                <target>z.B. Kunde zahlt kein Major-Update, Neubau für Q2 geplant</target>
+            </trans-unit>
+            <trans-unit id="js.ack.confirm" approved="yes">
+                <source>Acknowledge</source>
+                <target>Quittieren</target>
+            </trans-unit>
+            <trans-unit id="js.enroll.intro" approved="yes">
+                <source>Enter both in the Caretaker2 backend module of the instance. The code is valid for %s minutes and can be redeemed exactly once.</source>
+                <target>Im Backend-Modul Caretaker2 der Instanz beides eintragen. Der Code ist %s Minuten gültig und lässt sich genau einmal einlösen.</target>
+            </trans-unit>
+            <trans-unit id="js.enroll.failed" approved="yes">
+                <source>Could not create a code</source>
+                <target>Code konnte nicht erzeugt werden</target>
+            </trans-unit>
+            <trans-unit id="js.enroll.failedBody" approved="yes">
+                <source>Please try again. If it stays that way, the reason is in the hub's log.</source>
+                <target>Bitte erneut versuchen. Bleibt es dabei, steht der Grund im Log des Hubs.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

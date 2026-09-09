@@ -2,6 +2,7 @@ import Modal from '@typo3/backend/modal.js';
 import Notification from '@typo3/backend/notification.js';
 import AjaxRequest from '@typo3/core/ajax/ajax-request.js';
 import { SeverityEnum } from '@typo3/backend/enum/severity.js';
+import { lll } from '@typo3/core/lit-helper.js';
 import { html } from 'lit';
 
 /**
@@ -25,13 +26,13 @@ const copy = (event, value) => {
   const clipboard = event.target.ownerDocument.defaultView?.navigator?.clipboard;
 
   if (!clipboard) {
-    Notification.warning('Kopieren nicht verfügbar', 'Bitte den Wert von Hand markieren.', 6);
+    Notification.warning(lll('js.copy.unavailable'), lll('js.copy.manually'), 6);
     return;
   }
 
   clipboard.writeText(value)
-    .then(() => Notification.success('Kopiert', '', 2))
-    .catch(() => Notification.warning('Kopieren nicht möglich', 'Bitte den Wert von Hand markieren.', 6));
+    .then(() => Notification.success(lll('js.copy.done'), '', 2))
+    .catch(() => Notification.warning(lll('js.copy.failed'), lll('js.copy.manually'), 6));
 };
 
 const field = (label, value) => html`
@@ -41,24 +42,23 @@ const field = (label, value) => html`
       <input type="text" class="form-control" readonly value=${value}
              @focus=${(event) => event.target.select()}>
       <button type="button" class="btn btn-default"
-              @click=${(event) => copy(event, value)}>Kopieren</button>
+              @click=${(event) => copy(event, value)}>${lll('js.copy')}</button>
     </div>
   </div>
 `;
 
 const show = (data) => {
   Modal.advanced({
-    title: 'Instanz verbinden',
+    title: lll('list.enroll.title'),
     severity: SeverityEnum.ok,
     size: Modal.sizes.medium,
     content: html`
-      <p>Beides im Backend-Modul <strong>Caretaker2</strong> der Instanz eintragen.
-      Der Code ist ${data.validMinutes} Minuten gültig und lässt sich genau einmal einlösen.</p>
-      ${field('Adresse des Hubs', data.hubUrl)}
-      ${field('Code', data.code)}
+      <p>${lll('js.enroll.intro', data.validMinutes)}</p>
+      ${field(lll('list.enroll.hubUrl'), data.hubUrl)}
+      ${field(lll('list.enroll.code'), data.code)}
     `,
     buttons: [
-      { text: 'Schließen', btnClass: 'btn-default', active: true, name: 'close', trigger: (event, modal) => modal.hideModal() },
+      { text: lll('js.close'), btnClass: 'btn-default', active: true, name: 'close', trigger: (event, modal) => modal.hideModal() },
     ],
   });
 };
@@ -70,10 +70,7 @@ document.querySelectorAll('[data-caretaker2-enroll]').forEach((button) => {
 
     new AjaxRequest(button.dataset.caretaker2Enroll).post({})
       .then(async (response) => show(await response.resolve()))
-      .catch(() => Notification.error(
-        'Code konnte nicht erzeugt werden',
-        'Bitte erneut versuchen. Bleibt es dabei, steht der Grund im Log des Hubs.',
-      ))
+      .catch(() => Notification.error(lll('js.enroll.failed'), lll('js.enroll.failedBody')))
       .finally(() => { button.disabled = false; });
   });
 });
