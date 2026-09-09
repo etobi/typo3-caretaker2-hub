@@ -55,9 +55,12 @@ final class ApiMiddleware implements MiddlewareInterface, LoggerAwareInterface
                 ? $this->handleEnroll($payload)
                 : $this->handleInventory($request, $payload);
         } catch (\Throwable $e) {
+            // The detail goes to the log. The client is not authenticated on
+            // the enroll path, and an exception message can carry paths and
+            // table names.
             $this->logger?->error('The Caretaker2 API failed', ['exception' => $e]);
 
-            return $this->error('Internal error in the hub: ' . $e->getMessage(), 500);
+            return $this->error('Internal error in the hub. See the hub log for details.', 500);
         }
     }
 
