@@ -121,7 +121,11 @@ CREATE TABLE tx_caretaker2_finding (
     installed_version varchar(64) DEFAULT '' NOT NULL,
     latest_version varchar(64) DEFAULT '' NOT NULL,
 
+    # Entweder ein fertiger Satz — Advisory-Titel von Packagist, Meldungen aus
+    # TYPO3s eigenen Prüfungen — oder ein LLL-Schlüssel, dessen Platzhalter aus
+    # title_args gefüllt werden. Übersetzt wird erst bei der Anzeige.
     title text,
+    title_args text,
     link varchar(2048) DEFAULT '' NOT NULL,
 
     first_seen int(11) unsigned DEFAULT 0 NOT NULL,

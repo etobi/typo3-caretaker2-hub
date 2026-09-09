@@ -639,6 +639,78 @@
                 <source>Please try again. If it stays that way, the reason is in the hub's log.</source>
                 <target>Bitte erneut versuchen. Bleibt es dabei, steht der Grund im Log des Hubs.</target>
             </trans-unit>
+            <trans-unit id="finding.title.update_safe" approved="yes">
+                <source>Update available within the constraint</source>
+                <target>Update im Rahmen des Constraints möglich</target>
+            </trans-unit>
+            <trans-unit id="finding.title.update_major" approved="yes">
+                <source>A newer version exists, the constraint would have to change</source>
+                <target>Neuere Version vorhanden, der Constraint müsste geändert werden</target>
+            </trans-unit>
+            <trans-unit id="finding.title.abandoned" approved="yes">
+                <source>No longer maintained, successor: %s</source>
+                <target>Nicht mehr gepflegt, Nachfolger: %s</target>
+            </trans-unit>
+            <trans-unit id="finding.title.abandonedNoSuccessor" approved="yes">
+                <source>No longer maintained, no successor named</source>
+                <target>Nicht mehr gepflegt, kein Nachfolger benannt</target>
+            </trans-unit>
+            <trans-unit id="finding.title.repositoryUnreachable" approved="yes">
+                <source>Repository "%s" cannot be reached from the hub and was not assessed.</source>
+                <target>Repository "%s" ist vom Hub aus nicht erreichbar und wurde nicht bewertet.</target>
+            </trans-unit>
+            <trans-unit id="finding.title.typo3.eltsUnpatched" approved="yes">
+                <source>TYPO3 %s is no longer regularly maintained, and %s is the last freely published release. Security updates have come through ELTS only since then, until %s — this instance receives none.</source>
+                <target>TYPO3 %s wird regulär nicht mehr gepflegt, und %s ist das letzte frei veröffentlichte Release. Sicherheitsupdates gibt es seither nur über ELTS, noch bis %s — diese Instanz erhält keine.</target>
+            </trans-unit>
+            <trans-unit id="finding.title.typo3.eltsUnpatchedUndated" approved="yes">
+                <source>TYPO3 %s is no longer regularly maintained, and %s is the last freely published release. Security updates have come through ELTS only since then — this instance receives none.</source>
+                <target>TYPO3 %s wird regulär nicht mehr gepflegt, und %s ist das letzte frei veröffentlichte Release. Sicherheitsupdates gibt es seither nur über ELTS — diese Instanz erhält keine.</target>
+            </trans-unit>
+            <trans-unit id="finding.title.typo3.elts" approved="yes">
+                <source>TYPO3 %s is no longer regularly maintained. Security updates come through ELTS only, until %s.</source>
+                <target>TYPO3 %s wird regulär nicht mehr gepflegt. Sicherheitsupdates gibt es nur noch über ELTS, bis %s.</target>
+            </trans-unit>
+            <trans-unit id="finding.title.typo3.eltsUndated" approved="yes">
+                <source>TYPO3 %s is no longer regularly maintained. Security updates come through ELTS only.</source>
+                <target>TYPO3 %s wird regulär nicht mehr gepflegt. Sicherheitsupdates gibt es nur noch über ELTS.</target>
+            </trans-unit>
+            <trans-unit id="finding.title.typo3.unsupported" approved="yes">
+                <source>TYPO3 %s receives no security updates any more — ELTS ended on %s as well.</source>
+                <target>TYPO3 %s erhält keine Sicherheitsupdates mehr — auch ELTS endete am %s.</target>
+            </trans-unit>
+            <trans-unit id="finding.title.typo3.unsupportedUndated" approved="yes">
+                <source>TYPO3 %s receives no security updates any more.</source>
+                <target>TYPO3 %s erhält keine Sicherheitsupdates mehr.</target>
+            </trans-unit>
+            <trans-unit id="finding.title.php.eol" approved="yes">
+                <source>PHP %s receives no security fixes any more — the branch ended on %s.</source>
+                <target>PHP %s erhält keine Sicherheitsfixes mehr — der Zweig endete am %s.</target>
+            </trans-unit>
+            <trans-unit id="finding.title.php.eolUndated" approved="yes">
+                <source>PHP %s receives no security fixes any more.</source>
+                <target>PHP %s erhält keine Sicherheitsfixes mehr.</target>
+            </trans-unit>
+            <trans-unit id="finding.title.php.securityOnly" approved="yes">
+                <source>PHP %s only gets security fixes, until %s.</source>
+                <target>PHP %s bekommt nur noch Sicherheitsfixes, bis %s.</target>
+            </trans-unit>
+            <trans-unit id="finding.title.php.securityOnlyUndated" approved="yes">
+                <source>PHP %s only gets security fixes.</source>
+                <target>PHP %s bekommt nur noch Sicherheitsfixes.</target>
+            </trans-unit>
+            <trans-unit id="finding.title.reports.incomplete" approved="yes">
+                <source>TYPO3's own checks are only partly available: %s</source>
+                <target>TYPO3s eigene Prüfungen liegen nur unvollständig vor: %s</target>
+            </trans-unit>
+            <trans-unit id="finding.title.reports.none" approved="yes">
+                <source>TYPO3's own checks looked at nothing in this instance — that is a gap, not an all-clear.</source>
+                <target>TYPO3s eigene Prüfungen haben in dieser Instanz nichts geprüft — das ist keine Entwarnung, sondern eine Lücke.</target>
+            </trans-unit>
+            <trans-unit id="finding.title.evaluatorFailed" approved="yes">
+                <source>The "%s" evaluation broke off and contributed nothing: %s</source>
+                <target>Die Auswertung "%s" ist abgebrochen und hat nichts beigetragen: %s</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

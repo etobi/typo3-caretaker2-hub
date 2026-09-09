@@ -4,6 +4,15 @@ declare(strict_types=1);
 
 namespace Caretaker2\Hub\Evaluation;
 
+/**
+ * One thing that is wrong with an instance.
+ *
+ * The title is either finished text we did not write — an advisory title from
+ * Packagist, a message from TYPO3's own checks — or an LLL key of ours whose
+ * placeholders come from titleArguments. Findings are stored, so a translated
+ * sentence would freeze the language of whoever ran the evaluation; a key does
+ * not.
+ */
 final readonly class Finding
 {
     public const TYPE_SECURITY = 'security';
@@ -27,6 +36,8 @@ final readonly class Finding
         public string $latestVersion,
         public string $title,
         public string $link,
+        /** @var list<string> */
+        public array $titleArguments = [],
     ) {}
 
     /**
@@ -42,6 +53,7 @@ final readonly class Finding
             'installed_version' => $this->installedVersion,
             'latest_version' => $this->latestVersion,
             'title' => $this->title,
+            'title_args' => $this->titleArguments === [] ? '' : json_encode($this->titleArguments),
             'link' => $this->link,
         ];
     }

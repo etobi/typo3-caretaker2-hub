@@ -54,11 +54,9 @@ final class ReportFindings implements EvaluatorInterface
                 package: 'typo3/cms-reports',
                 installedVersion: '',
                 latestVersion: '',
-                title: sprintf(
-                    'TYPO3s eigene Prüfungen liegen nur unvollständig vor: %s',
-                    (string)($provider['message'] ?? $provider['reason'] ?? $status)
-                ),
+                title: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.reports.incomplete',
                 link: '',
+                titleArguments: [(string)($provider['message'] ?? $provider['reason'] ?? $status)],
             )];
         }
 
@@ -73,7 +71,7 @@ final class ReportFindings implements EvaluatorInterface
                 package: 'typo3/cms-reports',
                 installedVersion: '',
                 latestVersion: '',
-                title: 'TYPO3s eigene Prüfungen haben in dieser Instanz nichts geprüft — das ist keine Entwarnung, sondern eine Lücke.',
+                title: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.reports.none',
                 link: '',
             )];
         }

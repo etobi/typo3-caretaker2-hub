@@ -36,8 +36,6 @@ final class Typo3VersionFindings implements EvaluatorInterface
         $status = $this->majorVersions->statusOf(
             $instance->typo3Version !== '' ? $instance->typo3Version : (string)$instance->typo3Major
         );
-        $version = 'TYPO3 ' . $instance->typo3Major;
-
         // Im ELTS-Zeitraum, aber auf dem letzten frei veroeffentlichten Stand:
         // die Instanz bekommt nichts. Das wiegt schwerer als ELTS zu fahren.
         if ($status['status'] === Typo3MajorVersions::STATUS_ELTS_UNPATCHED) {
@@ -48,13 +46,13 @@ final class Typo3VersionFindings implements EvaluatorInterface
                 package: 'typo3/cms-core',
                 installedVersion: $instance->typo3Version,
                 latestVersion: $status['latest'],
-                title: sprintf(
-                    '%s wird regulär nicht mehr gepflegt, und %s ist das letzte frei veröffentlichte Release. Sicherheitsupdates gibt es seither nur über ELTS%s — diese Instanz erhält keine.',
-                    $version,
-                    $status['lastPublic'],
-                    $status['eltsUntil'] !== null ? ', noch bis ' . date('d.m.Y', $status['eltsUntil']) : ''
-                ),
+                title: $status['eltsUntil'] !== null
+                    ? 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.typo3.eltsUnpatched'
+                    : 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.typo3.eltsUnpatchedUndated',
                 link: '',
+                titleArguments: $status['eltsUntil'] !== null
+                    ? [(string)$instance->typo3Major, $status['lastPublic'], date('d.m.Y', $status['eltsUntil'])]
+                    : [(string)$instance->typo3Major, $status['lastPublic']],
             )];
         }
 
@@ -66,12 +64,13 @@ final class Typo3VersionFindings implements EvaluatorInterface
                 package: 'typo3/cms-core',
                 installedVersion: $instance->typo3Version,
                 latestVersion: '',
-                title: sprintf(
-                    '%s wird regulär nicht mehr gepflegt. Sicherheitsupdates gibt es nur noch über ELTS%s.',
-                    $version,
-                    $status['eltsUntil'] !== null ? ', bis ' . date('d.m.Y', $status['eltsUntil']) : ''
-                ),
+                title: $status['eltsUntil'] !== null
+                    ? 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.typo3.elts'
+                    : 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.typo3.eltsUndated',
                 link: '',
+                titleArguments: $status['eltsUntil'] !== null
+                    ? [(string)$instance->typo3Major, date('d.m.Y', $status['eltsUntil'])]
+                    : [(string)$instance->typo3Major],
             )];
         }
 
@@ -83,12 +82,13 @@ final class Typo3VersionFindings implements EvaluatorInterface
                 package: 'typo3/cms-core',
                 installedVersion: $instance->typo3Version,
                 latestVersion: '',
-                title: sprintf(
-                    '%s erhält keine Sicherheitsupdates mehr%s.',
-                    $version,
-                    $status['eltsUntil'] !== null ? ' — auch ELTS endete am ' . date('d.m.Y', $status['eltsUntil']) : ''
-                ),
+                title: $status['eltsUntil'] !== null
+                    ? 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.typo3.unsupported'
+                    : 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.typo3.unsupportedUndated',
                 link: 'https://typo3.org/cms/roadmap',
+                titleArguments: $status['eltsUntil'] !== null
+                    ? [(string)$instance->typo3Major, date('d.m.Y', $status['eltsUntil'])]
+                    : [(string)$instance->typo3Major],
             )];
         }
 

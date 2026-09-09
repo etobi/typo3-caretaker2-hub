@@ -80,12 +80,9 @@ final class EvaluationService implements LoggerAwareInterface
                 package: '',
                 installedVersion: '',
                 latestVersion: '',
-                title: sprintf(
-                    'Die Auswertung "%s" ist abgebrochen und hat nichts beigetragen: %s',
-                    $evaluator->key(),
-                    $e->getMessage()
-                ),
+                title: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.evaluatorFailed',
                 link: '',
+                titleArguments: [$evaluator->key(), $e->getMessage()],
             )];
         }
     }

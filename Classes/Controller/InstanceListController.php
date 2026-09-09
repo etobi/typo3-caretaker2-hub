@@ -164,7 +164,13 @@ final class InstanceListController
         $acknowledged = array_values(array_filter($all, static fn(array $r): bool => (int)$r['acknowledged'] === 1));
 
         $view->assignMultiple([
-            'instance' => $this->present($instance, time()),
+            // Mit den Befundzahlen, sonst zeigte die Detailansicht "OK", wo
+            // die Liste "ohne Sicherheitsupdates" sagt.
+            'instance' => $this->present(
+                $instance,
+                time(),
+                $this->findings->countsForInstances([$instanceId])[$instanceId] ?? []
+            ),
             // Findings always describe the current state, so they are hidden
             // while an older snapshot is on screen rather than shown next to
             // data they do not belong to.
@@ -474,7 +480,7 @@ final class InstanceListController
             'info' => 'secondary',
         ];
 
-        return array_map(static function (array $row) use ($typeLabels, $severityColours, $severityLabels, $unknownHint): array {
+        return array_map(function (array $row) use ($typeLabels, $severityColours, $severityLabels, $unknownHint): array {
             $severity = (string)$row['severity'];
 
             return [
@@ -486,7 +492,7 @@ final class InstanceListController
                 'package' => (string)$row['package'],
                 'installedVersion' => (string)$row['installed_version'],
                 'latestVersion' => (string)$row['latest_version'],
-                'title' => (string)$row['title'],
+                'title' => $this->findingTitle((string)$row['title'], (string)($row['title_args'] ?? '')),
                 'link' => (string)$row['link'],
                 'firstSeen' => (int)$row['first_seen'],
                 'uid' => (int)$row['uid'],
@@ -875,6 +881,33 @@ final class InstanceListController
             'unsupported' => 'danger',
             'stale' => 'danger',
         ][$state] ?? 'default';
+    }
+
+    /**
+     * A finding title is either text we did not write — an advisory from
+     * Packagist, a message from TYPO3's own checks — or one of our keys with
+     * its arguments beside it. Only the latter is translated, and a key whose
+     * placeholders no longer match its arguments falls back to the plain
+     * sentence rather than throwing in the user's face.
+     */
+    private function findingTitle(string $title, string $arguments): string
+    {
+        if (!str_starts_with($title, 'LLL:')) {
+            return $title;
+        }
+
+        $text = $this->getLanguageService()->sL($title);
+        $args = $arguments === '' ? [] : json_decode($arguments, true);
+
+        if (!is_array($args) || $args === []) {
+            return $text;
+        }
+
+        try {
+            return vsprintf($text, $args);
+        } catch (\Throwable $e) {
+            return $text;
+        }
     }
 
     /**

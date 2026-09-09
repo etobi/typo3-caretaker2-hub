@@ -32,8 +32,6 @@ final class PhpVersionFindings implements EvaluatorInterface
         }
 
         $status = $this->phpVersions->statusOf($instance->phpVersion);
-        $branch = 'PHP ' . $status['cycle'];
-
         if ($status['status'] === PhpVersions::STATUS_EOL) {
             return [new Finding(
                 type: Finding::TYPE_PHP_EOL,
@@ -42,12 +40,13 @@ final class PhpVersionFindings implements EvaluatorInterface
                 package: 'php',
                 installedVersion: $instance->phpVersion,
                 latestVersion: $status['latest'],
-                title: sprintf(
-                    '%s erhält keine Sicherheitsfixes mehr%s.',
-                    $branch,
-                    $status['eolUntil'] !== null ? ' — der Zweig endete am ' . date('d.m.Y', $status['eolUntil']) : ''
-                ),
+                title: $status['eolUntil'] !== null
+                    ? 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.php.eol'
+                    : 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.php.eolUndated',
                 link: 'https://www.php.net/supported-versions.php',
+                titleArguments: $status['eolUntil'] !== null
+                    ? [$status['cycle'], date('d.m.Y', $status['eolUntil'])]
+                    : [$status['cycle']],
             )];
         }
 
@@ -59,12 +58,13 @@ final class PhpVersionFindings implements EvaluatorInterface
                 package: 'php',
                 installedVersion: $instance->phpVersion,
                 latestVersion: $status['latest'],
-                title: sprintf(
-                    '%s bekommt nur noch Sicherheitsfixes%s.',
-                    $branch,
-                    $status['eolUntil'] !== null ? ', bis ' . date('d.m.Y', $status['eolUntil']) : ''
-                ),
+                title: $status['eolUntil'] !== null
+                    ? 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.php.securityOnly'
+                    : 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.php.securityOnlyUndated',
                 link: 'https://www.php.net/supported-versions.php',
+                titleArguments: $status['eolUntil'] !== null
+                    ? [$status['cycle'], date('d.m.Y', $status['eolUntil'])]
+                    : [$status['cycle']],
             )];
         }
 

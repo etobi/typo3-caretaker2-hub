@@ -90,8 +90,8 @@ final class FindingFactory
                 installedVersion: (string)($package['version'] ?? ''),
                 latestVersion: $latest,
                 title: $isSafe
-                    ? 'Update im Rahmen des Constraints möglich'
-                    : 'Neuere Version vorhanden, der Constraint müsste geändert werden',
+                    ? 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.update_safe'
+                    : 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.update_major',
                 // Deliberately no link. The package homepage has nothing to do
                 // with what this sentence says, and a link that does not lead
                 // where its text promises is worse than none.
@@ -119,9 +119,10 @@ final class FindingFactory
                 installedVersion: $installed[$package] ?? '',
                 latestVersion: '',
                 title: is_string($replacement) && $replacement !== ''
-                    ? sprintf('Nicht mehr gepflegt, Nachfolger: %s', $replacement)
-                    : 'Nicht mehr gepflegt, kein Nachfolger benannt',
+                    ? 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.abandoned'
+                    : 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.abandonedNoSuccessor',
                 link: '',
+                titleArguments: is_string($replacement) && $replacement !== '' ? [$replacement] : [],
             );
         }
 
@@ -147,8 +148,9 @@ final class FindingFactory
                 package: '',
                 installedVersion: '',
                 latestVersion: '',
-                title: sprintf('Repository "%s" ist vom Hub aus nicht erreichbar und wurde nicht bewertet.', $url),
+                title: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.repositoryUnreachable',
                 link: '',
+                titleArguments: [$url],
             );
         }
 

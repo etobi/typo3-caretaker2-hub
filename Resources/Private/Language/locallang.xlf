@@ -480,6 +480,60 @@
             <trans-unit id="js.enroll.failedBody">
                 <source>Please try again. If it stays that way, the reason is in the hub's log.</source>
             </trans-unit>
+            <trans-unit id="finding.title.update_safe">
+                <source>Update available within the constraint</source>
+            </trans-unit>
+            <trans-unit id="finding.title.update_major">
+                <source>A newer version exists, the constraint would have to change</source>
+            </trans-unit>
+            <trans-unit id="finding.title.abandoned">
+                <source>No longer maintained, successor: %s</source>
+            </trans-unit>
+            <trans-unit id="finding.title.abandonedNoSuccessor">
+                <source>No longer maintained, no successor named</source>
+            </trans-unit>
+            <trans-unit id="finding.title.repositoryUnreachable">
+                <source>Repository "%s" cannot be reached from the hub and was not assessed.</source>
+            </trans-unit>
+            <trans-unit id="finding.title.typo3.eltsUnpatched">
+                <source>TYPO3 %s is no longer regularly maintained, and %s is the last freely published release. Security updates have come through ELTS only since then, until %s — this instance receives none.</source>
+            </trans-unit>
+            <trans-unit id="finding.title.typo3.eltsUnpatchedUndated">
+                <source>TYPO3 %s is no longer regularly maintained, and %s is the last freely published release. Security updates have come through ELTS only since then — this instance receives none.</source>
+            </trans-unit>
+            <trans-unit id="finding.title.typo3.elts">
+                <source>TYPO3 %s is no longer regularly maintained. Security updates come through ELTS only, until %s.</source>
+            </trans-unit>
+            <trans-unit id="finding.title.typo3.eltsUndated">
+                <source>TYPO3 %s is no longer regularly maintained. Security updates come through ELTS only.</source>
+            </trans-unit>
+            <trans-unit id="finding.title.typo3.unsupported">
+                <source>TYPO3 %s receives no security updates any more — ELTS ended on %s as well.</source>
+            </trans-unit>
+            <trans-unit id="finding.title.typo3.unsupportedUndated">
+                <source>TYPO3 %s receives no security updates any more.</source>
+            </trans-unit>
+            <trans-unit id="finding.title.php.eol">
+                <source>PHP %s receives no security fixes any more — the branch ended on %s.</source>
+            </trans-unit>
+            <trans-unit id="finding.title.php.eolUndated">
+                <source>PHP %s receives no security fixes any more.</source>
+            </trans-unit>
+            <trans-unit id="finding.title.php.securityOnly">
+                <source>PHP %s only gets security fixes, until %s.</source>
+            </trans-unit>
+            <trans-unit id="finding.title.php.securityOnlyUndated">
+                <source>PHP %s only gets security fixes.</source>
+            </trans-unit>
+            <trans-unit id="finding.title.reports.incomplete">
+                <source>TYPO3's own checks are only partly available: %s</source>
+            </trans-unit>
+            <trans-unit id="finding.title.reports.none">
+                <source>TYPO3's own checks looked at nothing in this instance — that is a gap, not an all-clear.</source>
+            </trans-unit>
+            <trans-unit id="finding.title.evaluatorFailed">
+                <source>The "%s" evaluation broke off and contributed nothing: %s</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>
