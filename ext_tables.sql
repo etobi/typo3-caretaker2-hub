@@ -39,6 +39,11 @@ CREATE TABLE tx_caretaker2_instance (
     last_seen int(11) unsigned DEFAULT 0 NOT NULL,
     last_fingerprint varchar(64) DEFAULT '' NOT NULL,
 
+    # Das zuletzt empfangene Inventar, immer überschrieben. Getrennt von den
+    # Snapshots, weil beide verschiedene Fragen beantworten: dieses hier "was
+    # ist jetzt", die Snapshots "was hat sich wann geändert".
+    last_inventory mediumtext,
+
     # Die Auswertung dauert Sekunden bis Minuten und kann deshalb nicht im
     # Push-Request laufen. Der Empfang setzt nur die Marke, ein Scheduler-Lauf
     # arbeitet sie ab.

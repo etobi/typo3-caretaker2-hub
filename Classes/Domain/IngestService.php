@@ -70,6 +70,7 @@ final class IngestService
             [
                 'last_seen' => time(),
                 'last_fingerprint' => $fingerprint,
+                'last_inventory' => (string)json_encode($inventory, JSON_UNESCAPED_SLASHES),
                 'schema_version' => $schemaVersion,
                 'agent_version' => (string)($inventory['agent']['version'] ?? ''),
                 'worst_provider_status' => $this->worstStatus($providers),
@@ -204,6 +205,11 @@ final class IngestService
     private const VOLATILE_PATHS = [
         ['providers', 'platform', 'data', 'php', 'sapi'],
         ['providers', 'platform', 'data', 'php', 'settings'],
+        // TYPO3's own checks judge the runtime they happen to run in, so a
+        // scheduler push and a hub-triggered pull disagree about two of them.
+        // They describe the current state, not a change to the installation,
+        // and are always available in full from last_inventory.
+        ['providers', 'reports'],
     ];
 
     private const SAPI_BOUND_EXTENSIONS = [

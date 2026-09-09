@@ -153,9 +153,12 @@ final class InstanceListController
             new BreadcrumbContext(null, $this->breadcrumb($instance, $historic))
         );
 
+        // Der aktuelle Zustand kommt aus last_inventory, nicht aus dem letzten
+        // Snapshot: Snapshots entstehen nur bei Änderung und wären für alles,
+        // was von der Laufzeit abhängt, veraltet.
         $inventory = $historic !== null
             ? $historic['inventory']
-            : $this->snapshots->findLatestInventory($instanceId);
+            : $instance->lastInventory;
 
         $all = $this->findings->findForInstance($instanceId);
         $open = array_values(array_filter($all, static fn(array $r): bool => (int)$r['acknowledged'] === 0));

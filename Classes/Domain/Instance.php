@@ -31,6 +31,8 @@ final readonly class Instance
         public int $siteCount,
         public int $lastSeen,
         public string $lastFingerprint,
+        /** @var array<string, mixed>|null */
+        public ?array $lastInventory,
         public bool $needsEvaluation,
         public int $evaluatedAt,
     ) {}
@@ -60,9 +62,25 @@ final readonly class Instance
             siteCount: (int)($row['site_count'] ?? 0),
             lastSeen: (int)($row['last_seen'] ?? 0),
             lastFingerprint: (string)($row['last_fingerprint'] ?? ''),
+            lastInventory: self::decodeInventory($row['last_inventory'] ?? null),
             needsEvaluation: (bool)($row['needs_evaluation'] ?? false),
             evaluatedAt: (int)($row['evaluated_at'] ?? 0),
         );
+    }
+
+    /**
+     * @param mixed $raw
+     * @return array<string, mixed>|null
+     */
+    private static function decodeInventory($raw): ?array
+    {
+        if (!is_string($raw) || $raw === '') {
+            return null;
+        }
+
+        $decoded = json_decode($raw, true);
+
+        return is_array($decoded) ? $decoded : null;
     }
 
     /**

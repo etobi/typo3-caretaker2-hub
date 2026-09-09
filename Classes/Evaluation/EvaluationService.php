@@ -6,12 +6,10 @@ namespace Caretaker2\Hub\Evaluation;
 
 use Caretaker2\Hub\Domain\Instance;
 use Caretaker2\Hub\Domain\InstanceRepository;
-use Caretaker2\Hub\Domain\SnapshotRepository;
 
 final class EvaluationService
 {
     public function __construct(
-        private readonly SnapshotRepository $snapshots,
         private readonly ComposerEvaluator $evaluator,
         private readonly FindingFactory $factory,
         private readonly FindingRepository $findings,
@@ -24,7 +22,7 @@ final class EvaluationService
      */
     public function evaluate(Instance $instance): array
     {
-        $inventory = $this->snapshots->findLatestInventory($instance->uid);
+        $inventory = $instance->lastInventory;
         if ($inventory === null) {
             throw new EvaluationException('Für diese Instanz liegt noch kein Inventar vor.');
         }
