@@ -740,8 +740,8 @@
                 <target>Befunde offen</target>
             </trans-unit>
             <trans-unit id="state.hint.attention" approved="yes">
-                <source>There are findings, none of them urgent.</source>
-                <target>Es gibt Befunde, aber keinen dringenden.</target>
+                <source>Findings are open, the most severe one is rated %s.</source>
+                <target>Es sind Befunde offen, der schwerste ist als %s eingestuft.</target>
             </trans-unit>
             <trans-unit id="list.findings.bySeverity" approved="yes">
                 <source>%s findings of severity %s</source>

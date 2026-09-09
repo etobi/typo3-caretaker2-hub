@@ -41,6 +41,18 @@ use TYPO3\CMS\Core\Page\PageRenderer;
 #[AsController]
 final class InstanceListController
 {
+    /**
+     * Severities in the order they are shown and weighed, worst first.
+     */
+    private const SEVERITY_COLOURS = [
+        'critical' => 'danger',
+        'high' => 'danger',
+        'unknown' => 'danger',
+        'medium' => 'warning',
+        'low' => 'info',
+        'info' => 'secondary',
+    ];
+
     private const LANGUAGE_FILE = 'EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf';
 
     private const LL = 'LLL:' . self::LANGUAGE_FILE . ':';
@@ -378,8 +390,13 @@ final class InstanceListController
             'lastSeen' => $instance->lastSeen,
             'state' => $state,
             'stateLabel' => $this->stateLabel($state),
+            // "Findings open" is one state but not one weight: the colour comes
+            // from the worst thing that is open, or the badge would play down
+            // three high findings as a grey aside.
+            'stateSeverity' => $state === 'attention'
+                ? (self::SEVERITY_COLOURS[$this->worstSeverity($findingCounts)] ?? 'secondary')
+                : $this->stateSeverity($state),
             'stateHint' => $this->stateHint($state, $instance, $findingCounts),
-            'stateSeverity' => $this->stateSeverity($state),
             'findings' => $findingCounts,
             'findingsBySeverity' => $this->severityBadges($findingCounts['severities'] ?? []),
         ];
@@ -858,7 +875,7 @@ final class InstanceListController
         }
 
         if ($state === 'attention') {
-            return $this->ll('state.hint.attention');
+            return $this->ll('state.hint.attention', $this->ll('finding.severity.' . $this->worstSeverity($counts)));
         }
 
         if ($state === 'incomplete') {
@@ -910,6 +927,20 @@ final class InstanceListController
     }
 
     /**
+     * @param array<string, mixed> $counts
+     */
+    private function worstSeverity(array $counts): string
+    {
+        foreach (array_keys(self::SEVERITY_COLOURS) as $severity) {
+            if (($counts['severities'][$severity] ?? 0) > 0) {
+                return $severity;
+            }
+        }
+
+        return 'info';
+    }
+
+    /**
      * Findings grouped by how bad they are, worst first.
      *
      * By severity rather than by kind: whether something is an advisory or an
@@ -921,15 +952,6 @@ final class InstanceListController
      */
     private function severityBadges(array $severities): array
     {
-        $colours = [
-            'critical' => 'danger',
-            'high' => 'danger',
-            'unknown' => 'danger',
-            'medium' => 'warning',
-            'low' => 'info',
-            'info' => 'secondary',
-        ];
-
         $badges = [];
         foreach ($severities as $severity => $count) {
             if ($count < 1) {
@@ -941,7 +963,7 @@ final class InstanceListController
                 'severity' => $severity,
                 'count' => $count,
                 'label' => $label,
-                'colour' => $colours[$severity] ?? 'secondary',
+                'colour' => self::SEVERITY_COLOURS[$severity] ?? 'secondary',
                 'hint' => $this->ll('list.findings.bySeverity', $count, $label),
             ];
         }

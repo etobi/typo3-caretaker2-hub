@@ -556,7 +556,7 @@
                 <source>Findings open</source>
             </trans-unit>
             <trans-unit id="state.hint.attention">
-                <source>There are findings, none of them urgent.</source>
+                <source>Findings are open, the most severe one is rated %s.</source>
             </trans-unit>
             <trans-unit id="list.findings.bySeverity">
                 <source>%s findings of severity %s</source>
