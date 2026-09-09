@@ -72,17 +72,21 @@
                             <f:if condition="{showGroupHeadings}">
                                 <tr class="table-active">
                                     <th colspan="10" scope="colgroup">
-                                        {group.title}
-                                        <span class="badge badge-secondary">{group.instances -> f:count()}</span>
-                                        <f:if condition="{group.editUri}">
-                                            <a href="{group.editUri}" class="btn btn-default btn-sm"
-                                               title="Gruppe bearbeiten">
-                                                <core:icon identifier="actions-open" size="small"/>
-                                            </a>
-                                        </f:if>
-                                        <f:if condition="{group.description}">
-                                            <span class="fw-normal text-body-secondary ms-2">{group.description}</span>
-                                        </f:if>
+                                        <div class="d-flex align-items-center justify-content-between gap-2">
+                                            <span>
+                                                {group.title}
+                                                <span class="badge badge-secondary">{group.instances -> f:count()}</span>
+                                                <f:if condition="{group.description}">
+                                                    <span class="fw-normal text-body-secondary ms-2">{group.description}</span>
+                                                </f:if>
+                                            </span>
+                                            <f:if condition="{group.editUri}">
+                                                <a href="{group.editUri}" class="btn btn-default btn-sm"
+                                                   title="Gruppe bearbeiten">
+                                                    <core:icon identifier="actions-open" size="small"/>
+                                                </a>
+                                            </f:if>
+                                        </div>
                                     </th>
                                 </tr>
                             </f:if>
