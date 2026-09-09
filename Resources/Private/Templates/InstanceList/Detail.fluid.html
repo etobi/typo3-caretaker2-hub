@@ -58,13 +58,7 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th class="col-checkbox">
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input"
-                                           data-caretaker2-toggle-all="1"
-                                           aria-label="Alle auswählen">
-                                </div>
-                            </th>
+                            <th class="col-checkbox"></th>
                             <th>Schwere</th><th>Art</th><th>Paket</th>
                             <th>Installiert</th><th>Verfügbar</th><th>Befund</th>
                         </tr>
@@ -102,8 +96,9 @@
                 </button>
                 <f:for each="{openByType}" as="group">
                     <button type="button" class="btn btn-default"
-                            data-caretaker2-ack="1" data-ack-type="{group.type}">
-                        Alle {group.count} {group.label}
+                            data-caretaker2-ack="1" data-ack-type="{group.type}"
+                            data-ack-subject="alle {group.count} {group.label}">
+                        Alle {group.count} {group.label} quittieren
                     </button>
                 </f:for>
             </div>

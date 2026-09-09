@@ -16,26 +16,10 @@ class AcknowledgeForm {
     this.noteField = form.querySelector('input[name="note"]');
     this.typeField = form.querySelector('input[name="acknowledgeType"]');
 
-    const toggleAll = form.querySelector('[data-caretaker2-toggle-all]');
-    if (toggleAll) {
-      toggleAll.addEventListener('change', () => {
-        this.boxes().forEach((box) => { box.checked = toggleAll.checked; });
-      });
-      form.addEventListener('change', (event) => {
-        if (event.target.name !== 'findings[]') {
-          return;
-        }
-        const boxes = this.boxes();
-        const checked = boxes.filter((box) => box.checked).length;
-        toggleAll.checked = checked === boxes.length;
-        toggleAll.indeterminate = checked > 0 && checked < boxes.length;
-      });
-    }
-
     form.querySelectorAll('[data-caretaker2-ack]').forEach((button) => {
       button.addEventListener('click', (event) => {
         event.preventDefault();
-        this.open(button.dataset.ackType || '', button.textContent.trim());
+        this.open(button.dataset.ackType || '', button.dataset.ackSubject || '');
       });
     });
   }
@@ -48,7 +32,7 @@ class AcknowledgeForm {
     return this.boxes().filter((box) => box.checked).length;
   }
 
-  open(type, label) {
+  open(type, subjectLabel) {
     const count = this.selectedCount();
 
     if (type === '' && count === 0) {
@@ -62,7 +46,7 @@ class AcknowledgeForm {
 
     const subject = type === ''
       ? (count === 1 ? 'einen Befund' : `${count} Befunde`)
-      : label.replace(/^Alle /, '');
+      : subjectLabel;
 
     Modal.advanced({
       title: 'Befunde quittieren',
