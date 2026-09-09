@@ -140,10 +140,17 @@
                         <f:else><span class="text-body-secondary">noch nie</span></f:else>
                     </f:if>
                 </td></tr>
-                <tr><th>Inventar erstellt</th><td>{generatedAt}</td></tr>
+                <tr><th>Inventar erstellt</th><td>
+                    <f:if condition="{generatedAt}">
+                        <f:then><f:format.date format="d.m.Y H:i:s">@{generatedAt}</f:format.date></f:then>
+                        <f:else><span class="text-body-secondary">unbekannt</span></f:else>
+                    </f:if>
+                </td></tr>
                 <tr><th>Agent-Version</th><td>{instance.agentVersion}</td></tr>
                 <tr><th>Schemaversion</th><td>{schemaVersion}</td></tr>
-                <tr><th>Größe des Inventars</th><td>{inventorySize} Bytes</td></tr>
+                <tr><th>Größe des Inventars</th><td>
+                    <f:format.bytes value="{inventorySize}" decimals="1" decimalSeparator="," thousandsSeparator="."/>
+                </td></tr>
                 <tr><th>Veränderungen bisher</th><td>
                     {snapshotCount} <span class="text-body-secondary">Snapshots — es wird nur
                     gespeichert, wenn sich etwas geändert hat</span>
@@ -172,7 +179,7 @@
                                         <f:else><em class="text-body-secondary">ohne Begründung</em></f:else>
                                     </f:if>
                                     <div class="text-body-secondary">
-                                        {finding.ackUser}, <f:format.date format="d.m.Y H:i">@{finding.ackAt}</f:format.date>
+                                        {finding.ackUser}, <f:format.date format="d.m.Y H:i:s">@{finding.ackAt}</f:format.date>
                                     </div>
                                 </td>
                                 <td class="col-nowrap">
@@ -216,7 +223,7 @@
                         <f:if condition="{provider.omitted}">
                             <p class="text-body-secondary">
                                 Zu groß für die Anzeige, im Snapshot aber vollständig enthalten:
-                                <f:for each="{provider.omitted}" as="o" iteration="i"><code>{o.key}</code> ({o.bytes} Bytes)<f:if condition="!{i.isLast}">, </f:if></f:for>
+                                <f:for each="{provider.omitted}" as="o" iteration="i"><code>{o.key}</code> (<f:format.bytes value="{o.bytes}" decimals="1" decimalSeparator="," thousandsSeparator="."/>)<f:if condition="!{i.isLast}">, </f:if></f:for>
                             </p>
                         </f:if>
 

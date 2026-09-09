@@ -177,7 +177,10 @@ final class InstanceListController
             'inventorySize' => $inventory === null
                 ? 0
                 : strlen((string)json_encode($inventory)),
-            'generatedAt' => $inventory['generatedAt'] ?? null,
+            // Comes in as an ISO 8601 string in UTC. Passed on as a timestamp
+            // so it renders through the same path — and in the same time zone —
+            // as every other date on the page.
+            'generatedAt' => $this->toTimestamp($inventory['generatedAt'] ?? null),
             'schemaVersion' => $inventory['schemaVersion'] ?? null,
             'history' => $this->presentHistory($this->snapshots->findHistory($instanceId), $instanceId, $wanted),
             'snapshotCount' => $this->snapshots->countForInstance($instanceId),
@@ -203,6 +206,9 @@ final class InstanceListController
         }
 
         $view->assign('hubUrl', $this->publicHubUrl($request));
+        $view->assign('enrollUri', (string)$this->uriBuilder->buildUriFromRoute('ajax_caretaker2_enrollment_code'));
+
+        $this->pageRenderer->loadJavaScriptModule('@caretaker2/hub/enroll.js');
 
         $now = time();
         $instances = $this->instances->findAll();
@@ -404,6 +410,22 @@ final class InstanceListController
                 'ackAt' => (int)$row['ack_at'],
             ];
         }, $rows);
+    }
+
+    /**
+     * @param mixed $value
+     */
+    private function toTimestamp($value): int
+    {
+        if (!is_string($value) || $value === '') {
+            return 0;
+        }
+
+        try {
+            return (new \DateTimeImmutable($value))->getTimestamp();
+        } catch (\Exception $e) {
+            return 0;
+        }
     }
 
     /**

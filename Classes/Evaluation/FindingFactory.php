@@ -92,7 +92,10 @@ final class FindingFactory
                 title: $isSafe
                     ? 'Update im Rahmen des Constraints möglich'
                     : 'Neuere Version vorhanden, der Constraint müsste geändert werden',
-                link: (string)($package['homepage'] ?? ''),
+                // Deliberately no link. The package homepage has nothing to do
+                // with what this sentence says, and a link that does not lead
+                // where its text promises is worse than none.
+                link: '',
             );
         }
 
