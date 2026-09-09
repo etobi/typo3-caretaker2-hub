@@ -172,6 +172,7 @@ final class InstanceListController
             'historic' => $historic !== null,
             'historicAt' => $historic['crdate'] ?? 0,
             'shown' => $this->inventorySummary($inventory),
+            'sites' => $this->sitesFrom($inventory),
             'currentUri' => (string)$this->uriBuilder->buildUriFromRoute(
                 self::ROUTE,
                 ['instance' => $instanceId]
@@ -477,6 +478,40 @@ final class InstanceListController
         }
 
         return $nodes;
+    }
+
+    /**
+     * The sites of whichever snapshot is on screen, each with the domains it
+     * serves. Taken from the inventory rather than from the denormalised
+     * column on the instance, which only holds the flat set of hosts.
+     *
+     * @param array<string, mixed>|null $inventory
+     * @return list<array<string, mixed>>
+     */
+    private function sitesFrom(?array $inventory): array
+    {
+        $sites = $inventory['providers']['sites']['data']['sites'] ?? null;
+        if (!is_array($sites)) {
+            return [];
+        }
+
+        $out = [];
+        foreach ($sites as $site) {
+            if (!is_array($site)) {
+                continue;
+            }
+
+            $title = trim((string)($site['websiteTitle'] ?? ''));
+
+            $out[] = [
+                'identifier' => (string)($site['identifier'] ?? ''),
+                'title' => $title !== '' ? $title : (string)($site['identifier'] ?? ''),
+                'rootPageId' => (int)($site['rootPageId'] ?? 0),
+                'hosts' => array_values(array_filter((array)($site['hosts'] ?? []), 'is_string')),
+            ];
+        }
+
+        return $out;
     }
 
     /**

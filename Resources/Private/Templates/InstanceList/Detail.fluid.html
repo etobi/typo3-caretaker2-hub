@@ -131,17 +131,24 @@
                 <tr><th style="width:16rem">URL</th><td>
                     <a href="{instance.url}" target="_blank" rel="noreferrer noopener">{instance.url}</a>
                 </td></tr>
-                <f:if condition="{instance.siteCount}">
+                <f:if condition="{sites}">
                     <tr><th>Sites und Domains</th><td>
-                        {instance.siteCount} Site<f:if condition="{instance.siteCount} > 1">s</f:if>
-                        mit <f:variable name="domainCount">{instance.siteHosts -> f:count()}</f:variable>{domainCount}
-                        Domain<f:if condition="{domainCount} > 1">s</f:if>
-                        <div class="mt-1">
-                            <f:for each="{instance.siteHosts}" as="host">
-                                <a class="badge badge-secondary" href="https://{host}/"
-                                   target="_blank" rel="noreferrer noopener">{host}</a>
-                            </f:for>
-                        </div>
+                        <f:for each="{sites}" as="site" iteration="i">
+                            <div class="{f:if(condition: i.isFirst, then: '', else: 'mt-3')}">
+                                <strong>{site.title}</strong>
+                                <span class="text-body-secondary">
+                                    <code>{site.identifier}</code>, Root-Seite {site.rootPageId}
+                                </span>
+                                <ul class="mb-0">
+                                    <f:for each="{site.hosts}" as="host">
+                                        <li>
+                                            <a href="https://{host}/" target="_blank"
+                                               rel="noreferrer noopener">{host}</a>
+                                        </li>
+                                    </f:for>
+                                </ul>
+                            </div>
+                        </f:for>
                     </td></tr>
                 </f:if>
                 <tr><th>Zuletzt gemeldet</th><td>
