@@ -1,0 +1,22 @@
+{
+    "name": "caretaker2/hub",
+    "type": "typo3-cms-extension",
+    "description": "Caretaker2 Hub — die Zentrale: nimmt Inventare entgegen, bewertet und zeigt sie an",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "php": "^8.2",
+        "typo3/cms-core": "^13.4",
+        "typo3/cms-backend": "^13.4",
+        "typo3/cms-fluid": "^13.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Caretaker2\\Hub\\": "Classes/"
+        }
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "caretaker2_hub"
+        }
+    }
+}

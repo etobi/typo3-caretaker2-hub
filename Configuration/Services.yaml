@@ -1,0 +1,17 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  Caretaker2\Hub\:
+    resource: '../Classes/*'
+    exclude:
+      - '../Classes/Domain/Instance.php'
+      - '../Classes/Domain/EnrollmentException.php'
+      - '../Classes/Domain/IngestException.php'
+      - '../Classes/Domain/TokenGenerator.php'
+
+  Caretaker2\Hub\Command\CreateEnrollmentCodeCommand:
+    tags:
+      - { name: 'console.command', command: 'caretaker2:enroll', description: 'Erzeugt einen Enrollment-Code zum Verbinden einer Instanz', schedulable: false }
