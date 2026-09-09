@@ -46,6 +46,9 @@
                 <f:if condition="{summary.vulnerable}">
                     <span class="badge badge-danger">{summary.vulnerable} mit Sicherheitslücke</span>
                 </f:if>
+                <f:if condition="{summary.unsupported}">
+                    <span class="badge badge-danger">{summary.unsupported} ohne Sicherheitsupdates</span>
+                </f:if>
                 <f:if condition="{summary.stale}">
                     <span class="badge badge-danger">{summary.stale} melden sich nicht</span>
                 </f:if>

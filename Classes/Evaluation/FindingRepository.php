@@ -228,7 +228,7 @@ final class FindingRepository
         $counts = [];
         foreach ($rows as $row) {
             $uid = (int)$row['instance'];
-            $counts[$uid] ??= ['security' => 0, 'securityHigh' => 0, 'update_safe' => 0, 'update_major' => 0, 'abandoned' => 0, 'unassessable' => 0];
+            $counts[$uid] ??= ['security' => 0, 'securityHigh' => 0, 'typo3Unsupported' => 0, 'update_safe' => 0, 'update_major' => 0, 'abandoned' => 0, 'unassessable' => 0];
 
             $type = (string)$row['finding_type'];
             $amount = (int)$row['amount'];
@@ -242,6 +242,12 @@ final class FindingRepository
             // advisories without one are precisely the newest.
             if ($type === 'security' && in_array($row['severity'], ['critical', 'high', 'unknown'], true)) {
                 $counts[$uid]['securityHigh'] += $amount;
+            }
+
+            // A TYPO3 version past its updates is not a package finding, but it
+            // decides the state of the instance just as much.
+            if ($type === Finding::TYPE_TYPO3_ELTS_UNPATCHED || $type === Finding::TYPE_TYPO3_UNSUPPORTED) {
+                $counts[$uid]['typo3Unsupported'] += $amount;
             }
         }
 

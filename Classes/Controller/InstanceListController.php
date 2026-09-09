@@ -298,8 +298,14 @@ final class InstanceListController
 
         // A high or critical security finding outranks everything else. An
         // instance that is reporting cleanly but is vulnerable is not "current".
-        if (($findingCounts['securityHigh'] ?? 0) > 0 && $state !== 'stale') {
-            $state = 'vulnerable';
+        if ($state !== 'stale') {
+            if (($findingCounts['securityHigh'] ?? 0) > 0) {
+                $state = 'vulnerable';
+            } elseif (($findingCounts['typo3Unsupported'] ?? 0) > 0) {
+                // No known hole, but nothing to close one with either. That is
+                // its own statement and must not pass as "current".
+                $state = 'unsupported';
+            }
         }
 
         return [
@@ -340,7 +346,7 @@ final class InstanceListController
      */
     private function summarize(array $instances, int $now): array
     {
-        $summary = ['total' => count($instances), 'ok' => 0, 'incomplete' => 0, 'stale' => 0, 'vulnerable' => 0];
+        $summary = ['total' => count($instances), 'ok' => 0, 'incomplete' => 0, 'stale' => 0, 'vulnerable' => 0, 'unsupported' => 0];
         $counts = $this->findings->countsForInstances(
             array_map(static fn(Instance $i): int => $i->uid, $instances)
         );
@@ -770,6 +776,9 @@ final class InstanceListController
         return [
             'ok' => 'Aktuell',
             'vulnerable' => 'Sicherheitslücke',
+            // Nicht "Sicherheitslücke": Bekannt ist nur, dass nichts mehr
+            // nachkommt. Das ist schlimm genug, aber etwas anderes.
+            'unsupported' => 'Ohne Sicherheitsupdates',
             // Bewusst nicht "Fehler": Es ist nichts kaputt, wir wissen nur
             // nicht alles. Das ist eine eigene Aussage und darf nicht als
             // Entwarnung durchgehen.
@@ -784,6 +793,7 @@ final class InstanceListController
             'ok' => 'success',
             'incomplete' => 'warning',
             'vulnerable' => 'danger',
+            'unsupported' => 'danger',
             'stale' => 'danger',
         ][$state] ?? 'default';
     }
