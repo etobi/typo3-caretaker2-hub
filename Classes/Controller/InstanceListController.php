@@ -15,6 +15,8 @@ use Caretaker2\Hub\Evaluation\FindingRepository;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Attribute\AsController;
+use TYPO3\CMS\Backend\Breadcrumb\BreadcrumbContext;
+use TYPO3\CMS\Backend\Dto\Breadcrumb\BreadcrumbNode;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Http\RedirectResponse;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
@@ -138,6 +140,9 @@ final class InstanceListController
 
         $view = $this->moduleTemplateFactory->create($request);
         $view->setTitle('Caretaker2', $instance->title);
+        $view->getDocHeaderComponent()->setBreadcrumbContext(
+            new BreadcrumbContext(null, $this->breadcrumb($instance, $historic))
+        );
 
         $wanted = (int)($request->getQueryParams()['snapshot'] ?? 0);
         $historic = null;
@@ -156,7 +161,6 @@ final class InstanceListController
 
         $view->assignMultiple([
             'instance' => $this->present($instance, time()),
-            'listUri' => (string)$this->uriBuilder->buildUriFromRoute(self::ROUTE),
             // Findings always describe the current state, so they are hidden
             // while an older snapshot is on screen rather than shown next to
             // data they do not belong to.
@@ -398,6 +402,41 @@ final class InstanceListController
                 'ackAt' => (int)$row['ack_at'],
             ];
         }, $rows);
+    }
+
+    /**
+     * @param array{crdate: int, inventory: array<string, mixed>}|null $historic
+     * @return list<BreadcrumbNode>
+     */
+    private function breadcrumb(Instance $instance, ?array $historic): array
+    {
+        $nodes = [
+            new BreadcrumbNode(
+                identifier: 'caretaker2-instances',
+                label: 'Instanzen',
+                icon: 'caretaker2-module',
+                url: (string)$this->uriBuilder->buildUriFromRoute(self::ROUTE),
+            ),
+            new BreadcrumbNode(
+                identifier: 'caretaker2-instance-' . $instance->uid,
+                label: $instance->title,
+                icon: 'caretaker2-module',
+                url: $historic === null ? null : (string)$this->uriBuilder->buildUriFromRoute(
+                    self::ROUTE,
+                    ['instance' => $instance->uid]
+                ),
+            ),
+        ];
+
+        if ($historic !== null) {
+            $nodes[] = new BreadcrumbNode(
+                identifier: 'caretaker2-snapshot',
+                label: date('d.m.Y H:i', $historic['crdate']),
+                icon: 'actions-history',
+            );
+        }
+
+        return $nodes;
     }
 
     /**
