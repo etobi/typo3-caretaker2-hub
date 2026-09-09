@@ -190,6 +190,7 @@ final class InstanceListController
             'acknowledgedFindings' => $this->presentFindings($acknowledged),
             'findingCounts' => $this->findings->countsForInstance($instanceId),
             'openByType' => $this->openByType($open),
+            'hasUnrated' => array_filter($open, static fn(array $r): bool => $r['severity'] === 'unknown') !== [],
         ]);
 
         return $view->renderResponse('InstanceList/Detail');
@@ -381,23 +382,34 @@ final class InstanceListController
             'abandoned' => 'Nicht gepflegt',
             'unassessable' => 'Nicht bewertbar',
         ];
+        $severityLabels = [
+            'critical' => 'kritisch',
+            'high' => 'hoch',
+            'unknown' => 'ungewertet',
+            'medium' => 'mittel',
+            'low' => 'niedrig',
+            'info' => 'Hinweis',
+        ];
         $severityColours = [
             'critical' => 'danger',
             'high' => 'danger',
-            'unknown' => 'warning',
+            'unknown' => 'danger',
             'medium' => 'warning',
             'low' => 'info',
             'info' => 'secondary',
         ];
 
-        return array_map(static function (array $row) use ($typeLabels, $severityColours): array {
+        return array_map(static function (array $row) use ($typeLabels, $severityColours, $severityLabels): array {
             $severity = (string)$row['severity'];
 
             return [
                 'type' => (string)$row['finding_type'],
                 'typeLabel' => $typeLabels[$row['finding_type']] ?? (string)$row['finding_type'],
-                'severity' => $severity,
+                'severity' => $severityLabels[$severity] ?? $severity,
                 'severityColour' => $severityColours[$severity] ?? 'secondary',
+                'severityHint' => $severity === 'unknown'
+                    ? 'Noch keine Einstufung verfügbar. Die Schwere stammt aus der GitHub Advisory Database, die neue Meldungen erst mit Verzug aufnimmt — bis dahin wird der Befund wie ein schwerwiegender behandelt.'
+                    : '',
                 'package' => (string)$row['package'],
                 'installedVersion' => (string)$row['installed_version'],
                 'latestVersion' => (string)$row['latest_version'],

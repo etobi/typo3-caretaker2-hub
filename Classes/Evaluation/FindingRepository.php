@@ -257,7 +257,11 @@ final class FindingRepository
             if (isset($counts[$uid][$type])) {
                 $counts[$uid][$type] += $amount;
             }
-            if ($type === 'security' && in_array($row['severity'], ['critical', 'high'], true)) {
+            // "unknown" counts as serious. A missing rating is not evidence of
+            // harmlessness — and because the rating comes from the GitHub
+            // Advisory Database, which lags the FriendsOfPHP feed by days, the
+            // advisories without one are precisely the newest.
+            if ($type === 'security' && in_array($row['severity'], ['critical', 'high', 'unknown'], true)) {
                 $counts[$uid]['securityHigh'] += $amount;
             }
         }

@@ -73,7 +73,10 @@
                                                aria-label="{finding.package} auswählen">
                                     </div>
                                 </td>
-                                <td class="col-nowrap"><span class="badge badge-{finding.severityColour}">{finding.severity}</span></td>
+                                <td class="col-nowrap">
+                                    <span class="badge badge-{finding.severityColour}"
+                                          title="{finding.severityHint}">{finding.severity}</span>
+                                </td>
                                 <td class="col-nowrap">{finding.typeLabel}</td>
                                 <td class="col-nowrap"><code>{finding.package}</code></td>
                                 <td class="col-nowrap">{finding.installedVersion}</td>
@@ -89,6 +92,15 @@
                     </tbody>
                 </table>
             </div>
+
+            <f:if condition="{hasUnrated}">
+                <p class="text-body-secondary">
+                    <strong>Ungewertet</strong> heißt: Die Meldung ist so neu, dass die GitHub
+                    Advisory Database noch keine Einstufung dazu hat — Composer kennt sie dann
+                    auch nicht. Solche Befunde werden wie schwerwiegende behandelt, bis eine
+                    Einstufung vorliegt.
+                </p>
+            </f:if>
 
             <div class="mb-4">
                 <button type="button" class="btn btn-default" data-caretaker2-ack="1">
