@@ -22,6 +22,10 @@ final readonly class Instance
         public string $typo3Version,
         public int $typo3Major,
         public string $applicationContext,
+        public string $phpVersion,
+        public string $dbPlatform,
+        public string $dbVersion,
+        public string $worstProviderStatus,
         public int $lastSeen,
         public string $lastFingerprint,
     ) {}
@@ -41,6 +45,10 @@ final readonly class Instance
             typo3Version: (string)($row['typo3_version'] ?? ''),
             typo3Major: (int)($row['typo3_major'] ?? 0),
             applicationContext: (string)($row['application_context'] ?? ''),
+            phpVersion: (string)($row['php_version'] ?? ''),
+            dbPlatform: (string)($row['db_platform'] ?? ''),
+            dbVersion: (string)($row['db_version'] ?? ''),
+            worstProviderStatus: (string)($row['worst_provider_status'] ?? ''),
             lastSeen: (int)($row['last_seen'] ?? 0),
             lastFingerprint: (string)($row['last_fingerprint'] ?? ''),
         );
@@ -54,5 +62,22 @@ final readonly class Instance
     public function isStale(int $now, int $toleranceSeconds = 172800): bool
     {
         return $this->lastSeen === 0 || ($now - $this->lastSeen) > $toleranceSeconds;
+    }
+
+    /**
+     * Vier Zustände, nicht drei. "unvollständig geprüft" ist bewusst weder
+     * grün noch rot: Wer nicht alles sehen konnte, darf keine Entwarnung
+     * geben, hat aber auch nichts Schlimmes gefunden.
+     */
+    public function healthState(int $now): string
+    {
+        if ($this->isStale($now)) {
+            return 'stale';
+        }
+        if ($this->worstProviderStatus === 'unavailable' || $this->worstProviderStatus === 'degraded') {
+            return 'incomplete';
+        }
+
+        return 'ok';
     }
 }

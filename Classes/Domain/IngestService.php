@@ -72,8 +72,10 @@ final class IngestService
                 'last_fingerprint' => $fingerprint,
                 'schema_version' => $schemaVersion,
                 'agent_version' => (string)($inventory['agent']['version'] ?? ''),
+                'worst_provider_status' => $this->worstStatus($providers),
             ],
             $this->summaryFromCore($providers['core'] ?? null),
+            $this->summaryFromPlatform($providers['platform'] ?? null),
         ));
 
         return ['stored' => $changed, 'fingerprint' => $fingerprint];
@@ -106,6 +108,60 @@ final class IngestService
             'typo3_major' => (int)($data['majorVersion'] ?? 0),
             'application_context' => (string)($data['applicationContext'] ?? ''),
         ];
+    }
+
+    /**
+     * PHP- und Datenbankversion für die Liste. Der Hub baut aus denselben
+     * Rohwerten später den config.platform-Block für Composer — deshalb
+     * meldet der Agent sie roh und bewertet nichts.
+     *
+     * @param mixed $platform
+     * @return array<string, mixed>
+     */
+    private function summaryFromPlatform($platform): array
+    {
+        $empty = ['php_version' => '', 'db_platform' => '', 'db_version' => ''];
+
+        // Auch ein degraded-Ergebnis trägt Daten — die nehmen wir mit, statt
+        // die Instanz so aussehen zu lassen, als hätte sie gar nichts gemeldet.
+        if (!is_array($platform)
+            || !in_array($platform['status'] ?? null, ['ok', 'degraded'], true)
+            || !is_array($platform['data'] ?? null)
+        ) {
+            return $empty;
+        }
+
+        $data = $platform['data'];
+
+        return [
+            'php_version' => (string)($data['php']['version'] ?? ''),
+            'db_platform' => (string)($data['database']['platform'] ?? ''),
+            'db_version' => (string)($data['database']['serverVersion'] ?? ''),
+        ];
+    }
+
+    /**
+     * Der schlechteste Zustand gewinnt. Ein einziger Provider, der nichts
+     * liefern konnte, macht die ganze Instanz "unvollständig geprüft" —
+     * denn niemand weiß, was in der Lücke gesteckt hätte.
+     *
+     * @param array<string, mixed> $providers
+     */
+    private function worstStatus(array $providers): string
+    {
+        $worst = 'ok';
+
+        foreach ($providers as $provider) {
+            $status = is_array($provider) ? ($provider['status'] ?? 'unavailable') : 'unavailable';
+            if ($status === 'unavailable') {
+                return 'unavailable';
+            }
+            if ($status === 'degraded') {
+                $worst = 'degraded';
+            }
+        }
+
+        return $worst;
     }
 
     /**

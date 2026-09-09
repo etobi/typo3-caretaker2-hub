@@ -23,6 +23,13 @@ CREATE TABLE tx_caretaker2_instance (
     typo3_version varchar(32) DEFAULT '' NOT NULL,
     typo3_major int(11) unsigned DEFAULT 0 NOT NULL,
     application_context varchar(64) DEFAULT '' NOT NULL,
+    php_version varchar(32) DEFAULT '' NOT NULL,
+    db_platform varchar(32) DEFAULT '' NOT NULL,
+    db_version varchar(64) DEFAULT '' NOT NULL,
+
+    # Der schlechteste Providerstatus dieses Inventars. Eine Instanz, bei der
+    # ein Provider nichts liefern konnte, darf nicht wie eine saubere aussehen.
+    worst_provider_status varchar(16) DEFAULT '' NOT NULL,
 
     last_seen int(11) unsigned DEFAULT 0 NOT NULL,
     last_fingerprint varchar(64) DEFAULT '' NOT NULL,
