@@ -600,6 +600,54 @@
             <trans-unit id="list.findings.acknowledged">
                 <source>%s acknowledged findings</source>
             </trans-unit>
+            <trans-unit id="tca.group.title">
+                <source>Caretaker2 group</source>
+            </trans-unit>
+            <trans-unit id="tca.group.field.title">
+                <source>Name</source>
+            </trans-unit>
+            <trans-unit id="tca.group.field.description">
+                <source>Note</source>
+            </trans-unit>
+            <trans-unit id="tca.tenant">
+                <source>Tenant</source>
+            </trans-unit>
+            <trans-unit id="tca.instance.title">
+                <source>Caretaker2 instance</source>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.title">
+                <source>Name</source>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.group">
+                <source>Group</source>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.url">
+                <source>URL</source>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.typo3">
+                <source>TYPO3</source>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.php">
+                <source>PHP</source>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.database">
+                <source>Database</source>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.context">
+                <source>Application context</source>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.agentVersion">
+                <source>Agent version</source>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.lastSeen">
+                <source>Last reported</source>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.hosts">
+                <source>Domains</source>
+            </trans-unit>
+            <trans-unit id="tca.instance.tab.reported">
+                <source>Reported</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>

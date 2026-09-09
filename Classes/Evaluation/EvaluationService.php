@@ -62,7 +62,7 @@ final class EvaluationService implements LoggerAwareInterface
         try {
             return $evaluator->evaluate($instance, $inventory);
         } catch (\Throwable $e) {
-            $this->logger?->warning('Evaluator fehlgeschlagen', [
+            $this->logger?->warning('Evaluator failed', [
                 'evaluator' => $evaluator->key(),
                 'instance' => $instance->uid,
                 'exception' => $e,

@@ -799,6 +799,70 @@
                 <source>%s acknowledged findings</source>
                 <target>%s quittierte Befunde</target>
             </trans-unit>
+            <trans-unit id="tca.group.title" approved="yes">
+                <source>Caretaker2 group</source>
+                <target>Caretaker2-Gruppe</target>
+            </trans-unit>
+            <trans-unit id="tca.group.field.title" approved="yes">
+                <source>Name</source>
+                <target>Name</target>
+            </trans-unit>
+            <trans-unit id="tca.group.field.description" approved="yes">
+                <source>Note</source>
+                <target>Notiz</target>
+            </trans-unit>
+            <trans-unit id="tca.tenant" approved="yes">
+                <source>Tenant</source>
+                <target>Mandant</target>
+            </trans-unit>
+            <trans-unit id="tca.instance.title" approved="yes">
+                <source>Caretaker2 instance</source>
+                <target>Caretaker2-Instanz</target>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.title" approved="yes">
+                <source>Name</source>
+                <target>Name</target>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.group" approved="yes">
+                <source>Group</source>
+                <target>Gruppe</target>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.url" approved="yes">
+                <source>URL</source>
+                <target>URL</target>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.typo3" approved="yes">
+                <source>TYPO3</source>
+                <target>TYPO3</target>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.php" approved="yes">
+                <source>PHP</source>
+                <target>PHP</target>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.database" approved="yes">
+                <source>Database</source>
+                <target>Datenbank</target>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.context" approved="yes">
+                <source>Application context</source>
+                <target>Application Context</target>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.agentVersion" approved="yes">
+                <source>Agent version</source>
+                <target>Agent-Version</target>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.lastSeen" approved="yes">
+                <source>Last reported</source>
+                <target>Zuletzt gemeldet</target>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.hosts" approved="yes">
+                <source>Domains</source>
+                <target>Domains</target>
+            </trans-unit>
+            <trans-unit id="tca.instance.tab.reported" approved="yes">
+                <source>Reported</source>
+                <target>Gemeldet</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

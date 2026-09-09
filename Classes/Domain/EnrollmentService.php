@@ -88,6 +88,6 @@ final class EnrollmentService
     {
         $host = parse_url($instanceUrl, PHP_URL_HOST);
 
-        return is_string($host) && $host !== '' ? $host : 'Neue Instanz';
+        return is_string($host) && $host !== '' ? $host : 'New instance';
     }
 }

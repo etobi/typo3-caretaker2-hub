@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 return [
     'ctrl' => [
-        'title' => 'Caretaker2 Gruppe',
+        'title' => 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:tca.group.title',
         'label' => 'title',
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
@@ -16,7 +16,7 @@ return [
     ],
     'columns' => [
         'title' => [
-            'label' => 'Name',
+            'label' => 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:tca.group.field.title',
             'config' => [
                 'type' => 'input',
                 'size' => 40,
@@ -25,14 +25,14 @@ return [
             ],
         ],
         'description' => [
-            'label' => 'Notiz',
+            'label' => 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:tca.group.field.description',
             'config' => [
                 'type' => 'text',
                 'rows' => 3,
             ],
         ],
         'tenant' => [
-            'label' => 'Mandant',
+            'label' => 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:tca.tenant',
             'config' => [
                 'type' => 'number',
                 'default' => 1,

@@ -169,7 +169,7 @@ final class ComposerEvaluator
 
         if (!is_array($decoded)) {
             throw new EvaluationException(sprintf(
-                'composer %s lieferte kein JSON (Exit %d): %s',
+                'composer %s returned no JSON (exit code %d): %s',
                 $arguments[0],
                 (int)$process->getExitCode(),
                 substr($process->getErrorOutput() ?: $output, 0, 400)
