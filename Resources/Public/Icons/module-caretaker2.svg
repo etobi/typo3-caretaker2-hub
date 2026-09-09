@@ -1,1 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M8 1.2 2.4 3.5v4.1c0 3.2 2.3 6.1 5.6 7.2 3.3-1.1 5.6-4 5.6-7.2V3.5L8 1.2Zm0 1.5 4.2 1.7v3.2c0 2.5-1.7 4.8-4.2 5.8-2.5-1-4.2-3.3-4.2-5.8V4.4L8 2.7Z"/><path d="M7.3 5.2h1.4v3.1h2.2v1.4H7.3V5.2Z"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+    <g fill="currentColor">
+        <path d="M8 9.2V3.3M8 9.2l5.11 2.95M8 9.2l-5.11 2.95"
+              fill="none" stroke="currentColor" stroke-width="1.05" stroke-linecap="round"/>
+        <circle cx="8" cy="9.2" r="2.7"/>
+        <circle cx="8" cy="3.3" r="1.35"/>
+        <circle cx="13.11" cy="12.15" r="1.35"/>
+        <circle cx="2.89" cy="12.15" r="1.35"/>
+    </g>
+</svg>
