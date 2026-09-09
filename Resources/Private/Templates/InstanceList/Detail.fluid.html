@@ -206,7 +206,9 @@
     <f:if condition="{inventorySize}">
         <f:then>
 
-            <h2>Provider</h2>
+            <details class="mb-4">
+                <summary>Provider ({providers -> f:count()})</summary>
+                <div class="mt-2">
             <f:for each="{providers}" as="provider">
                 <div class="card mb-3">
                     <div class="card-header">
@@ -245,11 +247,13 @@
                     </div>
                 </div>
             </f:for>
-
+                </div>
+            </details>
 
             <f:if condition="{history}">
-                <h2>Veränderungen</h2>
-                <div class="table-fit">
+                <details class="mb-4">
+                    <summary>Veränderungen ({history -> f:count()})</summary>
+                    <div class="table-fit mt-2">
                     <table class="table table-striped">
                         <thead><tr><th>Zeitpunkt</th><th></th><th>Fingerabdruck</th></tr></thead>
                         <tbody>
@@ -273,7 +277,8 @@
                             </f:for>
                         </tbody>
                     </table>
-                </div>
+                    </div>
+                </details>
             </f:if>
 
         </f:then>
