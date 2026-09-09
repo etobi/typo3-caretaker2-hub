@@ -2,7 +2,7 @@
 
 $EM_CONF[$_EXTKEY] = [
     'title' => 'Caretaker2 Hub',
-    'description' => 'Die Zentrale: nimmt Inventare der Agents entgegen, bewertet und zeigt sie an.',
+    'description' => 'The centre: takes in the agents\' inventories, evaluates them and shows them.',
     'category' => 'module',
     'author' => 'Tobias Liebig',
     'state' => 'alpha',

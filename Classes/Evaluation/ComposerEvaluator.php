@@ -27,7 +27,7 @@ final class ComposerEvaluator
     {
         $composer = $inventory['providers']['composer']['data'] ?? null;
         if (!is_array($composer) || !is_string($composer['lock'] ?? null)) {
-            throw new EvaluationException('Das Inventar enthält keine composer.lock.');
+            throw new EvaluationException('The inventory carries no composer.lock.');
         }
 
         $workspace = $this->prepareWorkspace($instanceUid);

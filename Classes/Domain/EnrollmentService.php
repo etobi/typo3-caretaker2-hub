@@ -66,7 +66,7 @@ final class EnrollmentService
         if ($row === false) {
             // Deliberately one message for all three cases — unknown, expired,
             // already used. Whoever guesses codes should not learn which.
-            throw new EnrollmentException('Code ist unbekannt, abgelaufen oder bereits eingelöst.');
+            throw new EnrollmentException('The code is unknown, expired or already redeemed.');
         }
 
         $tenant = (int)$row['tenant'];

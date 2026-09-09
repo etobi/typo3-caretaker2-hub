@@ -35,7 +35,7 @@ final class IngestService
         $schemaVersion = (int)($inventory['schemaVersion'] ?? 0);
         if ($schemaVersion < self::SCHEMA_MIN_SUPPORTED) {
             throw new IngestException(sprintf(
-                'Schemaversion %d wird nicht mehr unterstützt, mindestens %d nötig. Agent aktualisieren.',
+                'Schema version %d is no longer supported, %d is the minimum. Please update the agent.',
                 $schemaVersion,
                 self::SCHEMA_MIN_SUPPORTED
             ));
@@ -43,7 +43,7 @@ final class IngestService
 
         $providers = $inventory['providers'] ?? null;
         if (!is_array($providers)) {
-            throw new IngestException('Inventar enthält keine Provider.');
+            throw new IngestException('The inventory carries no providers.');
         }
 
         $fingerprint = $this->fingerprint($inventory);

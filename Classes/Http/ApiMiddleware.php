@@ -45,12 +45,12 @@ final class ApiMiddleware implements MiddlewareInterface, LoggerAwareInterface
         }
 
         if ($request->getMethod() !== 'POST') {
-            return $this->error('Nur POST.', 405);
+            return $this->error('POST only.', 405);
         }
 
         $payload = json_decode((string)$request->getBody(), true);
         if (!is_array($payload)) {
-            return $this->error('Body ist kein gültiges JSON.', 400);
+            return $this->error('The body is not valid JSON.', 400);
         }
 
         // From here on the hub always answers JSON. An exception passed through
@@ -61,9 +61,9 @@ final class ApiMiddleware implements MiddlewareInterface, LoggerAwareInterface
                 ? $this->handleEnroll($payload)
                 : $this->handleInventory($request, $payload);
         } catch (\Throwable $e) {
-            $this->logger?->error('Caretaker2-API fehlgeschlagen', ['exception' => $e]);
+            $this->logger?->error('The Caretaker2 API failed', ['exception' => $e]);
 
-            return $this->error('Interner Fehler im Hub: ' . $e->getMessage(), 500);
+            return $this->error('Internal error in the hub: ' . $e->getMessage(), 500);
         }
     }
 
@@ -76,7 +76,7 @@ final class ApiMiddleware implements MiddlewareInterface, LoggerAwareInterface
         $instanceUrl = (string)($payload['instanceUrl'] ?? '');
 
         if ($code === '' || $instanceUrl === '') {
-            return $this->error('code und instanceUrl sind erforderlich.', 400);
+            return $this->error('code and instanceUrl are required.', 400);
         }
 
         try {
@@ -99,12 +99,12 @@ final class ApiMiddleware implements MiddlewareInterface, LoggerAwareInterface
     {
         $token = $this->bearerToken($request);
         if ($token === null) {
-            return $this->error('Authorization: Bearer <token> fehlt.', 401);
+            return $this->error('Authorization: Bearer <token> is missing.', 401);
         }
 
         $instance = $this->instances->findByToken($token);
         if ($instance === null) {
-            return $this->error('Token ist unbekannt oder wurde widerrufen.', 403);
+            return $this->error('The token is unknown or has been revoked.', 403);
         }
 
         try {
