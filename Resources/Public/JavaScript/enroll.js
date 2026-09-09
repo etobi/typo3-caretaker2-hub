@@ -3,7 +3,6 @@ import Notification from '@typo3/backend/notification.js';
 import AjaxRequest from '@typo3/core/ajax/ajax-request.js';
 import { SeverityEnum } from '@typo3/backend/enum/severity.js';
 import { html } from 'lit';
-import '@typo3/backend/copy-to-clipboard.js';
 
 /**
  * Shows a fresh enrollment code in a modal.
@@ -12,15 +11,37 @@ import '@typo3/backend/copy-to-clipboard.js';
  * button remains a real submit button, so without JavaScript the server-side
  * path still works.
  */
+/**
+ * Copies through the window that owns the element.
+ *
+ * Modal resolves to the top frame's instance and appends the dialog to the top
+ * document, so anything inside it lives there and not in this module's frame.
+ * <typo3-copy-to-clipboard> would render but stay inert, because importing the
+ * module only registers the custom element in this frame's registry. Reading
+ * the clipboard API off the owning window keeps the call in the same document
+ * as the click that triggered it.
+ */
+const copy = (event, value) => {
+  const clipboard = event.target.ownerDocument.defaultView?.navigator?.clipboard;
+
+  if (!clipboard) {
+    Notification.warning('Kopieren nicht verfügbar', 'Bitte den Wert von Hand markieren.', 6);
+    return;
+  }
+
+  clipboard.writeText(value)
+    .then(() => Notification.success('Kopiert', '', 2))
+    .catch(() => Notification.warning('Kopieren nicht möglich', 'Bitte den Wert von Hand markieren.', 6));
+};
+
 const field = (label, value) => html`
   <div class="form-group">
     <label class="form-label">${label}</label>
     <div class="input-group">
       <input type="text" class="form-control" readonly value=${value}
              @focus=${(event) => event.target.select()}>
-      <typo3-copy-to-clipboard class="btn btn-default" title="Kopieren" text=${value}>
-        <typo3-backend-icon identifier="actions-clipboard" size="small"></typo3-backend-icon>
-      </typo3-copy-to-clipboard>
+      <button type="button" class="btn btn-default"
+              @click=${(event) => copy(event, value)}>Kopieren</button>
     </div>
   </div>
 `;
