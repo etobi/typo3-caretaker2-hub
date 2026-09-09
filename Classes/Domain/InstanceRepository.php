@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Caretaker2\Hub\Domain;
 
 use Doctrine\DBAL\ParameterType;
-use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 
 final class InstanceRepository
@@ -122,6 +121,6 @@ final class InstanceRepository
         $values['tstamp'] = time();
         $this->connectionPool
             ->getConnectionForTable(self::TABLE)
-            ->update(self::TABLE, $values, ['uid' => $uid], [Connection::PARAM_INT]);
+            ->update(self::TABLE, $values, ['uid' => $uid]);
     }
 }
