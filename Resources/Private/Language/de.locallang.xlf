@@ -168,7 +168,7 @@
                 <target>Die Instanz hat sich länger nicht gemeldet. Die Angaben sind womöglich veraltet.</target>
             </trans-unit>
             <trans-unit id="typo3.status.stable" approved="yes">
-                <source>current</source>
+                <source>latest</source>
                 <target>aktuell</target>
             </trans-unit>
             <trans-unit id="typo3.status.oldstable" approved="yes">
@@ -456,7 +456,7 @@
                 <target>Fingerabdruck</target>
             </trans-unit>
             <trans-unit id="detail.history.latest" approved="yes">
-                <source>current</source>
+                <source>latest</source>
                 <target>aktuell</target>
             </trans-unit>
             <trans-unit id="detail.history.shown" approved="yes">

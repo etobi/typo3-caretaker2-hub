@@ -127,7 +127,7 @@
                 <source>The instance has not reported for a while. The data may be out of date.</source>
             </trans-unit>
             <trans-unit id="typo3.status.stable">
-                <source>current</source>
+                <source>latest</source>
             </trans-unit>
             <trans-unit id="typo3.status.oldstable">
                 <source>maintained</source>
@@ -343,7 +343,7 @@
                 <source>Fingerprint</source>
             </trans-unit>
             <trans-unit id="detail.history.latest">
-                <source>current</source>
+                <source>latest</source>
             </trans-unit>
             <trans-unit id="detail.history.shown">
                 <source>shown</source>
