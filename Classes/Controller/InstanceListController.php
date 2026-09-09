@@ -34,15 +34,9 @@ use TYPO3\CMS\Core\Page\PageRenderer;
 /**
  * The overview: every instance, its state, and the way to connect a new one.
  */
-// Module routes are resolved through the container. Without this tag the
-// controller is not a public service, and TYPO3 falls back to makeInstance()
-// without constructor arguments.
 #[AsController]
 final class InstanceListController
 {
-    /**
-     * Severities in the order they are shown and weighed, worst first.
-     */
     private const SEVERITY_COLOURS = [
         'critical' => 'danger',
         'high' => 'danger',
@@ -103,8 +97,6 @@ final class InstanceListController
             ? $this->snapshots->findInventoryByUid($wanted, $instanceId)
             : null;
 
-        // Hiding the buttons is not enough — every action describes the
-        // current state and must not run from a view of an older one.
         $readOnly = $historic !== null;
 
         $message = null;
@@ -153,13 +145,9 @@ final class InstanceListController
             [$ok, $message] = $this->triggerClient->trigger($instance);
             $messageSeverity = $ok ? 'success' : 'warning';
 
-            // The agent pushes synchronously, so the fresh data is already
-            // here — re-read the instance instead of showing the stale row.
             $instance = $this->instances->findByUid($instanceId) ?? $instance;
         }
 
-        // The modals are built in JavaScript, so their labels have to travel
-        // with the page rather than through the Fluid template.
         $this->pageRenderer->addInlineLanguageLabelFile(self::LANGUAGE_FILE);
         $this->pageRenderer->loadJavaScriptModule('@caretaker2/hub/acknowledge.js');
 
@@ -209,17 +197,12 @@ final class InstanceListController
             'inventorySize' => $inventory === null
                 ? 0
                 : strlen((string)json_encode($inventory)),
-            // Comes in as an ISO 8601 string in UTC. Passed on as a timestamp
-            // so it renders through the same path — and in the same time zone —
-            // as every other date on the page.
             'generatedAt' => $this->toTimestamp($inventory['generatedAt'] ?? null),
             'schemaVersion' => $inventory['schemaVersion'] ?? null,
             'history' => $this->presentHistory($this->snapshots->findHistory($instanceId), $instanceId, $wanted),
             'snapshotCount' => $this->snapshots->countForInstance($instanceId),
             'message' => $message,
             'messageSeverity' => $messageSeverity,
-            // Nothing here is evaluated on the spot — the scheduler does that.
-            // Saying so beats letting someone read stale findings as current.
             'evaluationPending' => $instance->needsEvaluation || $instance->evaluatedAt === 0,
             'evaluatedAt' => $instance->evaluatedAt,
             'findings' => $this->presentFindings($open),
@@ -274,8 +257,6 @@ final class InstanceListController
                 ->setClasses('btn btn-default')
                 ->setAttributes([
                     'type' => 'submit',
-                    // The button sits in the doc header, the form in the content.
-                    // That way the server-side path still carries without JavaScript.
                     'form' => 'caretaker2-enroll',
                     'name' => 'createCode',
                     'value' => '1',
@@ -305,8 +286,6 @@ final class InstanceListController
 
         $view->assignMultiple([
             'groups' => $groups,
-            // A single catch-all group is not a grouping, so the heading row
-            // stays away.
             'showGroupHeadings' => count($groups) > 1 || ($groups[0]['uid'] ?? 0) !== 0,
             'summary' => $this->summarize($instances, $now),
             'enrollmentCode' => $enrollmentCode,
@@ -378,9 +357,6 @@ final class InstanceListController
             'phpVersion' => $instance->phpVersion,
             'phpSupport' => $this->phpBadge($instance),
             'context' => $instance->applicationContext,
-            // Without a site configuration only the instance address is left.
-            // That one is a full URL where site domains are host names — side by
-            // side, one would carry a scheme and the other would not.
             'siteHosts' => $instance->siteHosts !== []
                 ? $instance->siteHosts
                 : array_values(array_filter([parse_url($instance->instanceUrl, PHP_URL_HOST)])),
@@ -389,9 +365,6 @@ final class InstanceListController
             'lastSeen' => $instance->lastSeen,
             'state' => $state,
             'stateLabel' => $this->stateLabel($state),
-            // "Findings open" is one state but not one weight: the colour comes
-            // from the worst thing that is open, or the badge would play down
-            // three high findings as a grey aside.
             'stateSeverity' => $state === 'attention'
                 ? (self::SEVERITY_COLOURS[$this->worstSeverity($findingCounts)] ?? 'secondary')
                 : $this->stateSeverity($state),
@@ -421,10 +394,6 @@ final class InstanceListController
     }
 
     /**
-     * The provider status with its reason in plain words. This is where "no
-     * data" becomes visibly different from "no findings": it says why something
-     * is missing.
-     *
      * @param array<string, mixed>|null $inventory
      * @return list<array<string, mixed>>
      */
@@ -456,10 +425,6 @@ final class InstanceListController
     }
 
     /**
-     * A composer.lock is a quarter of a megabyte. Dumping it into the page
-     * would make the whole view unusable, so oversized values are replaced by
-     * a note naming their size — the data itself is untouched in the snapshot.
-     *
      * @param mixed $data
      * @return array{0: string|null, 1: list<array{key: string, bytes: int}>}
      */
@@ -476,7 +441,7 @@ final class InstanceListController
                 $size = strlen((string)json_encode($value));
                 if ($size > self::MAX_RENDERED_VALUE_BYTES) {
                     $omitted[] = ['key' => (string)$key, 'bytes' => $size];
-                    $data[$key] = sprintf('… %s Bytes, hier nicht dargestellt', number_format($size, 0, ',', '.'));
+                    $data[$key] = $this->ll('detail.providers.omittedValue', number_format($size, 0, ',', '.'));
                 }
             }
         }
@@ -562,8 +527,6 @@ final class InstanceListController
      */
     private function breadcrumb(Instance $instance, ?array $historic): array
     {
-        // The module hierarchy is prepended by TYPO3 itself, so these are the
-        // nodes below it — anything else would show "Instanzen" twice.
         $nodes = [
             new BreadcrumbNode(
                 identifier: 'caretaker2-instance-' . $instance->uid,
@@ -588,10 +551,6 @@ final class InstanceListController
     }
 
     /**
-     * Instances arranged under their group, ungrouped ones last. A group with
-     * no instances is left out — the list answers "what do I have", not "what
-     * have I defined".
-     *
      * @param list<array<string, mixed>> $instances
      * @return list<array<string, mixed>>
      */
@@ -619,8 +578,6 @@ final class InstanceListController
             unset($buckets[$uid]);
         }
 
-        // Also catches instances whose group was deleted: they must not vanish
-        // from the list just because the record they pointed at is gone.
         $remaining = [];
         foreach ($buckets as $rest) {
             $remaining = array_merge($remaining, $rest);
@@ -639,11 +596,6 @@ final class InstanceListController
         return $out;
     }
 
-    /**
-     * A submit button in the doc header whose form lives in the content. Going
-     * through the form attribute keeps the server-side path alive, which is
-     * still needed without JavaScript.
-     */
     private function addSubmitButton(
         ModuleTemplate $view,
         string $formId,
@@ -677,10 +629,6 @@ final class InstanceListController
     }
 
     /**
-     * The sites of whichever snapshot is on screen, each with the domains it
-     * serves. Taken from the inventory rather than from the denormalised
-     * column on the instance, which only holds the flat set of hosts.
-     *
      * @param array<string, mixed>|null $inventory
      * @return list<array<string, mixed>>
      */
@@ -711,9 +659,6 @@ final class InstanceListController
     }
 
     /**
-     * The header values of whichever snapshot is on screen — not of the
-     * instance row, which always holds the latest.
-     *
      * @param array<string, mixed>|null $inventory
      * @return array<string, string>
      */
@@ -760,10 +705,6 @@ final class InstanceListController
     }
 
     /**
-     * Label and colour for the support status of a TYPO3 version. Green for
-     * the latest, blue for the ones still in regular maintenance, yellow for
-     * ELTS, red for anything without support.
-     *
      * @return array<string, string>
      */
     private function supportBadge(Instance $instance): array
@@ -811,9 +752,6 @@ final class InstanceListController
     }
 
     /**
-     * The same for the PHP branch. Green while it is actively supported,
-     * yellow while only security fixes arrive, red after that.
-     *
      * @return array<string, string>
      */
     private function phpBadge(Instance $instance): array
@@ -850,9 +788,6 @@ final class InstanceListController
     }
 
     /**
-     * Two red states next to each other do not say how they differ. The hover
-     * text does.
-     *
      * @param array<string, int> $counts
      */
     private function stateHint(string $state, Instance $instance, array $counts): string
@@ -888,10 +823,6 @@ final class InstanceListController
         return '';
     }
 
-    /**
-     * Whoever clicked. Stored alongside the note so that in half a year one
-     * can ask the person who waved a finding through.
-     */
     private function currentUser(ServerRequestInterface $request): string
     {
         $user = $request->getAttribute('backend.user');
@@ -904,10 +835,6 @@ final class InstanceListController
 
     private function stateLabel(string $state): string
     {
-        // "unsupported" is deliberately not "security hole": all that is
-        // known is that nothing arrives any more. And "incomplete" is not
-        // "error" — nothing is broken, we just do not know everything, which
-        // is a statement of its own and must not pass as an all-clear.
         return in_array($state, ['ok', 'attention', 'vulnerable', 'unsupported', 'incomplete', 'stale'], true)
             ? $this->ll('state.' . $state)
             : $state;
@@ -940,12 +867,6 @@ final class InstanceListController
     }
 
     /**
-     * Findings grouped by how bad they are, worst first.
-     *
-     * By severity rather than by kind: whether something is an advisory or an
-     * outdated package says what it is, not how much it matters, and the
-     * column has room for one of the two.
-     *
      * @param array<string, int> $severities
      * @return list<array<string, string|int>>
      */
@@ -970,13 +891,6 @@ final class InstanceListController
         return $badges;
     }
 
-    /**
-     * A finding title is either text we did not write — an advisory from
-     * Packagist, a message from TYPO3's own checks — or one of our keys with
-     * its arguments beside it. Only the latter is translated, and a key whose
-     * placeholders no longer match its arguments falls back to the plain
-     * sentence rather than throwing in the user's face.
-     */
     private function findingTitle(string $title, string $arguments): string
     {
         if (!str_starts_with($title, 'LLL:')) {
@@ -1012,11 +926,9 @@ final class InstanceListController
         return $GLOBALS['LANG'];
     }
 
-    /**
-     * "10.11.18-MariaDB-ubu2204-log" is unusable as a column value.
-     */
     private function shortenDbVersion(string $version): string
     {
+        // "10.11.18-MariaDB-ubu2204-log" is unusable as a column value.
         return preg_match('/^(\d+\.\d+\.\d+)/', $version, $m) === 1 ? $m[1] : $version;
     }
 }

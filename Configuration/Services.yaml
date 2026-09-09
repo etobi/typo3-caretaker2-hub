@@ -4,9 +4,6 @@ services:
     autoconfigure: true
     public: false
 
-  # Like the providers in the agent: every class implementing
-  # EvaluatorInterface is asked automatically, including from another
-  # extension.
   _instanceof:
     Caretaker2\Hub\Evaluation\EvaluatorInterface:
       tags: ['caretaker2.evaluator']

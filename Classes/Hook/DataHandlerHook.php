@@ -10,17 +10,6 @@ use Caretaker2\Hub\Domain\GroupRepository;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-/**
- * Removes what a deleted record leaves behind.
- *
- * Snapshots and findings carry no TCA and are invisible to DataHandler, so
- * deleting an instance would leave them in place. Not only waste:
- * auto_increment reuses ids after a table is rebuilt, and a later instance
- * would inherit a history that is not its own.
- *
- * A hook rather than an event, because the core offers no PSR-14 event for
- * deletion.
- */
 final class DataHandlerHook
 {
     /**

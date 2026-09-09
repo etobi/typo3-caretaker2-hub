@@ -12,26 +12,8 @@ use TYPO3\CMS\Scheduler\Domain\Repository\SchedulerTaskRepository;
 use TYPO3\CMS\Scheduler\Execution;
 use TYPO3\CMS\Scheduler\Task\ExecuteSchedulableCommandTask;
 
-/**
- * The hub's own scheduler tasks.
- *
- * Without them nothing is evaluated any more and the findings quietly stop
- * being refreshed, which is the worst way for a monitoring system to fail.
- * Hence the check in the instance list.
- */
 final class HubTaskInstaller
 {
-    /**
-     * Command to cron expression.
-     *
-     * Cron and not an interval: v14 persists through DataHandler, whose hook
-     * rebuilds the execution from the record and reads "frequency" or
-     * "cronCmd" there. An interval is dropped and the task runs exactly once.
-     *
-     * Five minutes is cheap because the evaluation only touches what changed
-     * or aged out. v14 also stores no options for a console task, so what the
-     * command does bare is what the scheduler does.
-     */
     public const TASKS = [
         'caretaker2:evaluate' => '*/5 * * * *',
         'caretaker2:cleanup' => '17 3 * * *',
@@ -51,7 +33,7 @@ final class HubTaskInstaller
     }
 
     /**
-     * @return list<string> commands without a task
+     * @return list<string>
      */
     public function missing(): array
     {
@@ -118,8 +100,6 @@ final class HubTaskInstaller
         }
 
         if ($saved === false) {
-            // The repository writes through DataHandler, which needs a backend
-            // user. In the module there is one.
             throw new SchedulerTaskException($this->ll('scheduler.taskFailed'));
         }
     }

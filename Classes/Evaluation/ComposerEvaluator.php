@@ -123,11 +123,6 @@ final class ComposerEvaluator
         return $platform;
     }
 
-    /**
-     * Composer rejects platform package names it cannot parse, and a single
-     * bad name aborts the whole run. Agents normalise this themselves, but an
-     * older one must not be able to break the evaluation.
-     */
     private function normalizePackageName(string $name): ?string
     {
         $name = str_replace(' ', '-', strtolower(trim($name)));
@@ -135,15 +130,6 @@ final class ComposerEvaluator
         return preg_match('/^[a-z0-9]([_.-]?[a-z0-9]+)*$/', $name) === 1 ? $name : null;
     }
 
-    /**
-     * Not every extension reports a plain version. mysqlnd answers
-     * "mysqlnd 8.3.31", others return build strings, and composer rejects
-     * anything it cannot parse — one such value aborts the whole run.
-     *
-     * A leading or embedded version is used as-is. Anything without one is
-     * left out entirely rather than guessed at: composer then treats the
-     * extension as absent, which is the safer error.
-     */
     private function versionFrom(string $version): ?string
     {
         $version = trim($version);
@@ -170,8 +156,6 @@ final class ComposerEvaluator
             array_merge([$this->composerBinary], $arguments, ['--no-interaction']),
             $workspace,
             [
-                // Per tenant, so that credentials for a private repository can
-                // never leak into another tenant's run.
                 'COMPOSER_HOME' => $home,
                 'COMPOSER_NO_INTERACTION' => '1',
                 'COMPOSER_DISABLE_XDEBUG_WARN' => '1',
@@ -220,7 +204,7 @@ final class ComposerEvaluator
     private function ensureDirectory(string $path): void
     {
         if (!is_dir($path) && !mkdir($path, 0775, true) && !is_dir($path)) {
-            throw new EvaluationException(sprintf('Verzeichnis %s konnte nicht angelegt werden.', $path));
+            throw new EvaluationException(sprintf('The directory %s could not be created.', $path));
         }
     }
 }

@@ -25,9 +25,6 @@ final class InstanceRepository
         $rows = $qb
             ->select('*')
             ->from(self::TABLE)
-            // The tenant condition lives here and not at the call site. An
-            // optional parameter one can forget is exactly the gap that turns
-            // up later as a data leak.
             ->where($qb->expr()->eq('tenant', $qb->createNamedParameter($tenant, ParameterType::INTEGER)))
             ->orderBy('title')
             ->executeQuery()
@@ -37,8 +34,7 @@ final class InstanceRepository
     }
 
     /**
-     * Finds the instance for a token. The hash is what is compared; the token
-     * itself is nowhere in the database.
+     * Finds the instance for a token.
      */
     public function findByToken(string $token): ?Instance
     {
@@ -57,10 +53,6 @@ final class InstanceRepository
         return $row === false ? null : Instance::fromRow($row);
     }
 
-    /**
-     * The tenant condition is here too, not only in findAll() — otherwise a
-     * guessed uid would be the way around it.
-     */
     public function findByUid(int $uid, int $tenant = 1): ?Instance
     {
         $qb = $this->connectionPool->getQueryBuilderForTable(self::TABLE);
@@ -79,11 +71,6 @@ final class InstanceRepository
     }
 
     /**
-     * Instances waiting for an evaluation: either their inventory changed, or
-     * their last evaluation is old enough that a newly published advisory
-     * could have appeared since. An untouched instance can become vulnerable
-     * overnight without sending anything.
-     *
      * @return list<Instance>
      */
     public function findPendingEvaluation(int $maxAgeSeconds, int $limit, int $tenant = 1): array

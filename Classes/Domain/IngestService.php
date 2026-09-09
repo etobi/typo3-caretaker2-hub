@@ -49,9 +49,6 @@ final class IngestService
         $fingerprint = $this->fingerprint($inventory);
         $changed = $fingerprint !== $instance->lastFingerprint;
 
-        // A snapshot only when something changed. The history falls out of
-        // that as a chain of differences, without being kept separately, and a
-        // daily push costs nothing on the days nothing moved.
         if ($changed) {
             $this->connectionPool->getConnectionForTable(self::TABLE_SNAPSHOT)->insert(
                 self::TABLE_SNAPSHOT,
@@ -74,9 +71,6 @@ final class IngestService
                 'schema_version' => $schemaVersion,
                 'agent_version' => (string)($inventory['agent']['version'] ?? ''),
                 'worst_provider_status' => $this->worstStatus($providers),
-                // Changed manifest means the findings are stale. Unchanged
-                // ones are re-evaluated by age instead, because a new advisory
-                // can make an untouched instance vulnerable overnight.
                 'needs_evaluation' => $changed ? 1 : (int)$instance->needsEvaluation,
             ],
             $this->summaryFromCore($providers['core'] ?? null),
@@ -88,10 +82,6 @@ final class IngestService
     }
 
     /**
-     * The figures for the instance list. If the core provider is missing or
-     * delivered nothing, the fields stay empty and the list says so, rather
-     * than carrying an old value forward.
-     *
      * @param mixed $core
      * @return array<string, mixed>
      */
@@ -117,10 +107,6 @@ final class IngestService
     }
 
     /**
-     * PHP and database version for the list. The hub later builds composer's
-     * config.platform block from the same raw values, which is why the agent
-     * reports them raw and judges nothing.
-     *
      * @param mixed $platform
      * @return array<string, mixed>
      */
@@ -170,10 +156,6 @@ final class IngestService
     }
 
     /**
-     * The worst state wins. A single provider that could deliver nothing makes
-     * the whole instance "incompletely checked", because nobody knows what
-     * would have been in the gap.
-     *
      * @param array<string, mixed> $providers
      */
     private function worstStatus(array $providers): string

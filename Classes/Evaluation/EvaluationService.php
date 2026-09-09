@@ -11,11 +11,6 @@ use Psr\Log\LoggerAwareTrait;
 
 /**
  * Runs every evaluator over an instance and stores what they found.
- *
- * The service itself judges nothing — it collects. Each evaluator is asked in
- * turn, and one that throws costs only its own findings: the failure becomes an
- * unassessable finding and the rest still run. Anything else would let a
- * network hiccup in the composer evaluation hide an end-of-life PHP.
  */
 final class EvaluationService implements LoggerAwareInterface
 {

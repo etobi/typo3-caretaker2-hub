@@ -8,11 +8,7 @@ use Doctrine\DBAL\ParameterType;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 
 /**
- * Connecting an instance without a key exchange.
- *
- * The hub hands out a short-lived code, the instance trades it for a lasting
- * token. No redirect, no callback, no two systems that have to reach each
- * other — the instance speaks, the hub answers.
+ * The hub hands out a short-lived code, the instance trades it for a lasting token.
  */
 final class EnrollmentService
 {
@@ -64,8 +60,6 @@ final class EnrollmentService
             ->fetchAssociative();
 
         if ($row === false) {
-            // Deliberately one message for all three cases — unknown, expired,
-            // already used. Whoever guesses codes should not learn which.
             throw new EnrollmentException('The code is unknown, expired or already redeemed.');
         }
 
@@ -90,10 +84,6 @@ final class EnrollmentService
         return $token;
     }
 
-    /**
-     * A usable display name without asking: the host name. Renaming it later
-     * is a backend edit away.
-     */
     private function deriveTitle(string $instanceUrl): string
     {
         $host = parse_url($instanceUrl, PHP_URL_HOST);

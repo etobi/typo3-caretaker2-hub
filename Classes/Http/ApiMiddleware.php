@@ -19,9 +19,6 @@ use TYPO3\CMS\Core\Http\JsonResponse;
 
 /**
  * The API the agents speak to.
- *
- * Runs ahead of site resolution so that it works even when the hub has no site
- * configured at all, or the frontend is busy with something else.
  */
 final class ApiMiddleware implements MiddlewareInterface, LoggerAwareInterface
 {
@@ -53,9 +50,6 @@ final class ApiMiddleware implements MiddlewareInterface, LoggerAwareInterface
             return $this->error('The body is not valid JSON.', 400);
         }
 
-        // From here on the hub always answers JSON. An exception passed through
-        // would reach the agent as an HTML error page, out of which it can make
-        // no usable message for the console.
         try {
             return $path === self::PATH_ENROLL
                 ? $this->handleEnroll($payload)

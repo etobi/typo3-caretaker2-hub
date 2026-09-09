@@ -6,12 +6,6 @@ namespace Caretaker2\Hub\Evaluation;
 
 /**
  * One thing that is wrong with an instance.
- *
- * The title is either finished text we did not write — an advisory title from
- * Packagist, a message from TYPO3's own checks — or an LLL key of ours whose
- * placeholders come from titleArguments. Findings are stored, so a translated
- * sentence would freeze the language of whoever ran the evaluation; a key does
- * not.
  */
 final readonly class Finding
 {

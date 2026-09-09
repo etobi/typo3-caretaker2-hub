@@ -2,12 +2,6 @@
 
 declare(strict_types=1);
 
-/**
- * The agent writes almost every field. Editable are the two that hold a
- * decision of the operator's: the display name and the group. The rest sits
- * next to them read-only, so that one record has everything together without
- * inviting an accidental overwrite.
- */
 return [
     'ctrl' => [
         'title' => 'Caretaker2 Instanz',
@@ -20,8 +14,6 @@ return [
         'iconfile' => 'EXT:caretaker2_hub/Resources/Public/Icons/module-caretaker2.svg',
         'enablecolumns' => [],
         'searchFields' => 'title,instance_url,site_hosts',
-        // The token exists only as a hash, but a copied record would carry the
-        // same one — and with it two instances reporting as the same.
         'hideTable' => false,
         'readOnly' => false,
     ],

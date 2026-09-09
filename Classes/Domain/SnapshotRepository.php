@@ -40,9 +40,6 @@ final class SnapshotRepository
     }
 
     /**
-     * One particular snapshot, restricted to the instance so that a guessed
-     * uid does not lead into someone else's data.
-     *
      * @return array{crdate: int, inventory: array<string, mixed>}|null
      */
     public function findInventoryByUid(int $snapshotUid, int $instanceId): ?array
@@ -71,8 +68,6 @@ final class SnapshotRepository
     }
 
     /**
-     * Metadata only — the payloads would be far too large for a list.
-     *
      * @return list<array{uid: int, crdate: int, fingerprint: string}>
      */
     public function findHistory(int $instanceId, int $limit = 50): array

@@ -11,16 +11,6 @@ use TYPO3\CMS\Core\Http\RequestFactory;
 
 /**
  * Support status of the TYPO3 major versions, from get.typo3.org.
- *
- * The dates are not ours to keep: they move when the TYPO3 project moves them,
- * and a hardcoded table would quietly go wrong. Cached for a day, because they
- * change a few times a year at most.
- *
- * The major alone does not settle the status. ELTS releases carry patch levels
- * beyond the last public one — 11.5.42 and up, where 11.5.41 was the last free
- * release — so an installation sitting on that last free release is inside the
- * ELTS window without receiving any of it. That case is the dangerous one, and
- * it looks identical to a supported instance if only the major is considered.
  */
 final class Typo3MajorVersions implements LoggerAwareInterface
 {
@@ -93,7 +83,7 @@ final class Typo3MajorVersions implements LoggerAwareInterface
         $majors = $this->fetch(self::ENDPOINT_MAJORS);
         $releases = $this->fetch(self::ENDPOINT_RELEASES);
         if ($majors === null || $releases === null) {
-            // Nothing cached: better to say "unknown" than to invent a status.
+            // Nothing cached: better to say "unknown"
             return [];
         }
 
@@ -114,7 +104,7 @@ final class Typo3MajorVersions implements LoggerAwareInterface
                 'headers' => ['Accept' => 'application/json'],
             ]);
         } catch (\Throwable $e) {
-            $this->logger?->warning('get.typo3.org nicht erreichbar', ['exception' => $e]);
+            $this->logger?->warning('get.typo3.org is unreachable', ['exception' => $e]);
 
             return null;
         }

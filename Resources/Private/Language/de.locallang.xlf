@@ -759,6 +759,10 @@
                 <source>The task could not be created.</source>
                 <target>Der Task ließ sich nicht anlegen.</target>
             </trans-unit>
+            <trans-unit id="detail.providers.omittedValue" approved="yes">
+                <source>… %s bytes, not shown here</source>
+                <target>… %s Bytes, hier nicht dargestellt</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

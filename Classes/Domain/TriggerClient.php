@@ -8,10 +8,6 @@ use TYPO3\CMS\Core\Http\RequestFactory;
 
 /**
  * Asks an instance to report right away.
- *
- * The hub never receives data on this path — it only knocks, and the agent
- * pushes through the same route it always uses. Nothing about the instance
- * travels back in the response.
  */
 final class TriggerClient
 {

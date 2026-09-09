@@ -570,6 +570,9 @@
             <trans-unit id="scheduler.taskFailed">
                 <source>The task could not be created.</source>
             </trans-unit>
+            <trans-unit id="detail.providers.omittedValue">
+                <source>… %s bytes, not shown here</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>

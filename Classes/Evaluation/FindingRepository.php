@@ -14,10 +14,6 @@ final class FindingRepository
 
     private const SEVERITY_ORDER = ['critical', 'high', 'unknown', 'medium', 'low', 'info'];
 
-    /**
-     * In the order they are shown: the most urgent first. "unknown" sits with
-     * the severe ones, because a missing rating is not a clean bill.
-     */
     private const EMPTY_SEVERITIES = [
         'critical' => 0,
         'high' => 0,
@@ -32,12 +28,6 @@ final class FindingRepository
     ) {}
 
     /**
-     * Replaces the findings of one instance with a fresh set.
-     *
-     * Known findings keep their first_seen and their acknowledgement — a
-     * finding that is merely re-detected must not pop back up as new, or
-     * acknowledging anything would be pointless.
-     *
      * @param list<Finding> $findings
      * @return array{added: int, kept: int, resolved: int}
      */
@@ -63,8 +53,6 @@ final class FindingRepository
             if (isset($existing[$key])) {
                 $previous = $existing[$key];
 
-                // A finding that got worse comes back. Acknowledging "medium"
-                // must not silently cover the same package turning critical.
                 if ($this->isMoreSevere($finding->severity, (string)$previous['severity'])) {
                     $row['acknowledged'] = 0;
                     $row['ack_note'] = null;
@@ -122,9 +110,6 @@ final class FindingRepository
             ->set('tstamp', $now)
             ->where(
                 $qb->expr()->in('uid', $qb->createNamedParameter($uids, ArrayParameterType::INTEGER)),
-                // Scoped to the instance and tenant on purpose: the uids come
-                // from a form and must not be able to reach another instance's
-                // findings.
                 $qb->expr()->eq('instance', $qb->createNamedParameter($instance, ParameterType::INTEGER)),
                 $qb->expr()->eq('tenant', $qb->createNamedParameter($tenant, ParameterType::INTEGER)),
             )
@@ -219,9 +204,6 @@ final class FindingRepository
     }
 
     /**
-     * Counts for many instances in one query — a list of a hundred instances
-     * must not turn into a hundred round trips.
-     *
      * @param list<int> $instanceIds
      * @return array<int, array<string, int>>
      */
@@ -260,10 +242,6 @@ final class FindingRepository
             if (isset($counts[$uid][$type])) {
                 $counts[$uid][$type] += $amount;
             }
-            // "unknown" counts as serious. A missing rating is not evidence of
-            // harmlessness — and because the rating comes from the GitHub
-            // Advisory Database, which lags the FriendsOfPHP feed by days, the
-            // advisories without one are precisely the newest.
             $severity = (string)$row['severity'];
             if (isset($counts[$uid]['severities'][$severity])) {
                 $counts[$uid]['severities'][$severity] += $amount;
@@ -274,8 +252,6 @@ final class FindingRepository
                 $counts[$uid]['securityHigh'] += $amount;
             }
 
-            // A TYPO3 version past its updates is not a package finding, but it
-            // decides the state of the instance just as much.
             if ($type === Finding::TYPE_TYPO3_ELTS_UNPATCHED || $type === Finding::TYPE_TYPO3_UNSUPPORTED) {
                 $counts[$uid]['typo3Unsupported'] += $amount;
             }

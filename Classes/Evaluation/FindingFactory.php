@@ -4,14 +4,6 @@ declare(strict_types=1);
 
 namespace Caretaker2\Hub\Evaluation;
 
-/**
- * Turns composer's output into findings.
- *
- * The one judgement made here is the severity mapping. Everything else is a
- * direct translation — composer already knows whether an update is allowed by
- * the constraint, and that distinction is what makes the list actionable
- * rather than noisy.
- */
 final class FindingFactory
 {
     /**
@@ -44,9 +36,6 @@ final class FindingFactory
 
                 $findings[] = new Finding(
                     type: Finding::TYPE_SECURITY,
-                    // Composer leaves severity empty for some advisories.
-                    // Unknown is not the same as harmless, so it ranks above
-                    // low rather than below it.
                     severity: $this->normalizeSeverity($advisory['severity'] ?? null),
                     identifier: $identifier,
                     package: (string)$package,
@@ -92,9 +81,6 @@ final class FindingFactory
                 title: $isSafe
                     ? 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.update_safe'
                     : 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.update_major',
-                // Deliberately no link. The package homepage has nothing to do
-                // with what this sentence says, and a link that does not lead
-                // where its text promises is worse than none.
                 link: '',
             );
         }
@@ -130,10 +116,6 @@ final class FindingFactory
     }
 
     /**
-     * Repositories the hub cannot reach are reported as their own finding.
-     * Silently leaving them out would make an instance look fully checked
-     * when part of it was never looked at.
-     *
      * @return list<Finding>
      */
     private function unassessable(EvaluationResult $result): array

@@ -9,7 +9,6 @@ return [
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
         'sortby' => 'sorting',
-        // Global records, not bound to a page.
         'rootLevel' => 1,
         'iconfile' => 'EXT:caretaker2_hub/Resources/Public/Icons/module-caretaker2.svg',
         'enablecolumns' => [],

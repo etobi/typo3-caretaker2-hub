@@ -6,9 +6,6 @@ namespace Caretaker2\Hub\Domain;
 
 /**
  * A monitored instance as the hub knows it.
- *
- * Deliberately a plain object over a Doctrine table rather than an Extbase
- * model: these records are written by machines almost exclusively.
  */
 final readonly class Instance
 {
@@ -85,21 +82,11 @@ final readonly class Instance
         return is_array($decoded) ? $decoded : null;
     }
 
-    /**
-     * Because the agent pushes, a missing push is the sign of life. An
-     * instance that has not reported for two days stands out without the hub
-     * having to ping anything.
-     */
     public function isStale(int $now, int $toleranceSeconds = 172800): bool
     {
         return $this->lastSeen === 0 || ($now - $this->lastSeen) > $toleranceSeconds;
     }
 
-    /**
-     * Four states, not three. "incompletely checked" is deliberately neither
-     * green nor red: whoever could not see everything must not give an
-     * all-clear, but has not found anything bad either.
-     */
     public function healthState(int $now): string
     {
         if ($this->isStale($now)) {

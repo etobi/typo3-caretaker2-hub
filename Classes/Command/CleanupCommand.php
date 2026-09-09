@@ -10,10 +10,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-/**
- * Safety net for what the hook cannot see: rows removed straight from the
- * database, or a table that was rebuilt.
- */
 final class CleanupCommand extends Command
 {
     public function __construct(private readonly CleanupService $cleanup)

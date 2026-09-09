@@ -11,10 +11,6 @@ use Caretaker2\Hub\Evaluation\Finding;
 
 /**
  * The support status of the installed TYPO3 version.
- *
- * Unlike the composer findings this one does not depend on the instance but on
- * the calendar: an untouched installation becomes vulnerable purely because a
- * date passes. Which is why evaluation runs by age as well as on change.
  */
 final class Typo3VersionFindings implements EvaluatorInterface
 {

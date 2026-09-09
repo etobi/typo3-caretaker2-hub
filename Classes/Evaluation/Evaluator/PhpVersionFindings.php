@@ -9,11 +9,6 @@ use Caretaker2\Hub\Domain\PhpVersions;
 use Caretaker2\Hub\Evaluation\EvaluatorInterface;
 use Caretaker2\Hub\Evaluation\Finding;
 
-/**
- * The same argument as for the TYPO3 version, one layer down: a PHP branch
- * without security fixes tears the application open no matter how well the
- * application itself is kept.
- */
 final class PhpVersionFindings implements EvaluatorInterface
 {
     public function __construct(

@@ -26,13 +26,6 @@ final class CleanupService
     }
 
     /**
-     * Everything the instance ever reported, gone — snapshots, the current
-     * inventory, the findings and the values derived from them.
-     *
-     * The record itself and its token stay, so the agent keeps reporting into
-     * the same instance instead of enrolling a second one. What comes back on
-     * the next push is a first report, and it is treated as one.
-     *
      * @return array{snapshots: int, findings: int}
      */
     public function resetInstance(int $instanceUid): array
@@ -60,10 +53,6 @@ final class CleanupService
         return $counts;
     }
 
-    /**
-     * Only the assignment is undone — instances do not belong to a group,
-     * they are in one.
-     */
     public function detachGroup(int $groupUid): int
     {
         $qb = $this->connectionPool->getQueryBuilderForTable(InstanceRepository::TABLE);
@@ -79,9 +68,6 @@ final class CleanupService
     }
 
     /**
-     * Clears out what was orphaned outside the DataHandler — a direct write to
-     * the database, say, or a rebuilt table.
-     *
      * @return array{snapshots: int, findings: int, groups: int}
      */
     public function removeOrphans(): array

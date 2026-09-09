@@ -8,14 +8,6 @@ use Caretaker2\Hub\Domain\Instance;
 use Caretaker2\Hub\Evaluation\EvaluatorInterface;
 use Caretaker2\Hub\Evaluation\Finding;
 
-/**
- * What TYPO3 already found out about itself.
- *
- * The statuses arrive pre-filtered — only what is above OK — and the wording
- * stays as TYPO3 wrote it. Rephrasing would mean maintaining a translation of
- * every check in every extension, and the original is what an administrator
- * will search for.
- */
 final class ReportFindings implements EvaluatorInterface
 {
     private const SEVERITIES = [
@@ -87,9 +79,6 @@ final class ReportFindings implements EvaluatorInterface
             $title = (string)($issue['title'] ?? '');
             $message = (string)($issue['message'] ?? '');
 
-            // A check without a title is not a check we can tell apart from
-            // the next one by its title. Two of them collided in the unique
-            // index, so the message stands in when there is no title.
             $distinct = $title !== '' ? $title : $message;
             if ($distinct === '') {
                 continue;
@@ -98,10 +87,6 @@ final class ReportFindings implements EvaluatorInterface
             $findings[] = new Finding(
                 type: Finding::TYPE_REPORT,
                 severity: $severity,
-                // The check itself has no id, so one is derived from where it
-                // came from and what it is called. Both are stable as long as
-                // the check is; a renamed check counts as a new one, which is
-                // the honest reading anyway.
                 identifier: 'report-' . substr(hash('sha256', $group . "\0" . $distinct), 0, 24),
                 package: $group,
                 installedVersion: (string)($issue['value'] ?? ''),

@@ -1,7 +1,7 @@
-# Template-Endungen
+# Template file extensions
 
-Hub: `*.fluid.html` — v14-Konvention, der Hub setzt v14 voraus.
+Hub: `*.fluid.html` — the v14 convention, and the hub requires v14.
 
-Agent: `*.html` — muss von v11 bis v14 tragen, und `.fluid.html` kennen
-ältere Fassungen nicht. Der Resolver in v14 probiert beide Varianten, in
-dieser Reihenfolge: `Name.fluid.html`, dann `Name.html`.
+Agent: `*.html` — has to carry v11 through v14, and older versions do not know
+`.fluid.html`. The v14 resolver tries both, in this order: `Name.fluid.html`,
+then `Name.html`.

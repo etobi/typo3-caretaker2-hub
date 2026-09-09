@@ -11,12 +11,6 @@ use TYPO3\CMS\Core\Http\RequestFactory;
 
 /**
  * Support status of the PHP release branches, from endoflife.date.
- *
- * A branch runs two years of active support and one more of security fixes.
- * Both dates matter: the first says features and bug fixes have stopped, the
- * second that nothing comes at all. Same reasoning as for the TYPO3 majors —
- * the dates belong to the PHP project, not to us.
- *
  * @see Typo3MajorVersions
  */
 final class PhpVersions implements LoggerAwareInterface
@@ -91,7 +85,7 @@ final class PhpVersions implements LoggerAwareInterface
                 'headers' => ['Accept' => 'application/json'],
             ]);
         } catch (\Throwable $e) {
-            $this->logger?->warning('endoflife.date nicht erreichbar', ['exception' => $e]);
+            $this->logger?->warning('endoflife.date is unreachable', ['exception' => $e]);
 
             return null;
         }
