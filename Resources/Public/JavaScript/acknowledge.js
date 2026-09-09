@@ -14,12 +14,11 @@ class AcknowledgeForm {
   constructor(form) {
     this.form = form;
     this.noteField = form.querySelector('input[name="note"]');
-    this.typeField = form.querySelector('input[name="acknowledgeType"]');
 
     form.querySelectorAll('[data-caretaker2-ack]').forEach((button) => {
       button.addEventListener('click', (event) => {
         event.preventDefault();
-        this.open(button.dataset.ackType || '', button.dataset.ackSubject || '');
+        this.open();
       });
     });
   }
@@ -32,21 +31,19 @@ class AcknowledgeForm {
     return this.boxes().filter((box) => box.checked).length;
   }
 
-  open(type, subjectLabel) {
+  open() {
     const count = this.selectedCount();
 
-    if (type === '' && count === 0) {
+    if (count === 0) {
       Notification.info(
         'Nichts ausgewählt',
-        'Zeilen ankreuzen, oder einen der Knöpfe für eine ganze Gruppe nehmen.',
+        'Bitte zuerst die Zeilen ankreuzen, die quittiert werden sollen.',
         6,
       );
       return;
     }
 
-    const subject = type === ''
-      ? (count === 1 ? 'einen Befund' : `${count} Befunde`)
-      : subjectLabel;
+    const subject = count === 1 ? 'einen Befund' : `${count} Befunde`;
 
     Modal.advanced({
       title: 'Befunde quittieren',
@@ -74,7 +71,6 @@ class AcknowledgeForm {
           trigger: (event, modal) => {
             const input = modal.querySelector('#caretaker2-ack-note');
             this.noteField.value = input ? input.value : '';
-            this.typeField.value = type;
             modal.hideModal();
             this.form.submit();
           },

@@ -94,17 +94,8 @@ final class InstanceListController
         if (!$readOnly && $request->getMethod() === 'POST' && is_array($body) && isset($body['acknowledge'])) {
             $note = trim((string)($body['note'] ?? ''));
 
-            $uids = $body['acknowledgeType'] ?? null;
-            if (is_string($uids) && $uids !== '') {
-                // "All 24 blocked updates" — the case where acknowledging one
-                // at a time is what stops people using this at all.
-                $selected = $this->findings->findOpenUidsByType($instanceId, $instance->tenant, $uids);
-            } else {
-                $selected = array_map('intval', (array)($body['findings'] ?? []));
-            }
-
             $count = $this->findings->acknowledgeMany(
-                $selected,
+                array_map('intval', (array)($body['findings'] ?? [])),
                 $instanceId,
                 $instance->tenant,
                 $this->currentUser($request),
@@ -207,7 +198,6 @@ final class InstanceListController
             'findings' => $this->presentFindings($open),
             'acknowledgedFindings' => $this->presentFindings($acknowledged),
             'findingCounts' => $this->findings->countsForInstance($instanceId),
-            'openByType' => $this->openByType($open),
             'hasUnrated' => array_filter($open, static fn(array $r): bool => $r['severity'] === 'unknown') !== [],
         ]);
 
@@ -695,40 +685,6 @@ final class InstanceListController
                 ),
             ];
         }, $history);
-    }
-
-    /**
-     * How many open findings there are per type, for the bulk buttons.
-     *
-     * @param list<array<string, mixed>> $open
-     * @return list<array<string, mixed>>
-     */
-    private function openByType(array $open): array
-    {
-        $labels = [
-            'security' => 'Sicherheitsbefunde',
-            'update_safe' => 'mögliche Updates',
-            'update_major' => 'blockierte Updates',
-            'abandoned' => 'nicht gepflegte Pakete',
-            'unassessable' => 'nicht bewertbare Repositories',
-        ];
-
-        $counts = [];
-        foreach ($open as $row) {
-            $type = (string)$row['finding_type'];
-            $counts[$type] = ($counts[$type] ?? 0) + 1;
-        }
-
-        $out = [];
-        foreach ($counts as $type => $count) {
-            $out[] = [
-                'type' => $type,
-                'count' => $count,
-                'label' => $labels[$type] ?? $type,
-            ];
-        }
-
-        return $out;
     }
 
     /**

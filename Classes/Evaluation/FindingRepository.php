@@ -118,27 +118,6 @@ final class FindingRepository
             ->executeStatement();
     }
 
-    /**
-     * @return list<int>
-     */
-    public function findOpenUidsByType(int $instance, int $tenant, string $type): array
-    {
-        $qb = $this->connectionPool->getQueryBuilderForTable(self::TABLE);
-        $rows = $qb
-            ->select('uid')
-            ->from(self::TABLE)
-            ->where(
-                $qb->expr()->eq('instance', $qb->createNamedParameter($instance, ParameterType::INTEGER)),
-                $qb->expr()->eq('tenant', $qb->createNamedParameter($tenant, ParameterType::INTEGER)),
-                $qb->expr()->eq('finding_type', $qb->createNamedParameter($type)),
-                $qb->expr()->eq('acknowledged', $qb->createNamedParameter(0, ParameterType::INTEGER)),
-            )
-            ->executeQuery()
-            ->fetchAllAssociative();
-
-        return array_map(static fn(array $r): int => (int)$r['uid'], $rows);
-    }
-
     public function unacknowledge(int $uid): void
     {
         $this->connectionPool->getConnectionForTable(self::TABLE)->update(
