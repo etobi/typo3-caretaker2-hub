@@ -47,6 +47,18 @@
             <input type="hidden" name="acknowledgeType" value="">
             <input type="hidden" name="note" value="">
 
+            <div class="d-flex justify-content-end gap-1 mb-2">
+                <button type="button" class="btn btn-default btn-sm" data-caretaker2-ack="1">
+                    Markierte quittieren
+                </button>
+                <f:for each="{openByType}" as="group">
+                    <button type="button" class="btn btn-default btn-sm"
+                            data-caretaker2-ack="1" data-ack-type="{group.type}"
+                            data-ack-subject="alle {group.count} {group.label}">
+                        Alle {group.count} {group.label} quittieren
+                    </button>
+                </f:for>
+            </div>
             <div class="table-fit mb-3">
                 <table class="table table-striped">
                     <thead>
@@ -95,18 +107,6 @@
                 </p>
             </f:if>
 
-            <div class="mb-4">
-                <button type="button" class="btn btn-default" data-caretaker2-ack="1">
-                    Markierte quittieren
-                </button>
-                <f:for each="{openByType}" as="group">
-                    <button type="button" class="btn btn-default"
-                            data-caretaker2-ack="1" data-ack-type="{group.type}"
-                            data-ack-subject="alle {group.count} {group.label}">
-                        Alle {group.count} {group.label} quittieren
-                    </button>
-                </f:for>
-            </div>
         </form>
     </f:if>
 
