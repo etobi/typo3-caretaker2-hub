@@ -128,7 +128,7 @@
     <div class="table-fit mb-4">
         <table class="table">
             <tbody>
-                <tr><th style="width:16rem">Adresse</th><td>{instance.url}</td></tr>
+                <tr><th style="width:16rem">URL</th><td>{instance.url}</td></tr>
                 <f:if condition="{instance.siteCount}">
                     <tr><th>Sites und Domains</th><td>
                         {instance.siteCount} Site<f:if condition="{instance.siteCount} > 1">s</f:if>
@@ -148,21 +148,18 @@
                         <f:else><span class="text-body-secondary">noch nie</span></f:else>
                     </f:if>
                 </td></tr>
-                <tr><th>Inventar erstellt</th><td>
+                <tr><th>Bekannt seit</th><td>
                     <f:if condition="{generatedAt}">
                         <f:then><f:format.date format="d.m.Y H:i:s">@{generatedAt}</f:format.date></f:then>
                         <f:else><span class="text-body-secondary">unbekannt</span></f:else>
                     </f:if>
                 </td></tr>
                 <tr><th>Agent-Version</th><td>{instance.agentVersion}</td></tr>
-                <tr><th>Schemaversion</th><td>{schemaVersion}</td></tr>
+                <tr><th>Schema-Version</th><td>{schemaVersion}</td></tr>
                 <tr><th>Größe des Inventars</th><td>
                     <f:format.bytes value="{inventorySize}" decimals="1" decimalSeparator="," thousandsSeparator="."/>
                 </td></tr>
-                <tr><th>Veränderungen bisher</th><td>
-                    {snapshotCount} <span class="text-body-secondary">Snapshots — es wird nur
-                    gespeichert, wenn sich etwas geändert hat</span>
-                </td></tr>
+                <tr><th>Veränderungen bisher</th><td>{snapshotCount}</td></tr>
             </tbody>
         </table>
     </div>
