@@ -306,6 +306,10 @@ final class InstanceListController
             // own frame. The token travels as a hidden field instead.
             'listUri' => $listUri->withQuery(''),
             'listParams' => $listParams,
+            // The link needs the token in the URL — it carries no form that
+            // could hold it, and without it TYPO3 redirects through
+            // /typo3/main and renders the backend inside its own frame.
+            'resetUri' => (string)$listUri,
             'enrollmentCode' => $enrollmentCode,
             'schedulerAvailable' => $this->tasks->isAvailable(),
             'missingTasks' => implode(', ', $this->tasks->missing()),
