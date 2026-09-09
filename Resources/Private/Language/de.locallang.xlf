@@ -1,0 +1,524 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.0">
+    <file source-language="en" target-language="de" datatype="plaintext" original="messages" date="2026-09-09T00:00:00Z" product-name="caretaker2_hub">
+        <header/>
+        <body>
+            <trans-unit id="module.instances.title" approved="yes">
+                <source>Instances</source>
+                <target>Instanzen</target>
+            </trans-unit>
+            <trans-unit id="module.instances.description" approved="yes">
+                <source>All monitored TYPO3 instances</source>
+                <target>Alle überwachten TYPO3-Instanzen</target>
+            </trans-unit>
+            <trans-unit id="list.heading" approved="yes">
+                <source>Instances</source>
+                <target>Instanzen</target>
+            </trans-unit>
+            <trans-unit id="list.button.addInstance" approved="yes">
+                <source>Add instance</source>
+                <target>Instanz hinzufügen</target>
+            </trans-unit>
+            <trans-unit id="list.button.addGroup" approved="yes">
+                <source>Create group</source>
+                <target>Gruppe anlegen</target>
+            </trans-unit>
+            <trans-unit id="list.enroll.title" approved="yes">
+                <source>Connect instance</source>
+                <target>Instanz verbinden</target>
+            </trans-unit>
+            <trans-unit id="list.enroll.intro" approved="yes">
+                <source>Enter both in the Caretaker2 backend module of the instance. The code is valid for 15 minutes and can be redeemed exactly once.</source>
+                <target>Im Backend-Modul Caretaker2 der Instanz beides eintragen. Der Code ist 15 Minuten gültig und lässt sich genau einmal einlösen.</target>
+            </trans-unit>
+            <trans-unit id="list.enroll.hubUrl" approved="yes">
+                <source>Hub address</source>
+                <target>Adresse des Hubs</target>
+            </trans-unit>
+            <trans-unit id="list.enroll.code" approved="yes">
+                <source>Code</source>
+                <target>Code</target>
+            </trans-unit>
+            <trans-unit id="list.summary.total" approved="yes">
+                <source>%s instances</source>
+                <target>%s Instanzen</target>
+            </trans-unit>
+            <trans-unit id="list.summary.ok" approved="yes">
+                <source>%s current</source>
+                <target>%s aktuell</target>
+            </trans-unit>
+            <trans-unit id="list.summary.incomplete" approved="yes">
+                <source>%s incompletely checked</source>
+                <target>%s unvollständig geprüft</target>
+            </trans-unit>
+            <trans-unit id="list.summary.vulnerable" approved="yes">
+                <source>%s with a security hole</source>
+                <target>%s mit Sicherheitslücke</target>
+            </trans-unit>
+            <trans-unit id="list.summary.unsupported" approved="yes">
+                <source>%s without security updates</source>
+                <target>%s ohne Sicherheitsupdates</target>
+            </trans-unit>
+            <trans-unit id="list.summary.stale" approved="yes">
+                <source>%s not reporting</source>
+                <target>%s melden sich nicht</target>
+            </trans-unit>
+            <trans-unit id="list.column.state" approved="yes">
+                <source>State</source>
+                <target>Zustand</target>
+            </trans-unit>
+            <trans-unit id="list.column.instance" approved="yes">
+                <source>Instance and domains</source>
+                <target>Instanz und Domains</target>
+            </trans-unit>
+            <trans-unit id="list.column.typo3" approved="yes">
+                <source>TYPO3</source>
+                <target>TYPO3</target>
+            </trans-unit>
+            <trans-unit id="list.column.php" approved="yes">
+                <source>PHP</source>
+                <target>PHP</target>
+            </trans-unit>
+            <trans-unit id="list.column.context" approved="yes">
+                <source>Context</source>
+                <target>Kontext</target>
+            </trans-unit>
+            <trans-unit id="list.column.findings" approved="yes">
+                <source>Findings</source>
+                <target>Befunde</target>
+            </trans-unit>
+            <trans-unit id="list.column.lastSeen" approved="yes">
+                <source>Last reported</source>
+                <target>Zuletzt gemeldet</target>
+            </trans-unit>
+            <trans-unit id="list.group.edit" approved="yes">
+                <source>Edit group</source>
+                <target>Gruppe bearbeiten</target>
+            </trans-unit>
+            <trans-unit id="list.group.ungrouped" approved="yes">
+                <source>Without group</source>
+                <target>Ohne Gruppe</target>
+            </trans-unit>
+            <trans-unit id="list.findings.security" approved="yes">
+                <source>Security findings</source>
+                <target>Sicherheitsbefunde</target>
+            </trans-unit>
+            <trans-unit id="list.findings.updateSafe" approved="yes">
+                <source>Updates within the constraint</source>
+                <target>Updates im Rahmen des Constraints</target>
+            </trans-unit>
+            <trans-unit id="list.findings.updateMajor" approved="yes">
+                <source>Updates that would change the constraint</source>
+                <target>Updates, die den Constraint ändern würden</target>
+            </trans-unit>
+            <trans-unit id="list.neverReported" approved="yes">
+                <source>never</source>
+                <target>noch nie</target>
+            </trans-unit>
+            <trans-unit id="list.action.detail" approved="yes">
+                <source>Show details</source>
+                <target>Details anzeigen</target>
+            </trans-unit>
+            <trans-unit id="list.action.edit" approved="yes">
+                <source>Edit instance</source>
+                <target>Instanz bearbeiten</target>
+            </trans-unit>
+            <trans-unit id="list.empty.title" approved="yes">
+                <source>No instance connected yet</source>
+                <target>Noch keine Instanz verbunden</target>
+            </trans-unit>
+            <trans-unit id="list.empty.body" approved="yes">
+                <source>Create a code, enter it in the backend module of the instance — done. No key exchange, nothing to open up from outside.</source>
+                <target>Einen Code erzeugen, ihn im Backend-Modul der Instanz eintragen — fertig. Kein Schlüsselaustausch, keine Freischaltung von außen.</target>
+            </trans-unit>
+            <trans-unit id="state.ok" approved="yes">
+                <source>Current</source>
+                <target>Aktuell</target>
+            </trans-unit>
+            <trans-unit id="state.vulnerable" approved="yes">
+                <source>Security hole</source>
+                <target>Sicherheitslücke</target>
+            </trans-unit>
+            <trans-unit id="state.unsupported" approved="yes">
+                <source>Without security updates</source>
+                <target>Ohne Sicherheitsupdates</target>
+            </trans-unit>
+            <trans-unit id="state.incomplete" approved="yes">
+                <source>Incompletely checked</source>
+                <target>Unvollständig geprüft</target>
+            </trans-unit>
+            <trans-unit id="state.stale" approved="yes">
+                <source>Not reporting</source>
+                <target>Meldet sich nicht</target>
+            </trans-unit>
+            <trans-unit id="state.hint.vulnerable" approved="yes">
+                <source>Known security hole in an installed package.</source>
+                <target>Bekannte Sicherheitslücke in einem installierten Paket.</target>
+            </trans-unit>
+            <trans-unit id="state.hint.unsupported" approved="yes">
+                <source>%s receives no security updates any more.</source>
+                <target>%s bekommt keine Sicherheitsupdates mehr.</target>
+            </trans-unit>
+            <trans-unit id="state.hint.incomplete" approved="yes">
+                <source>A provider delivered nothing or only parts — what you see here is not the whole picture.</source>
+                <target>Ein Provider hat nichts oder nur Teile geliefert — was hier steht, ist nicht das ganze Bild.</target>
+            </trans-unit>
+            <trans-unit id="state.hint.stale" approved="yes">
+                <source>The instance has not reported for a while. The data may be out of date.</source>
+                <target>Die Instanz hat sich länger nicht gemeldet. Die Angaben sind womöglich veraltet.</target>
+            </trans-unit>
+            <trans-unit id="typo3.status.stable" approved="yes">
+                <source>current</source>
+                <target>aktuell</target>
+            </trans-unit>
+            <trans-unit id="typo3.status.oldstable" approved="yes">
+                <source>maintained</source>
+                <target>gepflegt</target>
+            </trans-unit>
+            <trans-unit id="typo3.status.elts" approved="yes">
+                <source>ELTS</source>
+                <target>ELTS</target>
+            </trans-unit>
+            <trans-unit id="typo3.status.eltsUnpatched" approved="yes">
+                <source>without updates</source>
+                <target>ohne Updates</target>
+            </trans-unit>
+            <trans-unit id="typo3.status.unsupported" approved="yes">
+                <source>without support</source>
+                <target>ohne Support</target>
+            </trans-unit>
+            <trans-unit id="typo3.hint.elts" approved="yes">
+                <source>ELTS until %s</source>
+                <target>ELTS bis %s</target>
+            </trans-unit>
+            <trans-unit id="typo3.hint.eltsUnpatched" approved="yes">
+                <source>maintained through ELTS only since %s — this instance sits on the last free release</source>
+                <target>seit %s nur noch über ELTS gepflegt — diese Instanz steht auf dem letzten freien Release</target>
+            </trans-unit>
+            <trans-unit id="typo3.hint.maintained" approved="yes">
+                <source>regularly maintained until %s</source>
+                <target>regulär gepflegt bis %s</target>
+            </trans-unit>
+            <trans-unit id="typo3.hint.ended" approved="yes">
+                <source>ELTS ended on %s as well</source>
+                <target>auch ELTS endete am %s</target>
+            </trans-unit>
+            <trans-unit id="php.status.active" approved="yes">
+                <source>supported</source>
+                <target>unterstützt</target>
+            </trans-unit>
+            <trans-unit id="php.status.security" approved="yes">
+                <source>security fixes only</source>
+                <target>nur Sicherheitsfixes</target>
+            </trans-unit>
+            <trans-unit id="php.status.eol" approved="yes">
+                <source>end of life</source>
+                <target>am Ende</target>
+            </trans-unit>
+            <trans-unit id="php.hint.active" approved="yes">
+                <source>actively supported until %s</source>
+                <target>aktiv unterstützt bis %s</target>
+            </trans-unit>
+            <trans-unit id="php.hint.security" approved="yes">
+                <source>security fixes only, until %s</source>
+                <target>nur noch Sicherheitsfixes, bis %s</target>
+            </trans-unit>
+            <trans-unit id="php.hint.eol" approved="yes">
+                <source>without security fixes since %s</source>
+                <target>ohne Sicherheitsfixes seit %s</target>
+            </trans-unit>
+            <trans-unit id="finding.type.security" approved="yes">
+                <source>Security</source>
+                <target>Sicherheit</target>
+            </trans-unit>
+            <trans-unit id="finding.type.update_safe" approved="yes">
+                <source>Update available</source>
+                <target>Update möglich</target>
+            </trans-unit>
+            <trans-unit id="finding.type.update_major" approved="yes">
+                <source>Update blocked</source>
+                <target>Update blockiert</target>
+            </trans-unit>
+            <trans-unit id="finding.type.abandoned" approved="yes">
+                <source>Not maintained</source>
+                <target>Nicht gepflegt</target>
+            </trans-unit>
+            <trans-unit id="finding.type.unassessable" approved="yes">
+                <source>Not assessable</source>
+                <target>Nicht bewertbar</target>
+            </trans-unit>
+            <trans-unit id="finding.type.typo3_elts" approved="yes">
+                <source>ELTS only</source>
+                <target>Nur noch ELTS</target>
+            </trans-unit>
+            <trans-unit id="finding.type.typo3_elts_unpatched" approved="yes">
+                <source>ELTS not applied</source>
+                <target>ELTS nicht eingespielt</target>
+            </trans-unit>
+            <trans-unit id="finding.type.typo3_unsupported" approved="yes">
+                <source>Without support</source>
+                <target>Ohne Support</target>
+            </trans-unit>
+            <trans-unit id="finding.type.php_security_only" approved="yes">
+                <source>PHP security fixes only</source>
+                <target>PHP nur Sicherheitsfixes</target>
+            </trans-unit>
+            <trans-unit id="finding.type.php_eol" approved="yes">
+                <source>PHP without support</source>
+                <target>PHP ohne Support</target>
+            </trans-unit>
+            <trans-unit id="finding.severity.critical" approved="yes">
+                <source>critical</source>
+                <target>kritisch</target>
+            </trans-unit>
+            <trans-unit id="finding.severity.high" approved="yes">
+                <source>high</source>
+                <target>hoch</target>
+            </trans-unit>
+            <trans-unit id="finding.severity.medium" approved="yes">
+                <source>medium</source>
+                <target>mittel</target>
+            </trans-unit>
+            <trans-unit id="finding.severity.low" approved="yes">
+                <source>low</source>
+                <target>niedrig</target>
+            </trans-unit>
+            <trans-unit id="finding.severity.unknown" approved="yes">
+                <source>unrated</source>
+                <target>ungewertet</target>
+            </trans-unit>
+            <trans-unit id="finding.severity.info" approved="yes">
+                <source>note</source>
+                <target>Hinweis</target>
+            </trans-unit>
+            <trans-unit id="finding.severity.unknownHint" approved="yes">
+                <source>No rating available yet. The severity comes from the GitHub Advisory Database, which picks up new reports with a delay — until then the finding is treated as a serious one.</source>
+                <target>Noch keine Einstufung verfügbar. Die Schwere stammt aus der GitHub Advisory Database, die neue Meldungen erst mit Verzug aufnimmt — bis dahin wird der Befund wie ein schwerwiegender behandelt.</target>
+            </trans-unit>
+            <trans-unit id="finding.unratedNote" approved="yes">
+                <source>"Unrated" means the report is so new that the GitHub Advisory Database has no rating for it yet — Composer does not know one either. Such findings are treated as serious ones until a rating exists.</source>
+                <target>"Ungewertet" heißt: Die Meldung ist so neu, dass die GitHub Advisory Database noch keine Einstufung dazu hat — Composer kennt sie dann auch nicht. Solche Befunde werden wie schwerwiegende behandelt, bis eine Einstufung vorliegt.</target>
+            </trans-unit>
+            <trans-unit id="detail.button.refresh" approved="yes">
+                <source>Refresh data</source>
+                <target>Daten aktualisieren</target>
+            </trans-unit>
+            <trans-unit id="detail.button.evaluate" approved="yes">
+                <source>Evaluate Composer data</source>
+                <target>Composer auswerten</target>
+            </trans-unit>
+            <trans-unit id="detail.historic.title" approved="yes">
+                <source>Older state</source>
+                <target>Älterer Stand</target>
+            </trans-unit>
+            <trans-unit id="detail.historic.body" approved="yes">
+                <source>Showing the state from %s. Findings always describe the current state and are therefore hidden.</source>
+                <target>Angezeigt wird der Stand vom %s. Befunde beziehen sich immer auf den aktuellen Stand und sind deshalb ausgeblendet.</target>
+            </trans-unit>
+            <trans-unit id="detail.historic.toCurrent" approved="yes">
+                <source>To the current state</source>
+                <target>Zum aktuellen Stand</target>
+            </trans-unit>
+            <trans-unit id="detail.findings.heading" approved="yes">
+                <source>Findings</source>
+                <target>Befunde</target>
+            </trans-unit>
+            <trans-unit id="detail.findings.count.security" approved="yes">
+                <source>%s security</source>
+                <target>%s Sicherheit</target>
+            </trans-unit>
+            <trans-unit id="detail.findings.count.updateSafe" approved="yes">
+                <source>%s update available</source>
+                <target>%s Update möglich</target>
+            </trans-unit>
+            <trans-unit id="detail.findings.count.updateMajor" approved="yes">
+                <source>%s update blocked</source>
+                <target>%s Update blockiert</target>
+            </trans-unit>
+            <trans-unit id="detail.findings.count.abandoned" approved="yes">
+                <source>%s not maintained</source>
+                <target>%s nicht gepflegt</target>
+            </trans-unit>
+            <trans-unit id="detail.findings.count.unassessable" approved="yes">
+                <source>%s not assessable</source>
+                <target>%s nicht bewertbar</target>
+            </trans-unit>
+            <trans-unit id="detail.findings.acknowledgeSelected" approved="yes">
+                <source>Acknowledge selected</source>
+                <target>Markierte quittieren</target>
+            </trans-unit>
+            <trans-unit id="detail.column.severity" approved="yes">
+                <source>Severity</source>
+                <target>Schwere</target>
+            </trans-unit>
+            <trans-unit id="detail.column.type" approved="yes">
+                <source>Kind</source>
+                <target>Art</target>
+            </trans-unit>
+            <trans-unit id="detail.column.package" approved="yes">
+                <source>Package</source>
+                <target>Paket</target>
+            </trans-unit>
+            <trans-unit id="detail.column.installed" approved="yes">
+                <source>Installed</source>
+                <target>Installiert</target>
+            </trans-unit>
+            <trans-unit id="detail.column.available" approved="yes">
+                <source>Available</source>
+                <target>Verfügbar</target>
+            </trans-unit>
+            <trans-unit id="detail.column.finding" approved="yes">
+                <source>Finding</source>
+                <target>Befund</target>
+            </trans-unit>
+            <trans-unit id="detail.column.reason" approved="yes">
+                <source>Reason</source>
+                <target>Begründung</target>
+            </trans-unit>
+            <trans-unit id="detail.select" approved="yes">
+                <source>Select %s</source>
+                <target>%s auswählen</target>
+            </trans-unit>
+            <trans-unit id="detail.url" approved="yes">
+                <source>URL</source>
+                <target>URL</target>
+            </trans-unit>
+            <trans-unit id="detail.sites" approved="yes">
+                <source>Sites and domains</source>
+                <target>Sites und Domains</target>
+            </trans-unit>
+            <trans-unit id="detail.rootPage" approved="yes">
+                <source>root page %s</source>
+                <target>Root-Seite %s</target>
+            </trans-unit>
+            <trans-unit id="detail.lastSeen" approved="yes">
+                <source>Last reported</source>
+                <target>Zuletzt gemeldet</target>
+            </trans-unit>
+            <trans-unit id="detail.knownSince" approved="yes">
+                <source>Known since</source>
+                <target>Bekannt seit</target>
+            </trans-unit>
+            <trans-unit id="detail.agentVersion" approved="yes">
+                <source>Agent version</source>
+                <target>Agent-Version</target>
+            </trans-unit>
+            <trans-unit id="detail.schemaVersion" approved="yes">
+                <source>Schema version</source>
+                <target>Schema-Version</target>
+            </trans-unit>
+            <trans-unit id="detail.inventorySize" approved="yes">
+                <source>Inventory size</source>
+                <target>Größe des Inventars</target>
+            </trans-unit>
+            <trans-unit id="detail.changeCount" approved="yes">
+                <source>Changes so far</source>
+                <target>Veränderungen bisher</target>
+            </trans-unit>
+            <trans-unit id="detail.unknown" approved="yes">
+                <source>unknown</source>
+                <target>unbekannt</target>
+            </trans-unit>
+            <trans-unit id="detail.acknowledged.summary" approved="yes">
+                <source>Acknowledged findings (%s)</source>
+                <target>Quittierte Befunde (%s)</target>
+            </trans-unit>
+            <trans-unit id="detail.acknowledged.noReason" approved="yes">
+                <source>without reason</source>
+                <target>ohne Begründung</target>
+            </trans-unit>
+            <trans-unit id="detail.acknowledged.showAgain" approved="yes">
+                <source>Show again</source>
+                <target>Wieder anzeigen</target>
+            </trans-unit>
+            <trans-unit id="detail.providers.summary" approved="yes">
+                <source>Providers (%s)</source>
+                <target>Provider (%s)</target>
+            </trans-unit>
+            <trans-unit id="detail.providers.omitted" approved="yes">
+                <source>Too large to display, but complete in the snapshot:</source>
+                <target>Zu groß für die Anzeige, im Snapshot aber vollständig enthalten:</target>
+            </trans-unit>
+            <trans-unit id="detail.providers.noData" approved="yes">
+                <source>No data delivered.</source>
+                <target>Keine Daten geliefert.</target>
+            </trans-unit>
+            <trans-unit id="detail.history.summary" approved="yes">
+                <source>Changes (%s)</source>
+                <target>Veränderungen (%s)</target>
+            </trans-unit>
+            <trans-unit id="detail.history.time" approved="yes">
+                <source>Time</source>
+                <target>Zeitpunkt</target>
+            </trans-unit>
+            <trans-unit id="detail.history.fingerprint" approved="yes">
+                <source>Fingerprint</source>
+                <target>Fingerabdruck</target>
+            </trans-unit>
+            <trans-unit id="detail.history.latest" approved="yes">
+                <source>current</source>
+                <target>aktuell</target>
+            </trans-unit>
+            <trans-unit id="detail.history.shown" approved="yes">
+                <source>shown</source>
+                <target>angezeigt</target>
+            </trans-unit>
+            <trans-unit id="detail.noInventory.title" approved="yes">
+                <source>No inventory yet</source>
+                <target>Noch kein Inventar</target>
+            </trans-unit>
+            <trans-unit id="detail.noInventory.body" approved="yes">
+                <source>This instance is connected but has not reported anything yet. Trigger it from the backend module of the instance or with caretaker2:push.</source>
+                <target>Diese Instanz ist verbunden, hat aber noch nichts gemeldet. Im Backend-Modul der Instanz oder per caretaker2:push auslösen.</target>
+            </trans-unit>
+            <trans-unit id="message.nothingSelected" approved="yes">
+                <source>Nothing selected.</source>
+                <target>Nichts ausgewählt.</target>
+            </trans-unit>
+            <trans-unit id="message.acknowledged.one" approved="yes">
+                <source>One finding acknowledged.</source>
+                <target>Ein Befund quittiert.</target>
+            </trans-unit>
+            <trans-unit id="message.acknowledged.many" approved="yes">
+                <source>%s findings acknowledged.</source>
+                <target>%s Befunde quittiert.</target>
+            </trans-unit>
+            <trans-unit id="message.unacknowledged" approved="yes">
+                <source>Acknowledgement withdrawn.</source>
+                <target>Quittierung aufgehoben.</target>
+            </trans-unit>
+            <trans-unit id="message.evaluated" approved="yes">
+                <source>Evaluation done: %s new, %s unchanged, %s resolved.</source>
+                <target>Auswertung fertig: %s neu, %s unverändert, %s erledigt.</target>
+            </trans-unit>
+            <trans-unit id="message.unknownUser" approved="yes">
+                <source>unknown</source>
+                <target>unbekannt</target>
+            </trans-unit>
+            <trans-unit id="trigger.noUrl" approved="yes">
+                <source>No address is stored for this instance.</source>
+                <target>Für diese Instanz ist keine Adresse hinterlegt.</target>
+            </trans-unit>
+            <trans-unit id="trigger.unreachable" approved="yes">
+                <source>Instance unreachable: %s</source>
+                <target>Instanz nicht erreichbar: %s</target>
+            </trans-unit>
+            <trans-unit id="trigger.cooldown" approved="yes">
+                <source>The instance has just reported. Try again in %s seconds.</source>
+                <target>Die Instanz hat gerade erst gemeldet. In %s Sekunden erneut versuchen.</target>
+            </trans-unit>
+            <trans-unit id="trigger.refused" approved="yes">
+                <source>The instance refused: %s</source>
+                <target>Die Instanz hat abgelehnt: %s</target>
+            </trans-unit>
+            <trans-unit id="trigger.changed" approved="yes">
+                <source>The instance reported, there was a change.</source>
+                <target>Die Instanz hat gemeldet, es gab eine Veränderung.</target>
+            </trans-unit>
+            <trans-unit id="trigger.unchanged" approved="yes">
+                <source>The instance reported, unchanged.</source>
+                <target>Die Instanz hat gemeldet, unverändert.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

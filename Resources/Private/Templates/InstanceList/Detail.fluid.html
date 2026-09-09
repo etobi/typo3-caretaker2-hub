@@ -9,12 +9,10 @@
     <f:if condition="{historic}">
         <div class="callout callout-info">
             <div class="callout-content">
-                <div class="callout-title">Älterer Stand</div>
+                <div class="callout-title"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.historic.title"/></div>
                 <div class="callout-body">
-                    <p>Angezeigt wird der Stand vom
-                       <strong><f:format.date format="d.m.Y H:i:s">@{historicAt}</f:format.date></strong>.
-                       Befunde beziehen sich immer auf den aktuellen Stand und sind deshalb ausgeblendet.</p>
-                    <p class="mb-0"><a href="{currentUri}" class="btn btn-default btn-sm">Zum aktuellen Stand</a></p>
+                    <p><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.historic.body" arguments="{0: '{f:format.date(format: \'d.m.Y H:i:s\', date: historicAt)}'}"/></p>
+                    <p class="mb-0"><a href="{currentUri}" class="btn btn-default btn-sm"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.historic.toCurrent"/></a></p>
                 </div>
             </div>
         </div>
@@ -33,13 +31,13 @@
     </f:if>
 
     <f:if condition="{findings} && !{historic}">
-        <h2>Befunde</h2>
+        <h2><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.findings.heading"/></h2>
         <div class="mb-2">
-            <f:if condition="{findingCounts.security}"><span class="badge badge-danger">{findingCounts.security} Sicherheit</span> </f:if>
-            <f:if condition="{findingCounts.update_safe}"><span class="badge badge-warning">{findingCounts.update_safe} Update möglich</span> </f:if>
-            <f:if condition="{findingCounts.update_major}"><span class="badge badge-info">{findingCounts.update_major} Update blockiert</span> </f:if>
-            <f:if condition="{findingCounts.abandoned}"><span class="badge badge-info">{findingCounts.abandoned} nicht gepflegt</span> </f:if>
-            <f:if condition="{findingCounts.unassessable}"><span class="badge badge-secondary">{findingCounts.unassessable} nicht bewertbar</span></f:if>
+            <f:if condition="{findingCounts.security}"><span class="badge badge-danger"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.findings.count.security" arguments="{0: findingCounts.security}"/></span> </f:if>
+            <f:if condition="{findingCounts.update_safe}"><span class="badge badge-warning"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.findings.count.updateSafe" arguments="{0: findingCounts.update_safe}"/></span> </f:if>
+            <f:if condition="{findingCounts.update_major}"><span class="badge badge-info"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.findings.count.updateMajor" arguments="{0: findingCounts.update_major}"/></span> </f:if>
+            <f:if condition="{findingCounts.abandoned}"><span class="badge badge-info"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.findings.count.abandoned" arguments="{0: findingCounts.abandoned}"/></span> </f:if>
+            <f:if condition="{findingCounts.unassessable}"><span class="badge badge-secondary"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.findings.count.unassessable" arguments="{0: findingCounts.unassessable}"/></span></f:if>
         </div>
 
         <form method="post" data-caretaker2-findings="1">
@@ -48,7 +46,7 @@
 
             <div class="d-flex justify-content-end gap-1 mb-2">
                 <button type="button" class="btn btn-default btn-sm" data-caretaker2-ack="1">
-                    Markierte quittieren
+                    <f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.findings.acknowledgeSelected"/>
                 </button>
             </div>
             <div class="table-fit mb-3">
@@ -56,8 +54,8 @@
                     <thead>
                         <tr>
                             <th class="col-checkbox"></th>
-                            <th>Schwere</th><th>Art</th><th>Paket</th>
-                            <th>Installiert</th><th>Verfügbar</th><th>Befund</th>
+                            <th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.column.severity"/></th><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.column.type"/></th><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.column.package"/></th>
+                            <th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.column.installed"/></th><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.column.available"/></th><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.column.finding"/></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -67,7 +65,7 @@
                                     <div class="form-check">
                                         <input type="checkbox" class="form-check-input"
                                                name="findings[]" value="{finding.uid}"
-                                               aria-label="{finding.package} auswählen">
+                                               aria-label="{f:translate(key: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.select', arguments: {0: finding.package})}">
                                     </div>
                                 </td>
                                 <td class="col-nowrap">
@@ -91,12 +89,7 @@
             </div>
 
             <f:if condition="{hasUnrated}">
-                <p class="text-body-secondary">
-                    <strong>Ungewertet</strong> heißt: Die Meldung ist so neu, dass die GitHub
-                    Advisory Database noch keine Einstufung dazu hat — Composer kennt sie dann
-                    auch nicht. Solche Befunde werden wie schwerwiegende behandelt, bis eine
-                    Einstufung vorliegt.
-                </p>
+                <p class="text-body-secondary"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.unratedNote"/></p>
             </f:if>
 
         </form>
@@ -114,16 +107,16 @@
     <div class="table-fit mb-4">
         <table class="table">
             <tbody>
-                <tr><th style="width:16rem">URL</th><td>
+                <tr><th style="width:16rem"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.url"/></th><td>
                     <a href="{instance.url}" target="_blank" rel="noreferrer noopener">{instance.url}</a>
                 </td></tr>
                 <f:if condition="{sites}">
-                    <tr><th>Sites und Domains</th><td>
+                    <tr><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.sites"/></th><td>
                         <f:for each="{sites}" as="site" iteration="i">
                             <div class="{f:if(condition: i.isFirst, then: '', else: 'mt-3')}">
                                 <strong>{site.title}</strong>
                                 <span class="text-body-secondary">
-                                    <code>{site.identifier}</code>, Root-Seite {site.rootPageId}
+                                    <code>{site.identifier}</code>, <f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.rootPage" arguments="{0: site.rootPageId}"/>
                                 </span>
                                 <ul class="mb-0">
                                     <f:for each="{site.hosts}" as="host">
@@ -137,35 +130,35 @@
                         </f:for>
                     </td></tr>
                 </f:if>
-                <tr><th>Zuletzt gemeldet</th><td>
+                <tr><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.lastSeen"/></th><td>
                     <f:if condition="{instance.lastSeen}">
                         <f:then><f:format.date format="d.m.Y H:i:s">@{instance.lastSeen}</f:format.date></f:then>
                         <f:else><span class="text-body-secondary">noch nie</span></f:else>
                     </f:if>
                 </td></tr>
-                <tr><th>Bekannt seit</th><td>
+                <tr><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.knownSince"/></th><td>
                     <f:if condition="{generatedAt}">
                         <f:then><f:format.date format="d.m.Y H:i:s">@{generatedAt}</f:format.date></f:then>
-                        <f:else><span class="text-body-secondary">unbekannt</span></f:else>
+                        <f:else><span class="text-body-secondary"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.unknown"/></span></f:else>
                     </f:if>
                 </td></tr>
-                <tr><th>Agent-Version</th><td>{instance.agentVersion}</td></tr>
-                <tr><th>Schema-Version</th><td>{schemaVersion}</td></tr>
-                <tr><th>Größe des Inventars</th><td>
+                <tr><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.agentVersion"/></th><td>{instance.agentVersion}</td></tr>
+                <tr><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.schemaVersion"/></th><td>{schemaVersion}</td></tr>
+                <tr><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.inventorySize"/></th><td>
                     <f:format.bytes value="{inventorySize}" decimals="1" decimalSeparator="," thousandsSeparator="."/>
                 </td></tr>
-                <tr><th>Veränderungen bisher</th><td>{snapshotCount}</td></tr>
+                <tr><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.changeCount"/></th><td>{snapshotCount}</td></tr>
             </tbody>
         </table>
     </div>
 
     <f:if condition="{acknowledgedFindings} && !{historic}">
         <details class="mb-4">
-            <summary>Quittierte Befunde ({acknowledgedFindings -> f:count()})</summary>
+            <summary><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.acknowledged.summary" arguments="{0: '{acknowledgedFindings -> f:count()}'}"/></summary>
             <div class="table-fit mt-2">
                 <table class="table table-striped">
                     <thead>
-                        <tr><th>Schwere</th><th>Paket</th><th>Befund</th><th>Begründung</th><th></th></tr>
+                        <tr><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.column.severity"/></th><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.column.package"/></th><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.column.finding"/></th><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.column.reason"/></th><th></th></tr>
                     </thead>
                     <tbody>
                         <f:for each="{acknowledgedFindings}" as="finding">
@@ -176,7 +169,7 @@
                                 <td>
                                     <f:if condition="{finding.ackNote}">
                                         <f:then>{finding.ackNote}</f:then>
-                                        <f:else><em class="text-body-secondary">ohne Begründung</em></f:else>
+                                        <f:else><em class="text-body-secondary"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.acknowledged.noReason"/></em></f:else>
                                     </f:if>
                                     <div class="text-body-secondary">
                                         {finding.ackUser}, <f:format.date format="d.m.Y H:i:s">@{finding.ackAt}</f:format.date>
@@ -185,7 +178,7 @@
                                 <td class="col-nowrap">
                                     <form method="post">
                                         <button type="submit" name="unacknowledge" value="{finding.uid}"
-                                                class="btn btn-default btn-sm">Wieder anzeigen</button>
+                                                class="btn btn-default btn-sm"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.acknowledged.showAgain"/></button>
                                     </form>
                                 </td>
                             </tr>
@@ -200,7 +193,7 @@
         <f:then>
 
             <details class="mb-4">
-                <summary>Provider ({providers -> f:count()})</summary>
+                <summary><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.providers.summary" arguments="{0: '{providers -> f:count()}'}"/></summary>
                 <div class="mt-2">
             <f:for each="{providers}" as="provider">
                 <div class="card mb-3">
@@ -224,7 +217,7 @@
 
                         <f:if condition="{provider.omitted}">
                             <p class="text-body-secondary">
-                                Zu groß für die Anzeige, im Snapshot aber vollständig enthalten:
+                                <f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.providers.omitted"/>
                                 <f:for each="{provider.omitted}" as="o" iteration="i"><code>{o.key}</code> (<f:format.bytes value="{o.bytes}" decimals="1" decimalSeparator="," thousandsSeparator="."/>)<f:if condition="!{i.isLast}">, </f:if></f:for>
                             </p>
                         </f:if>
@@ -234,7 +227,7 @@
                                 <pre style="max-height:22rem;overflow:auto;margin:0"><code>{provider.json}</code></pre>
                             </f:then>
                             <f:else>
-                                <p class="text-body-secondary mb-0">Keine Daten geliefert.</p>
+                                <p class="text-body-secondary mb-0"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.providers.noData"/></p>
                             </f:else>
                         </f:if>
                     </div>
@@ -245,10 +238,10 @@
 
             <f:if condition="{history}">
                 <details class="mb-4">
-                    <summary>Veränderungen ({history -> f:count()})</summary>
+                    <summary><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.history.summary" arguments="{0: '{history -> f:count()}'}"/></summary>
                     <div class="table-fit mt-2">
                     <table class="table table-striped">
-                        <thead><tr><th>Zeitpunkt</th><th></th><th>Fingerabdruck</th></tr></thead>
+                        <thead><tr><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.history.time"/></th><th></th><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.history.fingerprint"/></th></tr></thead>
                         <tbody>
                             <f:for each="{history}" as="entry">
                                 <tr>
@@ -259,10 +252,10 @@
                                     </td>
                                     <td class="col-nowrap">
                                         <f:if condition="{entry.isLatest}">
-                                            <span class="badge badge-success">aktuell</span>
+                                            <span class="badge badge-success"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.history.latest"/></span>
                                         </f:if>
                                         <f:if condition="{entry.isActive}">
-                                            <span class="badge badge-info">angezeigt</span>
+                                            <span class="badge badge-info"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.history.shown"/></span>
                                         </f:if>
                                     </td>
                                     <td><code class="text-body-secondary">{entry.fingerprint -> f:format.crop(maxCharacters: 16, append: '…')}</code></td>
@@ -278,10 +271,9 @@
         <f:else>
             <div class="callout callout-warning">
                 <div class="callout-content">
-                    <div class="callout-title">Noch kein Inventar</div>
+                    <div class="callout-title"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.noInventory.title"/></div>
                     <div class="callout-body">
-                        <p class="mb-0">Diese Instanz ist verbunden, hat aber noch nichts gemeldet.
-                           Im Backend-Modul der Instanz oder per <code>caretaker2:push</code> auslösen.</p>
+                        <p class="mb-0"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.noInventory.body"/></p>
                     </div>
                 </div>
             </div>

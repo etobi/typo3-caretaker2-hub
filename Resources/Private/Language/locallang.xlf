@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.0">
+    <file source-language="en" datatype="plaintext" original="messages" date="2026-09-09T00:00:00Z" product-name="caretaker2_hub">
+        <header/>
+        <body>
+            <trans-unit id="module.instances.title">
+                <source>Instances</source>
+            </trans-unit>
+            <trans-unit id="module.instances.description">
+                <source>All monitored TYPO3 instances</source>
+            </trans-unit>
+            <trans-unit id="list.heading">
+                <source>Instances</source>
+            </trans-unit>
+            <trans-unit id="list.button.addInstance">
+                <source>Add instance</source>
+            </trans-unit>
+            <trans-unit id="list.button.addGroup">
+                <source>Create group</source>
+            </trans-unit>
+            <trans-unit id="list.enroll.title">
+                <source>Connect instance</source>
+            </trans-unit>
+            <trans-unit id="list.enroll.intro">
+                <source>Enter both in the Caretaker2 backend module of the instance. The code is valid for 15 minutes and can be redeemed exactly once.</source>
+            </trans-unit>
+            <trans-unit id="list.enroll.hubUrl">
+                <source>Hub address</source>
+            </trans-unit>
+            <trans-unit id="list.enroll.code">
+                <source>Code</source>
+            </trans-unit>
+            <trans-unit id="list.summary.total">
+                <source>%s instances</source>
+            </trans-unit>
+            <trans-unit id="list.summary.ok">
+                <source>%s current</source>
+            </trans-unit>
+            <trans-unit id="list.summary.incomplete">
+                <source>%s incompletely checked</source>
+            </trans-unit>
+            <trans-unit id="list.summary.vulnerable">
+                <source>%s with a security hole</source>
+            </trans-unit>
+            <trans-unit id="list.summary.unsupported">
+                <source>%s without security updates</source>
+            </trans-unit>
+            <trans-unit id="list.summary.stale">
+                <source>%s not reporting</source>
+            </trans-unit>
+            <trans-unit id="list.column.state">
+                <source>State</source>
+            </trans-unit>
+            <trans-unit id="list.column.instance">
+                <source>Instance and domains</source>
+            </trans-unit>
+            <trans-unit id="list.column.typo3">
+                <source>TYPO3</source>
+            </trans-unit>
+            <trans-unit id="list.column.php">
+                <source>PHP</source>
+            </trans-unit>
+            <trans-unit id="list.column.context">
+                <source>Context</source>
+            </trans-unit>
+            <trans-unit id="list.column.findings">
+                <source>Findings</source>
+            </trans-unit>
+            <trans-unit id="list.column.lastSeen">
+                <source>Last reported</source>
+            </trans-unit>
+            <trans-unit id="list.group.edit">
+                <source>Edit group</source>
+            </trans-unit>
+            <trans-unit id="list.group.ungrouped">
+                <source>Without group</source>
+            </trans-unit>
+            <trans-unit id="list.findings.security">
+                <source>Security findings</source>
+            </trans-unit>
+            <trans-unit id="list.findings.updateSafe">
+                <source>Updates within the constraint</source>
+            </trans-unit>
+            <trans-unit id="list.findings.updateMajor">
+                <source>Updates that would change the constraint</source>
+            </trans-unit>
+            <trans-unit id="list.neverReported">
+                <source>never</source>
+            </trans-unit>
+            <trans-unit id="list.action.detail">
+                <source>Show details</source>
+            </trans-unit>
+            <trans-unit id="list.action.edit">
+                <source>Edit instance</source>
+            </trans-unit>
+            <trans-unit id="list.empty.title">
+                <source>No instance connected yet</source>
+            </trans-unit>
+            <trans-unit id="list.empty.body">
+                <source>Create a code, enter it in the backend module of the instance — done. No key exchange, nothing to open up from outside.</source>
+            </trans-unit>
+            <trans-unit id="state.ok">
+                <source>Current</source>
+            </trans-unit>
+            <trans-unit id="state.vulnerable">
+                <source>Security hole</source>
+            </trans-unit>
+            <trans-unit id="state.unsupported">
+                <source>Without security updates</source>
+            </trans-unit>
+            <trans-unit id="state.incomplete">
+                <source>Incompletely checked</source>
+            </trans-unit>
+            <trans-unit id="state.stale">
+                <source>Not reporting</source>
+            </trans-unit>
+            <trans-unit id="state.hint.vulnerable">
+                <source>Known security hole in an installed package.</source>
+            </trans-unit>
+            <trans-unit id="state.hint.unsupported">
+                <source>%s receives no security updates any more.</source>
+            </trans-unit>
+            <trans-unit id="state.hint.incomplete">
+                <source>A provider delivered nothing or only parts — what you see here is not the whole picture.</source>
+            </trans-unit>
+            <trans-unit id="state.hint.stale">
+                <source>The instance has not reported for a while. The data may be out of date.</source>
+            </trans-unit>
+            <trans-unit id="typo3.status.stable">
+                <source>current</source>
+            </trans-unit>
+            <trans-unit id="typo3.status.oldstable">
+                <source>maintained</source>
+            </trans-unit>
+            <trans-unit id="typo3.status.elts">
+                <source>ELTS</source>
+            </trans-unit>
+            <trans-unit id="typo3.status.eltsUnpatched">
+                <source>without updates</source>
+            </trans-unit>
+            <trans-unit id="typo3.status.unsupported">
+                <source>without support</source>
+            </trans-unit>
+            <trans-unit id="typo3.hint.elts">
+                <source>ELTS until %s</source>
+            </trans-unit>
+            <trans-unit id="typo3.hint.eltsUnpatched">
+                <source>maintained through ELTS only since %s — this instance sits on the last free release</source>
+            </trans-unit>
+            <trans-unit id="typo3.hint.maintained">
+                <source>regularly maintained until %s</source>
+            </trans-unit>
+            <trans-unit id="typo3.hint.ended">
+                <source>ELTS ended on %s as well</source>
+            </trans-unit>
+            <trans-unit id="php.status.active">
+                <source>supported</source>
+            </trans-unit>
+            <trans-unit id="php.status.security">
+                <source>security fixes only</source>
+            </trans-unit>
+            <trans-unit id="php.status.eol">
+                <source>end of life</source>
+            </trans-unit>
+            <trans-unit id="php.hint.active">
+                <source>actively supported until %s</source>
+            </trans-unit>
+            <trans-unit id="php.hint.security">
+                <source>security fixes only, until %s</source>
+            </trans-unit>
+            <trans-unit id="php.hint.eol">
+                <source>without security fixes since %s</source>
+            </trans-unit>
+            <trans-unit id="finding.type.security">
+                <source>Security</source>
+            </trans-unit>
+            <trans-unit id="finding.type.update_safe">
+                <source>Update available</source>
+            </trans-unit>
+            <trans-unit id="finding.type.update_major">
+                <source>Update blocked</source>
+            </trans-unit>
+            <trans-unit id="finding.type.abandoned">
+                <source>Not maintained</source>
+            </trans-unit>
+            <trans-unit id="finding.type.unassessable">
+                <source>Not assessable</source>
+            </trans-unit>
+            <trans-unit id="finding.type.typo3_elts">
+                <source>ELTS only</source>
+            </trans-unit>
+            <trans-unit id="finding.type.typo3_elts_unpatched">
+                <source>ELTS not applied</source>
+            </trans-unit>
+            <trans-unit id="finding.type.typo3_unsupported">
+                <source>Without support</source>
+            </trans-unit>
+            <trans-unit id="finding.type.php_security_only">
+                <source>PHP security fixes only</source>
+            </trans-unit>
+            <trans-unit id="finding.type.php_eol">
+                <source>PHP without support</source>
+            </trans-unit>
+            <trans-unit id="finding.severity.critical">
+                <source>critical</source>
+            </trans-unit>
+            <trans-unit id="finding.severity.high">
+                <source>high</source>
+            </trans-unit>
+            <trans-unit id="finding.severity.medium">
+                <source>medium</source>
+            </trans-unit>
+            <trans-unit id="finding.severity.low">
+                <source>low</source>
+            </trans-unit>
+            <trans-unit id="finding.severity.unknown">
+                <source>unrated</source>
+            </trans-unit>
+            <trans-unit id="finding.severity.info">
+                <source>note</source>
+            </trans-unit>
+            <trans-unit id="finding.severity.unknownHint">
+                <source>No rating available yet. The severity comes from the GitHub Advisory Database, which picks up new reports with a delay — until then the finding is treated as a serious one.</source>
+            </trans-unit>
+            <trans-unit id="finding.unratedNote">
+                <source>"Unrated" means the report is so new that the GitHub Advisory Database has no rating for it yet — Composer does not know one either. Such findings are treated as serious ones until a rating exists.</source>
+            </trans-unit>
+            <trans-unit id="detail.button.refresh">
+                <source>Refresh data</source>
+            </trans-unit>
+            <trans-unit id="detail.button.evaluate">
+                <source>Evaluate Composer data</source>
+            </trans-unit>
+            <trans-unit id="detail.historic.title">
+                <source>Older state</source>
+            </trans-unit>
+            <trans-unit id="detail.historic.body">
+                <source>Showing the state from %s. Findings always describe the current state and are therefore hidden.</source>
+            </trans-unit>
+            <trans-unit id="detail.historic.toCurrent">
+                <source>To the current state</source>
+            </trans-unit>
+            <trans-unit id="detail.findings.heading">
+                <source>Findings</source>
+            </trans-unit>
+            <trans-unit id="detail.findings.count.security">
+                <source>%s security</source>
+            </trans-unit>
+            <trans-unit id="detail.findings.count.updateSafe">
+                <source>%s update available</source>
+            </trans-unit>
+            <trans-unit id="detail.findings.count.updateMajor">
+                <source>%s update blocked</source>
+            </trans-unit>
+            <trans-unit id="detail.findings.count.abandoned">
+                <source>%s not maintained</source>
+            </trans-unit>
+            <trans-unit id="detail.findings.count.unassessable">
+                <source>%s not assessable</source>
+            </trans-unit>
+            <trans-unit id="detail.findings.acknowledgeSelected">
+                <source>Acknowledge selected</source>
+            </trans-unit>
+            <trans-unit id="detail.column.severity">
+                <source>Severity</source>
+            </trans-unit>
+            <trans-unit id="detail.column.type">
+                <source>Kind</source>
+            </trans-unit>
+            <trans-unit id="detail.column.package">
+                <source>Package</source>
+            </trans-unit>
+            <trans-unit id="detail.column.installed">
+                <source>Installed</source>
+            </trans-unit>
+            <trans-unit id="detail.column.available">
+                <source>Available</source>
+            </trans-unit>
+            <trans-unit id="detail.column.finding">
+                <source>Finding</source>
+            </trans-unit>
+            <trans-unit id="detail.column.reason">
+                <source>Reason</source>
+            </trans-unit>
+            <trans-unit id="detail.select">
+                <source>Select %s</source>
+            </trans-unit>
+            <trans-unit id="detail.url">
+                <source>URL</source>
+            </trans-unit>
+            <trans-unit id="detail.sites">
+                <source>Sites and domains</source>
+            </trans-unit>
+            <trans-unit id="detail.rootPage">
+                <source>root page %s</source>
+            </trans-unit>
+            <trans-unit id="detail.lastSeen">
+                <source>Last reported</source>
+            </trans-unit>
+            <trans-unit id="detail.knownSince">
+                <source>Known since</source>
+            </trans-unit>
+            <trans-unit id="detail.agentVersion">
+                <source>Agent version</source>
+            </trans-unit>
+            <trans-unit id="detail.schemaVersion">
+                <source>Schema version</source>
+            </trans-unit>
+            <trans-unit id="detail.inventorySize">
+                <source>Inventory size</source>
+            </trans-unit>
+            <trans-unit id="detail.changeCount">
+                <source>Changes so far</source>
+            </trans-unit>
+            <trans-unit id="detail.unknown">
+                <source>unknown</source>
+            </trans-unit>
+            <trans-unit id="detail.acknowledged.summary">
+                <source>Acknowledged findings (%s)</source>
+            </trans-unit>
+            <trans-unit id="detail.acknowledged.noReason">
+                <source>without reason</source>
+            </trans-unit>
+            <trans-unit id="detail.acknowledged.showAgain">
+                <source>Show again</source>
+            </trans-unit>
+            <trans-unit id="detail.providers.summary">
+                <source>Providers (%s)</source>
+            </trans-unit>
+            <trans-unit id="detail.providers.omitted">
+                <source>Too large to display, but complete in the snapshot:</source>
+            </trans-unit>
+            <trans-unit id="detail.providers.noData">
+                <source>No data delivered.</source>
+            </trans-unit>
+            <trans-unit id="detail.history.summary">
+                <source>Changes (%s)</source>
+            </trans-unit>
+            <trans-unit id="detail.history.time">
+                <source>Time</source>
+            </trans-unit>
+            <trans-unit id="detail.history.fingerprint">
+                <source>Fingerprint</source>
+            </trans-unit>
+            <trans-unit id="detail.history.latest">
+                <source>current</source>
+            </trans-unit>
+            <trans-unit id="detail.history.shown">
+                <source>shown</source>
+            </trans-unit>
+            <trans-unit id="detail.noInventory.title">
+                <source>No inventory yet</source>
+            </trans-unit>
+            <trans-unit id="detail.noInventory.body">
+                <source>This instance is connected but has not reported anything yet. Trigger it from the backend module of the instance or with caretaker2:push.</source>
+            </trans-unit>
+            <trans-unit id="message.nothingSelected">
+                <source>Nothing selected.</source>
+            </trans-unit>
+            <trans-unit id="message.acknowledged.one">
+                <source>One finding acknowledged.</source>
+            </trans-unit>
+            <trans-unit id="message.acknowledged.many">
+                <source>%s findings acknowledged.</source>
+            </trans-unit>
+            <trans-unit id="message.unacknowledged">
+                <source>Acknowledgement withdrawn.</source>
+            </trans-unit>
+            <trans-unit id="message.evaluated">
+                <source>Evaluation done: %s new, %s unchanged, %s resolved.</source>
+            </trans-unit>
+            <trans-unit id="message.unknownUser">
+                <source>unknown</source>
+            </trans-unit>
+            <trans-unit id="trigger.noUrl">
+                <source>No address is stored for this instance.</source>
+            </trans-unit>
+            <trans-unit id="trigger.unreachable">
+                <source>Instance unreachable: %s</source>
+            </trans-unit>
+            <trans-unit id="trigger.cooldown">
+                <source>The instance has just reported. Try again in %s seconds.</source>
+            </trans-unit>
+            <trans-unit id="trigger.refused">
+                <source>The instance refused: %s</source>
+            </trans-unit>
+            <trans-unit id="trigger.changed">
+                <source>The instance reported, there was a change.</source>
+            </trans-unit>
+            <trans-unit id="trigger.unchanged">
+                <source>The instance reported, unchanged.</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

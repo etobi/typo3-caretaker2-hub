@@ -24,6 +24,7 @@ use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\Components\ComponentFactory;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Imaging\IconSize;
 use TYPO3\CMS\Core\Http\RedirectResponse;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
@@ -39,6 +40,7 @@ use TYPO3\CMS\Core\Page\PageRenderer;
 #[AsController]
 final class InstanceListController
 {
+    private const LL = 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:';
     private const ROUTE = 'caretaker2_instances';
 
     private const MAX_RENDERED_VALUE_BYTES = 8192;
@@ -107,27 +109,27 @@ final class InstanceListController
             );
 
             if ($count === 0) {
-                $message = 'Nichts ausgewählt.';
+                $message = $this->ll('message.nothingSelected');
                 $messageSeverity = 'warning';
             } else {
                 $message = $count === 1
-                    ? 'Ein Befund quittiert.'
-                    : sprintf('%d Befunde quittiert.', $count);
+                    ? $this->ll('message.acknowledged.one')
+                    : $this->ll('message.acknowledged.many', $count);
                 $messageSeverity = 'success';
             }
         }
 
         if (!$readOnly && $request->getMethod() === 'POST' && is_array($body) && isset($body['unacknowledge'])) {
             $this->findings->unacknowledge((int)$body['unacknowledge']);
-            $message = 'Quittierung aufgehoben.';
+            $message = $this->ll('message.unacknowledged');
             $messageSeverity = 'info';
         }
 
         if (!$readOnly && $request->getMethod() === 'POST' && ($request->getParsedBody()['evaluate'] ?? null) !== null) {
             try {
                 $counts = $this->evaluation->evaluate($instance);
-                $message = sprintf(
-                    'Auswertung fertig: %d neu, %d unverändert, %d erledigt.',
+                $message = $this->ll(
+                    'message.evaluated',
                     $counts['added'],
                     $counts['kept'],
                     $counts['resolved']
@@ -154,8 +156,8 @@ final class InstanceListController
         $view->setTitle('Caretaker2', $instance->title);
 
         if (!$readOnly) {
-            $this->addSubmitButton($view, 'caretaker2-actions', 'trigger', 'Daten aktualisieren', 'actions-refresh');
-            $this->addSubmitButton($view, 'caretaker2-actions', 'evaluate', 'Composer auswerten', 'actions-search');
+            $this->addSubmitButton($view, 'caretaker2-actions', 'trigger', $this->ll('detail.button.refresh'), 'actions-refresh');
+            $this->addSubmitButton($view, 'caretaker2-actions', 'evaluate', $this->ll('detail.button.evaluate'), 'actions-search');
         }
 
         $view->getDocHeaderComponent()->setBreadcrumbContext(
@@ -211,7 +213,7 @@ final class InstanceListController
     private function list(ServerRequestInterface $request): ResponseInterface
     {
         $view = $this->moduleTemplateFactory->create($request);
-        $view->setTitle('Caretaker2', 'Instanzen');
+        $view->setTitle('Caretaker2', $this->ll('list.heading'));
 
         $enrollmentCode = null;
         if ($request->getMethod() === 'POST' && ($request->getParsedBody()['createCode'] ?? null) !== null) {
@@ -226,8 +228,8 @@ final class InstanceListController
         $view->addButtonToButtonBar(
             $this->components->createGenericButton()
                 ->setTag('button')
-                ->setLabel('Instanz hinzufügen')
-                ->setTitle('Instanz hinzufügen')
+                ->setLabel($this->ll('list.button.addInstance'))
+                ->setTitle($this->ll('list.button.addInstance'))
                 ->setShowLabelText(true)
                 ->setIcon($this->icons->getIcon('actions-plus', IconSize::SMALL))
                 ->setClasses('btn btn-default')
@@ -245,7 +247,7 @@ final class InstanceListController
         $view->addButtonToButtonBar(
             $this->components->createLinkButton()
                 ->setHref($this->editUri('tx_caretaker2_group', 0, true))
-                ->setTitle('Gruppe anlegen')
+                ->setTitle($this->ll('list.button.addGroup'))
                 ->setShowLabelText(true)
                 ->setIcon($this->icons->getIcon('actions-plus', IconSize::SMALL))
         );
@@ -435,26 +437,21 @@ final class InstanceListController
      */
     private function presentFindings(array $rows): array
     {
-        $typeLabels = [
-            'security' => 'Sicherheit',
-            'update_safe' => 'Update möglich',
-            'update_major' => 'Update blockiert',
-            'abandoned' => 'Nicht gepflegt',
-            'unassessable' => 'Nicht bewertbar',
-            'typo3_elts' => 'Nur noch ELTS',
-            'typo3_elts_unpatched' => 'ELTS nicht eingespielt',
-            'php_security_only' => 'PHP nur Sicherheitsfixes',
-            'php_eol' => 'PHP ohne Support',
-            'typo3_unsupported' => 'Ohne Support',
+        $types = [
+            'security', 'update_safe', 'update_major', 'abandoned', 'unassessable',
+            'typo3_elts', 'typo3_elts_unpatched', 'php_security_only', 'php_eol',
+            'typo3_unsupported',
         ];
-        $severityLabels = [
-            'critical' => 'kritisch',
-            'high' => 'hoch',
-            'unknown' => 'ungewertet',
-            'medium' => 'mittel',
-            'low' => 'niedrig',
-            'info' => 'Hinweis',
-        ];
+        $typeLabels = [];
+        foreach ($types as $type) {
+            $typeLabels[$type] = $this->ll('finding.type.' . $type);
+        }
+
+        $severityLabels = [];
+        foreach (['critical', 'high', 'unknown', 'medium', 'low', 'info'] as $severity) {
+            $severityLabels[$severity] = $this->ll('finding.severity.' . $severity);
+        }
+        $unknownHint = $this->ll('finding.severity.unknownHint');
         $severityColours = [
             'critical' => 'danger',
             'high' => 'danger',
@@ -464,7 +461,7 @@ final class InstanceListController
             'info' => 'secondary',
         ];
 
-        return array_map(static function (array $row) use ($typeLabels, $severityColours, $severityLabels): array {
+        return array_map(static function (array $row) use ($typeLabels, $severityColours, $severityLabels, $unknownHint): array {
             $severity = (string)$row['severity'];
 
             return [
@@ -472,9 +469,7 @@ final class InstanceListController
                 'typeLabel' => $typeLabels[$row['finding_type']] ?? (string)$row['finding_type'],
                 'severity' => $severityLabels[$severity] ?? $severity,
                 'severityColour' => $severityColours[$severity] ?? 'secondary',
-                'severityHint' => $severity === 'unknown'
-                    ? 'Noch keine Einstufung verfügbar. Die Schwere stammt aus der GitHub Advisory Database, die neue Meldungen erst mit Verzug aufnimmt — bis dahin wird der Befund wie ein schwerwiegender behandelt.'
-                    : '',
+                'severityHint' => $severity === 'unknown' ? $unknownHint : '',
                 'package' => (string)$row['package'],
                 'installedVersion' => (string)$row['installed_version'],
                 'latestVersion' => (string)$row['latest_version'],
@@ -578,7 +573,7 @@ final class InstanceListController
         if ($remaining !== []) {
             $out[] = [
                 'uid' => 0,
-                'title' => 'Ohne Gruppe',
+                'title' => $this->ll('list.group.ungrouped'),
                 'description' => '',
                 'editUri' => '',
                 'instances' => $remaining,
@@ -722,11 +717,11 @@ final class InstanceListController
         );
 
         $labels = [
-            Typo3MajorVersions::STATUS_STABLE => 'aktuell',
-            Typo3MajorVersions::STATUS_OLDSTABLE => 'gepflegt',
-            Typo3MajorVersions::STATUS_ELTS => 'ELTS',
-            Typo3MajorVersions::STATUS_ELTS_UNPATCHED => 'ohne Updates',
-            Typo3MajorVersions::STATUS_UNSUPPORTED => 'ohne Support',
+            Typo3MajorVersions::STATUS_STABLE => $this->ll('typo3.status.stable'),
+            Typo3MajorVersions::STATUS_OLDSTABLE => $this->ll('typo3.status.oldstable'),
+            Typo3MajorVersions::STATUS_ELTS => $this->ll('typo3.status.elts'),
+            Typo3MajorVersions::STATUS_ELTS_UNPATCHED => $this->ll('typo3.status.eltsUnpatched'),
+            Typo3MajorVersions::STATUS_UNSUPPORTED => $this->ll('typo3.status.unsupported'),
         ];
         $colours = [
             Typo3MajorVersions::STATUS_STABLE => 'success',
@@ -738,20 +733,17 @@ final class InstanceListController
 
         $hint = '';
         if ($status['status'] === Typo3MajorVersions::STATUS_ELTS_UNPATCHED) {
-            $hint = sprintf(
-                'seit %s nur noch über ELTS gepflegt — diese Instanz steht auf dem letzten freien Release',
-                $status['lastPublic']
-            );
+            $hint = $this->ll('typo3.hint.eltsUnpatched', $status['lastPublic']);
         } elseif ($status['status'] === Typo3MajorVersions::STATUS_ELTS && $status['eltsUntil'] !== null) {
-            $hint = 'ELTS bis ' . date('d.m.Y', $status['eltsUntil']);
+            $hint = $this->ll('typo3.hint.elts', date('d.m.Y', $status['eltsUntil']));
         } elseif ($status['maintainedUntil'] !== null && in_array(
             $status['status'],
             [Typo3MajorVersions::STATUS_STABLE, Typo3MajorVersions::STATUS_OLDSTABLE],
             true
         )) {
-            $hint = 'regulär gepflegt bis ' . date('d.m.Y', $status['maintainedUntil']);
+            $hint = $this->ll('typo3.hint.maintained', date('d.m.Y', $status['maintainedUntil']));
         } elseif ($status['status'] === Typo3MajorVersions::STATUS_UNSUPPORTED && $status['eltsUntil'] !== null) {
-            $hint = 'auch ELTS endete am ' . date('d.m.Y', $status['eltsUntil']);
+            $hint = $this->ll('typo3.hint.ended', date('d.m.Y', $status['eltsUntil']));
         }
 
         return [
@@ -773,9 +765,9 @@ final class InstanceListController
         $status = $this->phpVersions->statusOf($instance->phpVersion);
 
         $labels = [
-            PhpVersions::STATUS_ACTIVE => 'unterstützt',
-            PhpVersions::STATUS_SECURITY => 'nur Sicherheitsfixes',
-            PhpVersions::STATUS_EOL => 'am Ende',
+            PhpVersions::STATUS_ACTIVE => $this->ll('php.status.active'),
+            PhpVersions::STATUS_SECURITY => $this->ll('php.status.security'),
+            PhpVersions::STATUS_EOL => $this->ll('php.status.eol'),
         ];
         $colours = [
             PhpVersions::STATUS_ACTIVE => 'success',
@@ -785,11 +777,11 @@ final class InstanceListController
 
         $hint = '';
         if ($status['status'] === PhpVersions::STATUS_ACTIVE && $status['supportUntil'] !== null) {
-            $hint = 'aktiv unterstützt bis ' . date('d.m.Y', $status['supportUntil']);
+            $hint = $this->ll('php.hint.active', date('d.m.Y', $status['supportUntil']));
         } elseif ($status['status'] === PhpVersions::STATUS_SECURITY && $status['eolUntil'] !== null) {
-            $hint = 'nur noch Sicherheitsfixes, bis ' . date('d.m.Y', $status['eolUntil']);
+            $hint = $this->ll('php.hint.security', date('d.m.Y', $status['eolUntil']));
         } elseif ($status['status'] === PhpVersions::STATUS_EOL && $status['eolUntil'] !== null) {
-            $hint = 'ohne Sicherheitsfixes seit ' . date('d.m.Y', $status['eolUntil']);
+            $hint = $this->ll('php.hint.eol', date('d.m.Y', $status['eolUntil']));
         }
 
         return [
@@ -810,7 +802,7 @@ final class InstanceListController
     private function stateHint(string $state, Instance $instance, array $counts): string
     {
         if ($state === 'vulnerable') {
-            return 'Bekannte Sicherheitslücke in einem installierten Paket.';
+            return $this->ll('state.hint.vulnerable');
         }
 
         if ($state === 'unsupported') {
@@ -822,18 +814,15 @@ final class InstanceListController
                 $affected[] = 'PHP ' . $this->phpBadge($instance)['cycle'];
             }
 
-            return sprintf(
-                '%s bekommt keine Sicherheitsupdates mehr.',
-                implode(' und ', $affected)
-            );
+            return $this->ll('state.hint.unsupported', implode(', ', $affected));
         }
 
         if ($state === 'incomplete') {
-            return 'Ein Provider hat nichts oder nur Teile geliefert — was hier steht, ist nicht das ganze Bild.';
+            return $this->ll('state.hint.incomplete');
         }
 
         if ($state === 'stale') {
-            return 'Die Instanz hat sich länger nicht gemeldet. Die Angaben sind womöglich veraltet.';
+            return $this->ll('state.hint.stale');
         }
 
         return '';
@@ -850,23 +839,18 @@ final class InstanceListController
             return (string)$user->user['username'];
         }
 
-        return (string)($GLOBALS['BE_USER']->user['username'] ?? 'unbekannt');
+        return (string)($GLOBALS['BE_USER']->user['username'] ?? $this->ll('message.unknownUser'));
     }
 
     private function stateLabel(string $state): string
     {
-        return [
-            'ok' => 'Aktuell',
-            'vulnerable' => 'Sicherheitslücke',
-            // Nicht "Sicherheitslücke": Bekannt ist nur, dass nichts mehr
-            // nachkommt. Das ist schlimm genug, aber etwas anderes.
-            'unsupported' => 'Ohne Sicherheitsupdates',
-            // Bewusst nicht "Fehler": Es ist nichts kaputt, wir wissen nur
-            // nicht alles. Das ist eine eigene Aussage und darf nicht als
-            // Entwarnung durchgehen.
-            'incomplete' => 'Unvollständig geprüft',
-            'stale' => 'Meldet sich nicht',
-        ][$state] ?? $state;
+        // "unsupported" is deliberately not "security hole": all that is
+        // known is that nothing arrives any more. And "incomplete" is not
+        // "error" — nothing is broken, we just do not know everything, which
+        // is a statement of its own and must not pass as an all-clear.
+        return in_array($state, ['ok', 'vulnerable', 'unsupported', 'incomplete', 'stale'], true)
+            ? $this->ll('state.' . $state)
+            : $state;
     }
 
     private function stateSeverity(string $state): string
@@ -881,7 +865,22 @@ final class InstanceListController
     }
 
     /**
-     * "10.11.18-MariaDB-ubu2204-log" ist als Spalteninhalt unbrauchbar.
+     * @param string|int ...$args
+     */
+    private function ll(string $key, ...$args): string
+    {
+        $text = $this->getLanguageService()->sL(self::LL . $key);
+
+        return $args === [] ? $text : vsprintf($text, $args);
+    }
+
+    private function getLanguageService(): LanguageService
+    {
+        return $GLOBALS['LANG'];
+    }
+
+    /**
+     * "10.11.18-MariaDB-ubu2204-log" is unusable as a column value.
      */
     private function shortenDbVersion(string $version): string
     {

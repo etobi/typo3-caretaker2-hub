@@ -19,8 +19,8 @@ return [
         'path' => '/module/caretaker2/instances',
         'iconIdentifier' => 'caretaker2-module',
         'labels' => [
-            'title' => 'Instanzen',
-            'description' => 'Alle überwachten TYPO3-Instanzen',
+            'title' => 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:module.instances.title',
+            'description' => 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:module.instances.description',
         ],
         'routes' => [
             '_default' => [

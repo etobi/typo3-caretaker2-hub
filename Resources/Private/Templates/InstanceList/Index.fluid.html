@@ -6,24 +6,23 @@
 
 <f:section name="Content">
 
-    <h1>Instanzen</h1>
+    <h1><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.heading"/></h1>
 
     <f:if condition="{enrollmentCode}">
         <div class="callout callout-success">
             <div class="callout-content">
-                <div class="callout-title">Instanz verbinden</div>
+                <div class="callout-title"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.enroll.title"/></div>
                 <div class="callout-body">
-                    <p>Im Backend-Modul <strong>Caretaker2</strong> der Instanz beides eintragen.
-                       Der Code ist 15&nbsp;Minuten gültig und lässt sich genau einmal einlösen.</p>
+                    <p><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.enroll.intro"/></p>
 
                     <div class="row">
                         <div class="col-md-6 mb-2">
-                            <label class="form-label">Adresse des Hubs</label>
+                            <label class="form-label"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.enroll.hubUrl"/></label>
                             <input type="text" class="form-control" readonly="readonly"
                                    onclick="this.select()" value="{hubUrl}">
                         </div>
                         <div class="col-md-3 mb-2">
-                            <label class="form-label">Code</label>
+                            <label class="form-label"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.enroll.code"/></label>
                             <input type="text" class="form-control" readonly="readonly"
                                    onclick="this.select()"
                                    style="font-family:monospace;letter-spacing:.1em;font-weight:bold"
@@ -38,19 +37,19 @@
     <f:if condition="{summary.total}">
         <f:then>
             <div class="mb-3">
-                <span class="badge badge-secondary">{summary.total} Instanzen</span>
-                <span class="badge badge-success">{summary.ok} aktuell</span>
+                <span class="badge badge-secondary"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.summary.total" arguments="{0: summary.total}"/></span>
+                <span class="badge badge-success"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.summary.ok" arguments="{0: summary.ok}"/></span>
                 <f:if condition="{summary.incomplete}">
-                    <span class="badge badge-warning">{summary.incomplete} unvollständig geprüft</span>
+                    <span class="badge badge-warning"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.summary.incomplete" arguments="{0: summary.incomplete}"/></span>
                 </f:if>
                 <f:if condition="{summary.vulnerable}">
-                    <span class="badge badge-danger">{summary.vulnerable} mit Sicherheitslücke</span>
+                    <span class="badge badge-danger"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.summary.vulnerable" arguments="{0: summary.vulnerable}"/></span>
                 </f:if>
                 <f:if condition="{summary.unsupported}">
-                    <span class="badge badge-danger">{summary.unsupported} ohne Sicherheitsupdates</span>
+                    <span class="badge badge-danger"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.summary.unsupported" arguments="{0: summary.unsupported}"/></span>
                 </f:if>
                 <f:if condition="{summary.stale}">
-                    <span class="badge badge-danger">{summary.stale} melden sich nicht</span>
+                    <span class="badge badge-danger"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.summary.stale" arguments="{0: summary.stale}"/></span>
                 </f:if>
             </div>
 
@@ -58,13 +57,13 @@
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr>
-                            <th>Zustand</th>
-                            <th>Instanz und Domains</th>
-                            <th>TYPO3</th>
-                            <th>PHP</th>
-                            <th>Kontext</th>
-                            <th>Befunde</th>
-                            <th>Zuletzt gemeldet</th>
+                            <th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.column.state"/></th>
+                            <th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.column.instance"/></th>
+                            <th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.column.typo3"/></th>
+                            <th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.column.php"/></th>
+                            <th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.column.context"/></th>
+                            <th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.column.findings"/></th>
+                            <th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.column.lastSeen"/></th>
                             <th class="col-control"></th>
                         </tr>
                     </thead>
@@ -83,7 +82,7 @@
                                             </span>
                                             <f:if condition="{group.editUri}">
                                                 <a href="{group.editUri}" class="btn btn-default btn-sm"
-                                                   title="Gruppe bearbeiten">
+                                                   title="{f:translate(key: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.group.edit')}">
                                                     <core:icon identifier="actions-open" size="small"/>
                                                 </a>
                                             </f:if>
@@ -117,29 +116,29 @@
                                     <td class="col-nowrap">{instance.context}</td>
                                     <td class="col-nowrap">
                                         <f:if condition="{instance.findings.security}">
-                                            <span class="badge badge-danger" title="Sicherheitsbefunde">{instance.findings.security}</span>
+                                            <span class="badge badge-danger" title="{f:translate(key: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.findings.security')}">{instance.findings.security}</span>
                                         </f:if>
                                         <f:if condition="{instance.findings.update_safe}">
-                                            <span class="badge badge-warning" title="Updates im Rahmen des Constraints">{instance.findings.update_safe}</span>
+                                            <span class="badge badge-warning" title="{f:translate(key: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.findings.updateSafe')}">{instance.findings.update_safe}</span>
                                         </f:if>
                                         <f:if condition="{instance.findings.update_major}">
-                                            <span class="badge badge-info" title="Updates, die den Constraint ändern würden">{instance.findings.update_major}</span>
+                                            <span class="badge badge-info" title="{f:translate(key: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.findings.updateMajor')}">{instance.findings.update_major}</span>
                                         </f:if>
                                     </td>
                                     <td class="col-nowrap">
                                         <f:if condition="{instance.lastSeen}">
                                             <f:then><f:format.date format="d.m.Y H:i">@{instance.lastSeen}</f:format.date></f:then>
-                                            <f:else><span class="text-body-secondary">noch nie</span></f:else>
+                                            <f:else><span class="text-body-secondary"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.neverReported"/></span></f:else>
                                         </f:if>
                                     </td>
                                     <td class="col-control">
                                         <div class="btn-group">
                                             <a href="{instance.detailUri}" class="btn btn-default"
-                                               title="Details anzeigen">
+                                               title="{f:translate(key: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.action.detail')}">
                                                 <core:icon identifier="actions-eye" size="small"/>
                                             </a>
                                             <a href="{instance.editUri}" class="btn btn-default"
-                                               title="Instanz bearbeiten">
+                                               title="{f:translate(key: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.action.edit')}">
                                                 <core:icon identifier="actions-open" size="small"/>
                                             </a>
                                         </div>
@@ -154,10 +153,9 @@
         <f:else>
             <div class="callout callout-info">
                 <div class="callout-content">
-                    <div class="callout-title">Noch keine Instanz verbunden</div>
+                    <div class="callout-title"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.empty.title"/></div>
                     <div class="callout-body">
-                        <p>Einen Code erzeugen, ihn im Backend-Modul der Instanz eintragen — fertig.
-                           Kein Schlüsselaustausch, keine Freischaltung von außen.</p>
+                        <p><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.empty.body"/></p>
                     </div>
                 </div>
             </div>

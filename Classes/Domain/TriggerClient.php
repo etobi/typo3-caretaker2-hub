@@ -15,6 +15,8 @@ use TYPO3\CMS\Core\Http\RequestFactory;
  */
 final class TriggerClient
 {
+    private const LL = 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:';
+
     private const PATH = '/caretaker2/trigger';
     private const TIMEOUT_SECONDS = 25;
 
@@ -28,7 +30,7 @@ final class TriggerClient
     public function trigger(Instance $instance): array
     {
         if ($instance->instanceUrl === '') {
-            return [false, 'Für diese Instanz ist keine Adresse hinterlegt.'];
+            return [false, $this->ll('trigger.noUrl')];
         }
 
         $url = rtrim($instance->instanceUrl, '/') . self::PATH;
@@ -40,7 +42,7 @@ final class TriggerClient
                 'headers' => ['Accept' => 'application/json'],
             ]);
         } catch (\Throwable $e) {
-            return [false, sprintf('Instanz nicht erreichbar: %s', $e->getMessage())];
+            return [false, $this->ll('trigger.unreachable', $e->getMessage())];
         }
 
         $status = $response->getStatusCode();
@@ -49,20 +51,30 @@ final class TriggerClient
         if ($status === 429) {
             $wait = is_array($body) ? (int)($body['retryAfter'] ?? 0) : 0;
 
-            return [false, sprintf('Die Instanz hat gerade erst gemeldet. In %d Sekunden erneut versuchen.', $wait)];
+            return [false, $this->ll('trigger.cooldown', $wait)];
         }
 
         if ($status >= 400) {
             $detail = is_array($body) && isset($body['error']) ? (string)$body['error'] : 'HTTP ' . $status;
 
-            return [false, 'Die Instanz hat abgelehnt: ' . $detail];
+            return [false, $this->ll('trigger.refused', $detail)];
         }
 
         return [
             true,
             (is_array($body) && ($body['stored'] ?? false))
-                ? 'Die Instanz hat gemeldet, es gab eine Veränderung.'
-                : 'Die Instanz hat gemeldet, unverändert.',
+                ? $this->ll('trigger.changed')
+                : $this->ll('trigger.unchanged'),
         ];
+    }
+
+    /**
+     * @param string|int ...$args
+     */
+    private function ll(string $key, ...$args): string
+    {
+        $text = $GLOBALS['LANG']->sL(self::LL . $key);
+
+        return $args === [] ? $text : vsprintf($text, $args);
     }
 }
