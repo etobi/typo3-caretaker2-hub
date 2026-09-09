@@ -8,6 +8,7 @@ use Caretaker2\Hub\Domain\EnrollmentService;
 use Caretaker2\Hub\Domain\Instance;
 use Caretaker2\Hub\Domain\GroupRepository;
 use Caretaker2\Hub\Domain\InstanceRepository;
+use Caretaker2\Hub\Domain\PhpVersions;
 use Caretaker2\Hub\Domain\SnapshotRepository;
 use Caretaker2\Hub\Domain\TriggerClient;
 use Caretaker2\Hub\Domain\Typo3MajorVersions;
@@ -54,6 +55,7 @@ final class InstanceListController
         private readonly PageRenderer $pageRenderer,
         private readonly GroupRepository $groups,
         private readonly Typo3MajorVersions $majorVersions,
+        private readonly PhpVersions $phpVersions,
         private readonly ComponentFactory $components,
         private readonly IconFactory $icons,
     ) {}
@@ -301,7 +303,7 @@ final class InstanceListController
         if ($state !== 'stale') {
             if (($findingCounts['securityHigh'] ?? 0) > 0) {
                 $state = 'vulnerable';
-            } elseif (($findingCounts['typo3Unsupported'] ?? 0) > 0) {
+            } elseif ((($findingCounts['typo3Unsupported'] ?? 0) + ($findingCounts['phpUnsupported'] ?? 0)) > 0) {
                 // No known hole, but nothing to close one with either. That is
                 // its own statement and must not pass as "current".
                 $state = 'unsupported';
@@ -322,6 +324,7 @@ final class InstanceListController
             'typo3Major' => $instance->typo3Major,
             'typo3Support' => $this->supportBadge($instance),
             'phpVersion' => $instance->phpVersion,
+            'phpSupport' => $this->phpBadge($instance),
             'context' => $instance->applicationContext,
             // Ohne Site-Konfiguration bleibt nur die Instanz-Adresse. Die ist
             // eine vollständige URL, die Site-Domains sind Hostnamen — nebeneinander
@@ -334,6 +337,7 @@ final class InstanceListController
             'lastSeen' => $instance->lastSeen,
             'state' => $state,
             'stateLabel' => $this->stateLabel($state),
+            'stateHint' => $this->stateHint($state, $instance, $findingCounts),
             'stateSeverity' => $this->stateSeverity($state),
             'findings' => $findingCounts,
         ];
@@ -439,6 +443,8 @@ final class InstanceListController
             'unassessable' => 'Nicht bewertbar',
             'typo3_elts' => 'Nur noch ELTS',
             'typo3_elts_unpatched' => 'ELTS nicht eingespielt',
+            'php_security_only' => 'PHP nur Sicherheitsfixes',
+            'php_eol' => 'PHP ohne Support',
             'typo3_unsupported' => 'Ohne Support',
         ];
         $severityLabels = [
@@ -754,6 +760,83 @@ final class InstanceListController
             'colour' => $colours[$status['status']] ?? 'secondary',
             'hint' => $hint,
         ];
+    }
+
+    /**
+     * Dasselbe für den PHP-Zweig. Grün, solange er aktiv unterstützt wird,
+     * gelb in der Phase, in der nur noch Sicherheitsfixes kommen, rot danach.
+     *
+     * @return array<string, string>
+     */
+    private function phpBadge(Instance $instance): array
+    {
+        $status = $this->phpVersions->statusOf($instance->phpVersion);
+
+        $labels = [
+            PhpVersions::STATUS_ACTIVE => 'unterstützt',
+            PhpVersions::STATUS_SECURITY => 'nur Sicherheitsfixes',
+            PhpVersions::STATUS_EOL => 'am Ende',
+        ];
+        $colours = [
+            PhpVersions::STATUS_ACTIVE => 'success',
+            PhpVersions::STATUS_SECURITY => 'warning',
+            PhpVersions::STATUS_EOL => 'danger',
+        ];
+
+        $hint = '';
+        if ($status['status'] === PhpVersions::STATUS_ACTIVE && $status['supportUntil'] !== null) {
+            $hint = 'aktiv unterstützt bis ' . date('d.m.Y', $status['supportUntil']);
+        } elseif ($status['status'] === PhpVersions::STATUS_SECURITY && $status['eolUntil'] !== null) {
+            $hint = 'nur noch Sicherheitsfixes, bis ' . date('d.m.Y', $status['eolUntil']);
+        } elseif ($status['status'] === PhpVersions::STATUS_EOL && $status['eolUntil'] !== null) {
+            $hint = 'ohne Sicherheitsfixes seit ' . date('d.m.Y', $status['eolUntil']);
+        }
+
+        return [
+            'status' => $status['status'],
+            'cycle' => $status['cycle'],
+            'label' => $labels[$status['status']] ?? '',
+            'colour' => $colours[$status['status']] ?? 'secondary',
+            'hint' => $hint,
+        ];
+    }
+
+    /**
+     * Zwei rote Zustände nebeneinander sagen von sich aus nicht, worin sie
+     * sich unterscheiden. Der Hover-Text sagt es.
+     *
+     * @param array<string, int> $counts
+     */
+    private function stateHint(string $state, Instance $instance, array $counts): string
+    {
+        if ($state === 'vulnerable') {
+            return 'Bekannte Sicherheitslücke in einem installierten Paket — ein Update schließt sie.';
+        }
+
+        if ($state === 'unsupported') {
+            $affected = [];
+            if (($counts['typo3Unsupported'] ?? 0) > 0) {
+                $affected[] = 'TYPO3 ' . $instance->typo3Major;
+            }
+            if (($counts['phpUnsupported'] ?? 0) > 0) {
+                $affected[] = 'PHP ' . $this->phpBadge($instance)['cycle'];
+            }
+
+            return sprintf(
+                '%s bekommt keine Sicherheitsupdates mehr. Keine bekannte Lücke — aber auch nichts, womit sich eine schließen ließe.',
+                implode(' und ', $affected)
+            );
+        }
+
+        if ($state === 'incomplete') {
+            return 'Ein Provider hat nichts oder nur Teile geliefert — was hier steht, ist nicht das ganze Bild.';
+        }
+
+        if ($state === 'stale') {
+            return 'Die Instanz hat sich länger nicht gemeldet. Die Angaben sind womöglich veraltet.';
+        }
+
+        return '';
     }
 
     /**

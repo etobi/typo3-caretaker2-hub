@@ -228,7 +228,7 @@ final class FindingRepository
         $counts = [];
         foreach ($rows as $row) {
             $uid = (int)$row['instance'];
-            $counts[$uid] ??= ['security' => 0, 'securityHigh' => 0, 'typo3Unsupported' => 0, 'update_safe' => 0, 'update_major' => 0, 'abandoned' => 0, 'unassessable' => 0];
+            $counts[$uid] ??= ['security' => 0, 'securityHigh' => 0, 'typo3Unsupported' => 0, 'phpUnsupported' => 0, 'update_safe' => 0, 'update_major' => 0, 'abandoned' => 0, 'unassessable' => 0];
 
             $type = (string)$row['finding_type'];
             $amount = (int)$row['amount'];
@@ -248,6 +248,10 @@ final class FindingRepository
             // decides the state of the instance just as much.
             if ($type === Finding::TYPE_TYPO3_ELTS_UNPATCHED || $type === Finding::TYPE_TYPO3_UNSUPPORTED) {
                 $counts[$uid]['typo3Unsupported'] += $amount;
+            }
+
+            if ($type === Finding::TYPE_PHP_EOL) {
+                $counts[$uid]['phpUnsupported'] += $amount;
             }
         }
 

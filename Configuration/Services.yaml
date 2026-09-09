@@ -24,6 +24,10 @@ services:
     arguments:
       $cache: '@cache.caretaker2'
 
+  Caretaker2\Hub\Domain\PhpVersions:
+    arguments:
+      $cache: '@cache.caretaker2'
+
   Caretaker2\Hub\Command\CleanupCommand:
     tags:
       - { name: 'console.command', command: 'caretaker2:cleanup', description: 'Entfernt Verwaistes nach gelöschten Instanzen und Gruppen', schedulable: true }

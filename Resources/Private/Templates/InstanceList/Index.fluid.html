@@ -94,7 +94,8 @@
                             <f:for each="{group.instances}" as="instance">
                                 <tr>
                                     <td class="col-nowrap">
-                                        <span class="badge badge-{instance.stateSeverity}">{instance.stateLabel}</span>
+                                        <span class="badge badge-{instance.stateSeverity}"
+                                              title="{instance.stateHint}">{instance.stateLabel}</span>
                                     </td>
                                     <td>
                                         <a href="{instance.detailUri}"><strong>{instance.title}</strong></a>
@@ -109,7 +110,10 @@
                                               title="{instance.typo3Support.hint}">v{instance.typo3Major}</span>
                                         {instance.typo3Version}
                                     </td>
-                                    <td class="col-nowrap">{instance.phpVersion}</td>
+                                    <td class="col-nowrap">
+                                        <span class="badge badge-{instance.phpSupport.colour}"
+                                              title="{instance.phpSupport.hint}">{instance.phpVersion}</span>
+                                    </td>
                                     <td class="col-nowrap">{instance.context}</td>
                                     <td class="col-nowrap">
                                         <f:if condition="{instance.findings.security}">
