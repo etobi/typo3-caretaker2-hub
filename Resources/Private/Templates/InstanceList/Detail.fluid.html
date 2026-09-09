@@ -41,12 +41,12 @@
                 <thead>
                     <tr>
                         <th>Schwere</th><th>Art</th><th>Paket</th>
-                        <th>Installiert</th><th>Verfügbar</th><th>Befund</th>
+                        <th>Installiert</th><th>Verfügbar</th><th>Befund</th><th></th>
                     </tr>
                 </thead>
                 <tbody>
                     <f:for each="{findings}" as="finding">
-                        <tr>
+                        <tr id="befund-{finding.uid}">
                             <td class="col-nowrap"><span class="badge badge-{finding.severityColour}">{finding.severity}</span></td>
                             <td class="col-nowrap">{finding.typeLabel}</td>
                             <td class="col-nowrap"><code>{finding.package}</code></td>
@@ -58,7 +58,38 @@
                                     <f:else>{finding.title}</f:else>
                                 </f:if>
                             </td>
+                            <td class="col-nowrap">
+                                <f:if condition="{noteFor} != {finding.uid}">
+                                    <a href="{finding.noteUri}" class="btn btn-default btn-sm">Ignorieren</a>
+                                </f:if>
+                            </td>
                         </tr>
+                        <f:if condition="{noteFor} == {finding.uid}">
+                            <tr>
+                                <td colspan="7">
+                                    <form method="post">
+                                        <label class="form-label" for="note-{finding.uid}">
+                                            Warum wird dieser Befund ignoriert?
+                                        </label>
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <input type="text" class="form-control" id="note-{finding.uid}"
+                                                       name="note" autofocus="autofocus"
+                                                       placeholder="z.B. Kunde zahlt kein Major-Update, Neubau für Q2 geplant">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <button type="submit" name="acknowledge" value="{finding.uid}"
+                                                        class="btn btn-primary">Quittieren</button>
+                                            </div>
+                                        </div>
+                                        <p class="text-body-secondary mt-2 mb-0">
+                                            Der Befund verschwindet dauerhaft aus der Ampel — ohne Frist.
+                                            Wird er später schwerwiegender, taucht er von selbst wieder auf.
+                                        </p>
+                                    </form>
+                                </td>
+                            </tr>
+                        </f:if>
                     </f:for>
                 </tbody>
             </table>
@@ -105,6 +136,43 @@
             </tbody>
         </table>
     </div>
+
+    <f:if condition="{acknowledgedFindings}">
+        <details class="mb-4">
+            <summary>Quittierte Befunde ({acknowledgedFindings -> f:count()})</summary>
+            <div class="table-fit mt-2">
+                <table class="table table-striped">
+                    <thead>
+                        <tr><th>Schwere</th><th>Paket</th><th>Befund</th><th>Begründung</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        <f:for each="{acknowledgedFindings}" as="finding">
+                            <tr>
+                                <td class="col-nowrap"><span class="badge badge-{finding.severityColour}">{finding.severity}</span></td>
+                                <td class="col-nowrap"><code>{finding.package}</code></td>
+                                <td>{finding.title}</td>
+                                <td>
+                                    <f:if condition="{finding.ackNote}">
+                                        <f:then>{finding.ackNote}</f:then>
+                                        <f:else><em class="text-body-secondary">ohne Begründung</em></f:else>
+                                    </f:if>
+                                    <div class="text-body-secondary">
+                                        {finding.ackUser}, <f:format.date format="d.m.Y">@{finding.ackAt}</f:format.date>
+                                    </div>
+                                </td>
+                                <td class="col-nowrap">
+                                    <form method="post">
+                                        <button type="submit" name="unacknowledge" value="{finding.uid}"
+                                                class="btn btn-default btn-sm">Wieder anzeigen</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </f:for>
+                    </tbody>
+                </table>
+            </div>
+        </details>
+    </f:if>
 
     <f:if condition="{inventorySize}">
         <f:then>

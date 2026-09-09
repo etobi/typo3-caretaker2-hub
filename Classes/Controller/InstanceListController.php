@@ -68,6 +68,24 @@ final class InstanceListController
         $message = null;
         $messageSeverity = 'info';
 
+        $body = $request->getParsedBody();
+
+        if ($request->getMethod() === 'POST' && is_array($body) && isset($body['acknowledge'])) {
+            $this->findings->acknowledge(
+                (int)$body['acknowledge'],
+                $this->currentUser($request),
+                trim((string)($body['note'] ?? ''))
+            );
+            $message = 'Befund quittiert.';
+            $messageSeverity = 'success';
+        }
+
+        if ($request->getMethod() === 'POST' && is_array($body) && isset($body['unacknowledge'])) {
+            $this->findings->unacknowledge((int)$body['unacknowledge']);
+            $message = 'Quittierung aufgehoben.';
+            $messageSeverity = 'info';
+        }
+
         if ($request->getMethod() === 'POST' && ($request->getParsedBody()['evaluate'] ?? null) !== null) {
             try {
                 $counts = $this->evaluation->evaluate($instance);
@@ -98,6 +116,10 @@ final class InstanceListController
 
         $inventory = $this->snapshots->findLatestInventory($instanceId);
 
+        $all = $this->findings->findForInstance($instanceId);
+        $open = array_values(array_filter($all, static fn(array $r): bool => (int)$r['acknowledged'] === 0));
+        $acknowledged = array_values(array_filter($all, static fn(array $r): bool => (int)$r['acknowledged'] === 1));
+
         $view->assignMultiple([
             'instance' => $this->present($instance, time()),
             'listUri' => (string)$this->uriBuilder->buildUriFromRoute(self::ROUTE),
@@ -111,8 +133,13 @@ final class InstanceListController
             'snapshotCount' => $this->snapshots->countForInstance($instanceId),
             'message' => $message,
             'messageSeverity' => $messageSeverity,
-            'findings' => $this->presentFindings($this->findings->findForInstance($instanceId)),
+            'findings' => $this->presentFindings($open, $instanceId),
+            'acknowledgedFindings' => $this->presentFindings($acknowledged, $instanceId),
             'findingCounts' => $this->findings->countsForInstance($instanceId),
+            // Which finding is currently having its note written.
+            'noteFor' => isset($request->getQueryParams()['note'])
+                ? (int)$request->getQueryParams()['note']
+                : null,
         ]);
 
         return $view->renderResponse('InstanceList/Detail');
@@ -292,7 +319,7 @@ final class InstanceListController
      * @param list<array<string, mixed>> $rows
      * @return list<array<string, mixed>>
      */
-    private function presentFindings(array $rows): array
+    private function presentFindings(array $rows, int $instanceId): array
     {
         $typeLabels = [
             'security' => 'Sicherheit',
@@ -310,7 +337,9 @@ final class InstanceListController
             'info' => 'secondary',
         ];
 
-        return array_map(static function (array $row) use ($typeLabels, $severityColours): array {
+        $uriBuilder = $this->uriBuilder;
+
+        return array_map(static function (array $row) use ($typeLabels, $severityColours, $uriBuilder, $instanceId): array {
             $severity = (string)$row['severity'];
 
             return [
@@ -324,8 +353,30 @@ final class InstanceListController
                 'title' => (string)$row['title'],
                 'link' => (string)$row['link'],
                 'firstSeen' => (int)$row['first_seen'],
+                'uid' => (int)$row['uid'],
+                'ackNote' => (string)($row['ack_note'] ?? ''),
+                'ackUser' => (string)$row['ack_user'],
+                'ackAt' => (int)$row['ack_at'],
+                'noteUri' => (string)$uriBuilder->buildUriFromRoute(
+                    self::ROUTE,
+                    ['instance' => $instanceId, 'note' => (int)$row['uid']]
+                ) . '#befund-' . (int)$row['uid'],
             ];
         }, $rows);
+    }
+
+    /**
+     * Whoever clicked. Stored alongside the note so that in half a year one
+     * can ask the person who waved a finding through.
+     */
+    private function currentUser(ServerRequestInterface $request): string
+    {
+        $user = $request->getAttribute('backend.user');
+        if ($user !== null && isset($user->user['username'])) {
+            return (string)$user->user['username'];
+        }
+
+        return (string)($GLOBALS['BE_USER']->user['username'] ?? 'unbekannt');
     }
 
     private function stateLabel(string $state): string

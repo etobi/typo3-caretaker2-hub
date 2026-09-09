@@ -48,7 +48,18 @@ final class FindingRepository
             $row['tstamp'] = $now;
 
             if (isset($existing[$key])) {
-                $connection->update(self::TABLE, $row, ['uid' => (int)$existing[$key]['uid']]);
+                $previous = $existing[$key];
+
+                // A finding that got worse comes back. Acknowledging "medium"
+                // must not silently cover the same package turning critical.
+                if ($this->isMoreSevere($finding->severity, (string)$previous['severity'])) {
+                    $row['acknowledged'] = 0;
+                    $row['ack_note'] = null;
+                    $row['ack_user'] = '';
+                    $row['ack_at'] = 0;
+                }
+
+                $connection->update(self::TABLE, $row, ['uid' => (int)$previous['uid']]);
                 unset($existing[$key]);
                 $kept++;
                 continue;
@@ -73,6 +84,63 @@ final class FindingRepository
         }
 
         return ['added' => $added, 'kept' => $kept, 'resolved' => count($stale)];
+    }
+
+    public function acknowledge(int $uid, string $user, string $note): void
+    {
+        $this->connectionPool->getConnectionForTable(self::TABLE)->update(
+            self::TABLE,
+            [
+                'acknowledged' => 1,
+                'ack_note' => $note,
+                'ack_user' => $user,
+                'ack_at' => time(),
+                'tstamp' => time(),
+            ],
+            ['uid' => $uid]
+        );
+    }
+
+    public function unacknowledge(int $uid): void
+    {
+        $this->connectionPool->getConnectionForTable(self::TABLE)->update(
+            self::TABLE,
+            [
+                'acknowledged' => 0,
+                'ack_note' => null,
+                'ack_user' => '',
+                'ack_at' => 0,
+                'tstamp' => time(),
+            ],
+            ['uid' => $uid]
+        );
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function findByUid(int $uid, int $tenant = 1): ?array
+    {
+        $qb = $this->connectionPool->getQueryBuilderForTable(self::TABLE);
+        $row = $qb
+            ->select('*')
+            ->from(self::TABLE)
+            ->where(
+                $qb->expr()->eq('uid', $qb->createNamedParameter($uid, ParameterType::INTEGER)),
+                $qb->expr()->eq('tenant', $qb->createNamedParameter($tenant, ParameterType::INTEGER)),
+            )
+            ->setMaxResults(1)
+            ->executeQuery()
+            ->fetchAssociative();
+
+        return $row === false ? null : $row;
+    }
+
+    private function isMoreSevere(string $candidate, string $current): bool
+    {
+        $order = array_flip(self::SEVERITY_ORDER);
+
+        return ($order[$candidate] ?? 99) < ($order[$current] ?? 99);
     }
 
     /**
