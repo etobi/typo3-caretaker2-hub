@@ -29,30 +29,29 @@ final class EvaluateCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription('Wertet die Composer-Daten der Instanzen aus und schreibt Befunde')
-            ->addOption('instance', 'i', InputOption::VALUE_REQUIRED, 'Nur diese Instanz auswerten')
-            // Voreinstellung ist die Warteschlange, nicht der Rundumschlag: Der
-            // Befehl läuft im Scheduler alle fünf Minuten, und v14 speichert
-            // für einen Konsolen-Task keine Optionen mit — was voreingestellt
-            // ist, ist damit auch das, was tatsächlich läuft.
+            ->setDescription('Evaluates the instances and writes findings')
+            ->addOption('instance', 'i', InputOption::VALUE_REQUIRED, 'Evaluate this instance only')
+            // The queue is the default, not the sweep: the scheduler runs this
+            // every five minutes, and v14 stores no options for a console task
+            // — so whatever the command does bare is what actually runs.
             ->addOption(
                 'all',
                 'a',
                 InputOption::VALUE_NONE,
-                'Alle Instanzen auswerten, unabhängig von Änderung und Alter'
+                'Evaluate every instance, regardless of change and age'
             )
             ->addOption(
                 'max-age',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Ab welchem Alter in Stunden eine Auswertung als überfällig gilt',
+                'From what age in hours an evaluation counts as overdue',
                 (string)self::DEFAULT_MAX_AGE_HOURS
             )
             ->addOption(
                 'limit',
                 'l',
                 InputOption::VALUE_REQUIRED,
-                'Höchstens so viele Instanzen in einem Lauf',
+                'At most this many instances in one run',
                 (string)self::DEFAULT_LIMIT
             );
     }
@@ -77,7 +76,7 @@ final class EvaluateCommand extends Command
         if ($instances === []) {
             // Nothing pending is the normal case for a frequent run, so it is
             // not a warning.
-            $io->writeln('Nichts auszuwerten.');
+            $io->writeln('Nothing to evaluate.');
 
             return Command::SUCCESS;
         }
@@ -96,7 +95,7 @@ final class EvaluateCommand extends Command
             }
 
             $io->writeln(sprintf(
-                '  %d neu, %d unverändert, %d erledigt',
+                '  %d new, %d unchanged, %d resolved',
                 $counts['added'],
                 $counts['kept'],
                 $counts['resolved']

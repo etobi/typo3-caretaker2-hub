@@ -564,6 +564,12 @@
             <trans-unit id="list.summary.attention">
                 <source>%s with open findings</source>
             </trans-unit>
+            <trans-unit id="scheduler.notInstalled">
+                <source>The scheduler extension is not installed.</source>
+            </trans-unit>
+            <trans-unit id="scheduler.taskFailed">
+                <source>The task could not be created.</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>

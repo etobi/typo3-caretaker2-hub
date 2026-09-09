@@ -43,12 +43,12 @@ services:
 
   Caretaker2\Hub\Command\CleanupCommand:
     tags:
-      - { name: 'console.command', command: 'caretaker2:cleanup', description: 'Entfernt Verwaistes nach gelöschten Instanzen und Gruppen', schedulable: true }
+      - { name: 'console.command', command: 'caretaker2:cleanup', description: 'Removes what deleted instances and groups left behind', schedulable: true }
 
   Caretaker2\Hub\Command\EvaluateCommand:
     tags:
-      - { name: 'console.command', command: 'caretaker2:evaluate', description: 'Wertet die Composer-Daten der Instanzen aus', schedulable: true }
+      - { name: 'console.command', command: 'caretaker2:evaluate', description: 'Evaluates the instances and writes findings', schedulable: true }
 
   Caretaker2\Hub\Command\CreateEnrollmentCodeCommand:
     tags:
-      - { name: 'console.command', command: 'caretaker2:enroll', description: 'Erzeugt einen Enrollment-Code zum Verbinden einer Instanz', schedulable: false }
+      - { name: 'console.command', command: 'caretaker2:enroll', description: 'Creates an enrollment code for connecting an instance', schedulable: false }

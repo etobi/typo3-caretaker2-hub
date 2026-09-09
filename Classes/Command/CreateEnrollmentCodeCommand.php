@@ -19,14 +19,14 @@ final class CreateEnrollmentCodeCommand extends Command
 
     protected function configure(): void
     {
-        $this->setDescription('Erzeugt einen Enrollment-Code zum Verbinden einer Instanz (15 Minuten gültig)');
+        $this->setDescription('Creates an enrollment code for connecting an instance (valid for 15 minutes)');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $io->success('Code: ' . $this->enrollment->createCode());
-        $io->writeln('Im Backend-Modul "Caretaker2" der Instanz eintragen. Gültig für 15 Minuten.');
+        $io->writeln('Enter it in the "Caretaker2" backend module of the instance. Valid for 15 minutes.');
 
         return Command::SUCCESS;
     }

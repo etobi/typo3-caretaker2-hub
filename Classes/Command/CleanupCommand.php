@@ -23,7 +23,7 @@ final class CleanupCommand extends Command
 
     protected function configure(): void
     {
-        $this->setDescription('Entfernt Snapshots und Befunde ohne Instanz und löst Verweise auf gelöschte Gruppen');
+        $this->setDescription('Removes snapshots and findings without an instance and detaches references to deleted groups');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -32,13 +32,13 @@ final class CleanupCommand extends Command
         $removed = $this->cleanup->removeOrphans();
 
         if (array_sum($removed) === 0) {
-            $io->writeln('Nichts aufzuräumen.');
+            $io->writeln('Nothing to clean up.');
 
             return Command::SUCCESS;
         }
 
         $io->success(sprintf(
-            '%d Snapshots und %d Befunde ohne Instanz entfernt, %d Instanzen von gelöschten Gruppen gelöst.',
+            '%d snapshots and %d findings without an instance removed, %d instances detached from deleted groups.',
             $removed['snapshots'],
             $removed['findings'],
             $removed['groups']

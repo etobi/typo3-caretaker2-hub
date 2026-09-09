@@ -50,6 +50,8 @@ final class HubTaskInstaller
 
     private const TABLE = 'tx_scheduler_task';
 
+    private const LL = 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:';
+
     public function __construct(
         private readonly ConnectionPool $connectionPool,
     ) {}
@@ -97,7 +99,7 @@ final class HubTaskInstaller
     public function installMissing(): int
     {
         if (!$this->isAvailable()) {
-            throw new SchedulerTaskException('Die Extension "scheduler" ist nicht installiert.');
+            throw new SchedulerTaskException($this->ll('scheduler.notInstalled'));
         }
 
         $created = 0;
@@ -129,7 +131,12 @@ final class HubTaskInstaller
         if ($saved === false) {
             // The repository writes through DataHandler, which needs a backend
             // user. In the module there is one.
-            throw new SchedulerTaskException('Der Task ließ sich nicht anlegen.');
+            throw new SchedulerTaskException($this->ll('scheduler.taskFailed'));
         }
+    }
+
+    private function ll(string $key): string
+    {
+        return $GLOBALS['LANG']->sL(self::LL . $key);
     }
 }

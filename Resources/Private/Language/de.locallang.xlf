@@ -751,6 +751,14 @@
                 <source>%s with open findings</source>
                 <target>%s mit offenen Befunden</target>
             </trans-unit>
+            <trans-unit id="scheduler.notInstalled" approved="yes">
+                <source>The scheduler extension is not installed.</source>
+                <target>Die Extension scheduler ist nicht installiert.</target>
+            </trans-unit>
+            <trans-unit id="scheduler.taskFailed" approved="yes">
+                <source>The task could not be created.</source>
+                <target>Der Task ließ sich nicht anlegen.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

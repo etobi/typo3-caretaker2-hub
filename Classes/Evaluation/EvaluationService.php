@@ -38,7 +38,7 @@ final class EvaluationService implements LoggerAwareInterface
     {
         $inventory = $instance->lastInventory;
         if ($inventory === null) {
-            throw new EvaluationException('Für diese Instanz liegt noch kein Inventar vor.');
+            throw new EvaluationException('No inventory has arrived for this instance yet.');
         }
 
         $findings = [];
