@@ -9,12 +9,17 @@ use Caretaker2\Hub\Domain\Instance;
 use Caretaker2\Hub\Domain\InstanceRepository;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Backend\Attribute\AsController;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 
 /**
  * Die Übersicht: alle Instanzen, ihr Zustand und der Knopf zum Verbinden
  * einer neuen.
  */
+// Modul-Routen werden über den Container aufgelöst. Ohne diesen Tag ist der
+// Controller kein öffentlicher Service, und TYPO3 fällt auf makeInstance()
+// ohne Konstruktor-Argumente zurück.
+#[AsController]
 final class InstanceListController
 {
     public function __construct(
