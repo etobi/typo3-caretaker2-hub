@@ -126,10 +126,16 @@
                                     </td>
                                     <td class="col-nowrap text-body-secondary">{instance.agentVersion}</td>
                                     <td class="col-control">
-                                        <a href="{instance.editUri}" class="btn btn-default"
-                                           title="Instanz bearbeiten">
-                                            <core:icon identifier="actions-open" size="small"/>
-                                        </a>
+                                        <div class="btn-group">
+                                            <a href="{instance.detailUri}" class="btn btn-default"
+                                               title="Details anzeigen">
+                                                <core:icon identifier="actions-eye" size="small"/>
+                                            </a>
+                                            <a href="{instance.editUri}" class="btn btn-default"
+                                               title="Instanz bearbeiten">
+                                                <core:icon identifier="actions-open" size="small"/>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             </f:for>
