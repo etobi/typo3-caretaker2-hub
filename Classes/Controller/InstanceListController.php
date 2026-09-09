@@ -810,7 +810,7 @@ final class InstanceListController
     private function stateHint(string $state, Instance $instance, array $counts): string
     {
         if ($state === 'vulnerable') {
-            return 'Bekannte Sicherheitslücke in einem installierten Paket — ein Update schließt sie.';
+            return 'Bekannte Sicherheitslücke in einem installierten Paket.';
         }
 
         if ($state === 'unsupported') {
@@ -823,7 +823,7 @@ final class InstanceListController
             }
 
             return sprintf(
-                '%s bekommt keine Sicherheitsupdates mehr. Keine bekannte Lücke — aber auch nichts, womit sich eine schließen ließe.',
+                '%s bekommt keine Sicherheitsupdates mehr.',
                 implode(' und ', $affected)
             );
         }
