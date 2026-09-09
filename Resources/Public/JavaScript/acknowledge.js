@@ -16,6 +16,22 @@ class AcknowledgeForm {
     this.noteField = form.querySelector('input[name="note"]');
     this.typeField = form.querySelector('input[name="acknowledgeType"]');
 
+    const toggleAll = form.querySelector('[data-caretaker2-toggle-all]');
+    if (toggleAll) {
+      toggleAll.addEventListener('change', () => {
+        this.boxes().forEach((box) => { box.checked = toggleAll.checked; });
+      });
+      form.addEventListener('change', (event) => {
+        if (event.target.name !== 'findings[]') {
+          return;
+        }
+        const boxes = this.boxes();
+        const checked = boxes.filter((box) => box.checked).length;
+        toggleAll.checked = checked === boxes.length;
+        toggleAll.indeterminate = checked > 0 && checked < boxes.length;
+      });
+    }
+
     form.querySelectorAll('[data-caretaker2-ack]').forEach((button) => {
       button.addEventListener('click', (event) => {
         event.preventDefault();
@@ -24,8 +40,12 @@ class AcknowledgeForm {
     });
   }
 
+  boxes() {
+    return Array.from(this.form.querySelectorAll('input[name="findings[]"]'));
+  }
+
   selectedCount() {
-    return this.form.querySelectorAll('input[name="findings[]"]:checked').length;
+    return this.boxes().filter((box) => box.checked).length;
   }
 
   open(type, label) {
