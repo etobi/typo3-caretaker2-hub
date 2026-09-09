@@ -128,7 +128,9 @@
     <div class="table-fit mb-4">
         <table class="table">
             <tbody>
-                <tr><th style="width:16rem">URL</th><td>{instance.url}</td></tr>
+                <tr><th style="width:16rem">URL</th><td>
+                    <a href="{instance.url}" target="_blank" rel="noreferrer noopener">{instance.url}</a>
+                </td></tr>
                 <f:if condition="{instance.siteCount}">
                     <tr><th>Sites und Domains</th><td>
                         {instance.siteCount} Site<f:if condition="{instance.siteCount} > 1">s</f:if>
