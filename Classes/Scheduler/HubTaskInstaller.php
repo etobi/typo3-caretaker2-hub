@@ -15,33 +15,22 @@ use TYPO3\CMS\Scheduler\Task\ExecuteSchedulableCommandTask;
 /**
  * The hub's own scheduler tasks.
  *
- * Nothing in the hub judges anything on its own: an instance pushes, the hub
- * files the inventory away and notes that it needs looking at. If the tasks are
- * missing, findings simply stop being refreshed — silently, which is the worst
- * way for a monitoring system to fail. Hence the check in the instance list.
- *
- * Evaluating every five minutes is not as expensive as it sounds: an
- * evaluation only runs for instances that reported something new or were last
- * looked at too long ago, so a quiet run is one query.
- *
- * v14 only, unlike the agent's counterpart — the hub does not have to carry
- * older versions, so there is one code path here instead of three.
+ * Without them nothing is evaluated any more and the findings quietly stop
+ * being refreshed, which is the worst way for a monitoring system to fail.
+ * Hence the check in the instance list.
  */
 final class HubTaskInstaller
 {
     /**
      * Command to cron expression.
      *
-     * Cron rather than a plain interval, and not as a matter of taste: v14
-     * persists a task through DataHandler, whose hook rebuilds the execution
-     * from the submitted record and reads "frequency" or "cronCmd" there. An
-     * interval is silently dropped and the task ends up running exactly once.
+     * Cron and not an interval: v14 persists through DataHandler, whose hook
+     * rebuilds the execution from the record and reads "frequency" or
+     * "cronCmd" there. An interval is dropped and the task runs exactly once.
      *
-     * Five minutes is cheap: by default the evaluation only touches instances
-     * that reported something new or were last evaluated more than a day ago,
-     * so a quiet run is a single query. That default matters here — v14 stores
-     * no options for a console command task, so whatever the command does
-     * without arguments is what the scheduler will do.
+     * Five minutes is cheap because the evaluation only touches what changed
+     * or aged out. v14 also stores no options for a console task, so what the
+     * command does bare is what the scheduler does.
      */
     public const TASKS = [
         'caretaker2:evaluate' => '*/5 * * * *',

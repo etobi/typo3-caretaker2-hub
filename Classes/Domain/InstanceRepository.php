@@ -103,7 +103,6 @@ final class InstanceRepository
                     ),
                 ),
             )
-            // Never evaluated first, then longest ago.
             ->orderBy('evaluated_at', 'ASC')
             ->setMaxResults($limit)
             ->executeQuery()

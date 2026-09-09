@@ -13,14 +13,13 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Removes what a deleted record leaves behind.
  *
- * Snapshots and findings carry no TCA and are therefore invisible to
- * DataHandler; deleting an instance would leave them in place. That is not
- * only waste: auto_increment reuses ids after a table is rebuilt, so a later
- * instance inherits a history that is not its own — which is exactly how the
- * third test instance ended up showing snapshots from hours before it existed.
+ * Snapshots and findings carry no TCA and are invisible to DataHandler, so
+ * deleting an instance would leave them in place. Not only waste:
+ * auto_increment reuses ids after a table is rebuilt, and a later instance
+ * would inherit a history that is not its own.
  *
- * A hook rather than an event: the core offers no PSR-14 event for deletion,
- * and this one works unchanged from v11 to v14.
+ * A hook rather than an event, because the core offers no PSR-14 event for
+ * deletion.
  */
 final class DataHandlerHook
 {

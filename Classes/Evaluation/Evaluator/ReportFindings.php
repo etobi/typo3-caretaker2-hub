@@ -11,14 +11,10 @@ use Caretaker2\Hub\Evaluation\Finding;
 /**
  * What TYPO3 already found out about itself.
  *
- * The agent hands over the reports framework's own statuses — install tool
- * password, devIPmask, file permissions, whatever extensions add. They arrive
- * pre-filtered: only what is above OK. Turning them into findings costs almost
- * nothing and doubles what the hub can say about an instance.
- *
- * The wording stays as TYPO3 wrote it. Rephrasing would mean maintaining a
- * translation of every check in every extension, and the original is what an
- * administrator will search for.
+ * The statuses arrive pre-filtered — only what is above OK — and the wording
+ * stays as TYPO3 wrote it. Rephrasing would mean maintaining a translation of
+ * every check in every extension, and the original is what an administrator
+ * will search for.
  */
 final class ReportFindings implements EvaluatorInterface
 {

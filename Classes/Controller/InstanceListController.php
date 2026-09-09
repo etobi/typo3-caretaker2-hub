@@ -32,8 +32,7 @@ use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Page\PageRenderer;
 
 /**
- * The overview: every instance, its state, and the way to connect a new one
- * einer neuen.
+ * The overview: every instance, its state, and the way to connect a new one.
  */
 // Module routes are resolved through the container. Without this tag the
 // controller is not a public service, and TYPO3 falls back to makeInstance()
