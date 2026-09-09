@@ -62,6 +62,22 @@ final class ReportFindings implements EvaluatorInterface
             )];
         }
 
+        // "ok" with nothing looked at is not an all-clear, it is an empty
+        // report. Older TYPO3 versions register their checks somewhere the
+        // agent may not reach, and the difference has to stay visible.
+        if ((int)($data['checked'] ?? 0) === 0) {
+            return [new Finding(
+                type: Finding::TYPE_UNASSESSABLE,
+                severity: 'info',
+                identifier: 'reports-none',
+                package: 'typo3/cms-reports',
+                installedVersion: '',
+                latestVersion: '',
+                title: 'TYPO3s eigene Prüfungen haben in dieser Instanz nichts geprüft — das ist keine Entwarnung, sondern eine Lücke.',
+                link: '',
+            )];
+        }
+
         $findings = [];
         foreach ($data['issues'] ?? [] as $issue) {
             if (!is_array($issue)) {
