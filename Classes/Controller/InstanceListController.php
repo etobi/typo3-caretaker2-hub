@@ -699,7 +699,7 @@ final class InstanceListController
 
     /**
      * Beschriftung und Farbe für den Support-Status einer TYPO3-Fassung.
-     * Blau für die aktuelle, grün für die noch regulär gepflegten, gelb für
+     * Grün für die aktuelle, blau für die noch regulär gepflegten, gelb für
      * ELTS, rot für alles ohne Unterstützung.
      *
      * @return array<string, string>
@@ -718,8 +718,8 @@ final class InstanceListController
             Typo3MajorVersions::STATUS_UNSUPPORTED => 'ohne Support',
         ];
         $colours = [
-            Typo3MajorVersions::STATUS_STABLE => 'info',
-            Typo3MajorVersions::STATUS_OLDSTABLE => 'success',
+            Typo3MajorVersions::STATUS_STABLE => 'success',
+            Typo3MajorVersions::STATUS_OLDSTABLE => 'info',
             Typo3MajorVersions::STATUS_ELTS => 'warning',
             Typo3MajorVersions::STATUS_ELTS_UNPATCHED => 'danger',
             Typo3MajorVersions::STATUS_UNSUPPORTED => 'danger',
