@@ -1,4 +1,5 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
       data-namespace-typo3-fluid="true">
 
 <f:layout name="Module" />
@@ -55,7 +56,10 @@
                     {group.title}
                     <span class="badge badge-secondary">{group.instances -> f:count()}</span>
                     <f:if condition="{group.editUri}">
-                        <a href="{group.editUri}" class="btn btn-link btn-sm">bearbeiten</a>
+                        <a href="{group.editUri}" class="btn btn-default btn-sm"
+                           title="Gruppe bearbeiten">
+                            <core:icon identifier="actions-open" size="small"/>
+                        </a>
                     </f:if>
                 </h2>
                 <f:if condition="{group.description}">
@@ -75,7 +79,7 @@
                                 <th>Befunde</th>
                                 <th>Zuletzt gemeldet</th>
                                 <th>Agent</th>
-                                <th></th>
+                                <th class="col-control"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -117,8 +121,11 @@
                                         </f:if>
                                     </td>
                                     <td class="col-nowrap text-body-secondary">{instance.agentVersion}</td>
-                                    <td class="col-nowrap">
-                                        <a href="{instance.editUri}" class="btn btn-link btn-sm">bearbeiten</a>
+                                    <td class="col-control">
+                                        <a href="{instance.editUri}" class="btn btn-default"
+                                           title="Instanz bearbeiten">
+                                            <core:icon identifier="actions-open" size="small"/>
+                                        </a>
                                     </td>
                                 </tr>
                             </f:for>
