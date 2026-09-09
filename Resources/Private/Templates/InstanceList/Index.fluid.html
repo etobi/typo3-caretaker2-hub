@@ -89,6 +89,57 @@
                 </f:if>
             </div>
 
+            <form method="get" action="{listUri}" class="mb-3">
+                <f:for each="{listParams}" as="value" key="name">
+                    <input type="hidden" name="{name}" value="{value}">
+                </f:for>
+                <div class="row g-2 align-items-end">
+                    <div class="col-auto">
+                        <label class="form-label" for="c2-filter-state"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.filter.state"/></label>
+                        <select class="form-select" id="c2-filter-state" name="filter_state">
+                            <option value=""><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.filter.any"/></option>
+                            <f:for each="{filterOptions.state}" as="option">
+                                <option value="{option.value}"{f:if(condition: '{filters.state} == {option.value}', then: ' selected="selected"')}>{option.label}</option>
+                            </f:for>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <label class="form-label" for="c2-filter-typo3"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.filter.typo3"/></label>
+                        <select class="form-select" id="c2-filter-typo3" name="filter_typo3">
+                            <option value=""><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.filter.any"/></option>
+                            <f:for each="{filterOptions.typo3}" as="option">
+                                <option value="{option.value}"{f:if(condition: '{filters.typo3} == {option.value}', then: ' selected="selected"')}>{option.label}</option>
+                            </f:for>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <label class="form-label" for="c2-filter-php"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.filter.php"/></label>
+                        <select class="form-select" id="c2-filter-php" name="filter_php">
+                            <option value=""><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.filter.any"/></option>
+                            <f:for each="{filterOptions.php}" as="option">
+                                <option value="{option.value}"{f:if(condition: '{filters.php} == {option.value}', then: ' selected="selected"')}>{option.label}</option>
+                            </f:for>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <label class="form-label" for="c2-filter-group"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.filter.group"/></label>
+                        <select class="form-select" id="c2-filter-group" name="filter_group">
+                            <option value=""><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.filter.any"/></option>
+                            <f:for each="{filterOptions.group}" as="option">
+                                <option value="{option.value}"{f:if(condition: '{filters.group} == {option.value}', then: ' selected="selected"')}>{option.label}</option>
+                            </f:for>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-default"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.filter.apply"/></button>
+                        <f:if condition="{filterActive}">
+                            <a href="{listUri}" class="btn btn-link"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.filter.reset"/></a>
+                            <span class="text-body-secondary ms-2"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.filter.showing" arguments="{0: shownCount, 1: totalCount}"/></span>
+                        </f:if>
+                    </div>
+                </div>
+            </form>
+
             <div class="table-fit mb-3">
                 <table class="table table-striped table-hover">
                     <thead>
@@ -154,6 +205,11 @@
                                         <f:for each="{instance.findingsBySeverity}" as="badge">
                                             <span class="badge badge-{badge.colour}" title="{badge.hint}">{badge.count}</span>
                                         </f:for>
+                                        <f:if condition="{instance.findings.acknowledged}">
+                                            <span class="badge badge-secondary"
+                                                  title="{f:translate(key: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.findings.acknowledged', arguments: {0: instance.findings.acknowledged})}"
+                                                  style="opacity:.6">&#10003; {instance.findings.acknowledged}</span>
+                                        </f:if>
                                     </td>
                                     <td class="col-nowrap">
                                         <f:if condition="{instance.lastSeen}">

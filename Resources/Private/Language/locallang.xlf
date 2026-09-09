@@ -573,6 +573,33 @@
             <trans-unit id="detail.providers.omittedValue">
                 <source>… %s bytes, not shown here</source>
             </trans-unit>
+            <trans-unit id="list.filter.state">
+                <source>State</source>
+            </trans-unit>
+            <trans-unit id="list.filter.typo3">
+                <source>TYPO3</source>
+            </trans-unit>
+            <trans-unit id="list.filter.php">
+                <source>PHP</source>
+            </trans-unit>
+            <trans-unit id="list.filter.group">
+                <source>Group</source>
+            </trans-unit>
+            <trans-unit id="list.filter.any">
+                <source>all</source>
+            </trans-unit>
+            <trans-unit id="list.filter.apply">
+                <source>Filter</source>
+            </trans-unit>
+            <trans-unit id="list.filter.reset">
+                <source>Reset</source>
+            </trans-unit>
+            <trans-unit id="list.filter.showing">
+                <source>%s of %s instances</source>
+            </trans-unit>
+            <trans-unit id="list.findings.acknowledged">
+                <source>%s acknowledged findings</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>

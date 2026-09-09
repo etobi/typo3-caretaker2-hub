@@ -28,6 +28,7 @@ use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Imaging\IconSize;
 use TYPO3\CMS\Core\Http\RedirectResponse;
+use TYPO3\CMS\Core\Http\Uri;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Page\PageRenderer;
 
@@ -282,12 +283,29 @@ final class InstanceListController
             fn(Instance $i): array => $this->present($i, $now, $counts[$i->uid] ?? []),
             $instances
         );
-        $groups = $this->groupInstances($presented);
+
+        $listUri = new Uri((string)$this->uriBuilder->buildUriFromRoute(self::ROUTE));
+        parse_str($listUri->getQuery(), $listParams);
+
+        $filters = $this->filtersFrom($request);
+        $matching = $this->applyFilters($presented, $filters);
+        $groups = $this->groupInstances($matching);
 
         $view->assignMultiple([
             'groups' => $groups,
             'showGroupHeadings' => count($groups) > 1 || ($groups[0]['uid'] ?? 0) !== 0,
             'summary' => $this->summarize($instances, $now),
+            'filters' => $filters,
+            'filterOptions' => $this->filterOptions($presented),
+            'filterActive' => array_filter($filters) !== [],
+            'shownCount' => count($matching),
+            'totalCount' => count($presented),
+            // Path and query separately: a GET form replaces the whole query
+            // string, and the route token in there would go with it — TYPO3
+            // then bounces to /typo3/main and renders the backend inside its
+            // own frame. The token travels as a hidden field instead.
+            'listUri' => $listUri->withQuery(''),
+            'listParams' => $listParams,
             'enrollmentCode' => $enrollmentCode,
             'schedulerAvailable' => $this->tasks->isAvailable(),
             'missingTasks' => implode(', ', $this->tasks->missing()),
@@ -355,6 +373,7 @@ final class InstanceListController
             'typo3Major' => $instance->typo3Major,
             'typo3Support' => $this->supportBadge($instance),
             'phpVersion' => $instance->phpVersion,
+            'phpBranch' => $this->phpBadge($instance)['cycle'],
             'phpSupport' => $this->phpBadge($instance),
             'context' => $instance->applicationContext,
             'siteHosts' => $instance->siteHosts !== []
@@ -548,6 +567,91 @@ final class InstanceListController
         }
 
         return $nodes;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function filtersFrom(ServerRequestInterface $request): array
+    {
+        $query = $request->getQueryParams();
+
+        $filters = [];
+        foreach (['state', 'typo3', 'php', 'group'] as $key) {
+            $filters[$key] = trim((string)($query['filter_' . $key] ?? ''));
+        }
+
+        return $filters;
+    }
+
+    /**
+     * @param list<array<string, mixed>> $instances
+     * @param array<string, string> $filters
+     * @return list<array<string, mixed>>
+     */
+    private function applyFilters(array $instances, array $filters): array
+    {
+        return array_values(array_filter($instances, static function (array $instance) use ($filters): bool {
+            foreach ($filters as $key => $wanted) {
+                if ($wanted === '') {
+                    continue;
+                }
+
+                $value = match ($key) {
+                    'state' => (string)$instance['state'],
+                    'typo3' => (string)$instance['typo3Major'],
+                    'php' => (string)$instance['phpBranch'],
+                    'group' => (string)$instance['groupUid'],
+                    default => '',
+                };
+
+                if ($value !== $wanted) {
+                    return false;
+                }
+            }
+
+            return true;
+        }));
+    }
+
+    /**
+     * Only the values that actually occur. A dropdown offering PHP 8.4 when
+     * nothing runs it invites a filter that can only come back empty.
+     *
+     * @param list<array<string, mixed>> $instances
+     * @return array<string, list<array<string, string>>>
+     */
+    private function filterOptions(array $instances): array
+    {
+        $groups = $this->groups->findAllIndexed();
+        $options = ['state' => [], 'typo3' => [], 'php' => [], 'group' => []];
+
+        foreach ($instances as $instance) {
+            $options['state'][(string)$instance['state']] = (string)$instance['stateLabel'];
+
+            if ((int)$instance['typo3Major'] > 0) {
+                $options['typo3'][(string)$instance['typo3Major']] = 'TYPO3 ' . $instance['typo3Major'];
+            }
+
+            if ($instance['phpBranch'] !== '') {
+                $options['php'][(string)$instance['phpBranch']] = 'PHP ' . $instance['phpBranch'];
+            }
+
+            $groupUid = (string)$instance['groupUid'];
+            $options['group'][$groupUid] = $groups[(int)$groupUid]['title'] ?? $this->ll('list.group.ungrouped');
+        }
+
+        $out = [];
+        foreach ($options as $key => $values) {
+            ksort($values, $key === 'state' ? SORT_STRING : SORT_NATURAL);
+            $out[$key] = array_map(
+                static fn(string $value, string $label): array => ['value' => $value, 'label' => $label],
+                array_keys($values),
+                array_values($values)
+            );
+        }
+
+        return $out;
     }
 
     /**

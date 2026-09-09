@@ -213,17 +213,19 @@ final class FindingRepository
             return [];
         }
 
+        // Acknowledged findings are counted too, separately: an instance where
+        // sixty findings were waved through must not look like a clean one in
+        // the list.
         $qb = $this->connectionPool->getQueryBuilderForTable(self::TABLE);
         $rows = $qb
-            ->select('instance', 'finding_type', 'severity')
+            ->select('instance', 'finding_type', 'severity', 'acknowledged')
             ->addSelectLiteral($qb->expr()->count('uid', 'amount'))
             ->from(self::TABLE)
             ->where(
                 $qb->expr()->in('instance', $qb->createNamedParameter($instanceIds, ArrayParameterType::INTEGER)),
                 $qb->expr()->eq('tenant', $qb->createNamedParameter($tenant, ParameterType::INTEGER)),
-                $qb->expr()->eq('acknowledged', $qb->createNamedParameter(0, ParameterType::INTEGER)),
             )
-            ->groupBy('instance', 'finding_type', 'severity')
+            ->groupBy('instance', 'finding_type', 'severity', 'acknowledged')
             ->executeQuery()
             ->fetchAllAssociative();
 
@@ -233,11 +235,16 @@ final class FindingRepository
             $counts[$uid] ??= [
                 'security' => 0, 'securityHigh' => 0, 'typo3Unsupported' => 0, 'phpUnsupported' => 0,
                 'update_safe' => 0, 'update_major' => 0, 'abandoned' => 0, 'unassessable' => 0, 'report' => 0,
-                'severities' => self::EMPTY_SEVERITIES, 'total' => 0,
+                'severities' => self::EMPTY_SEVERITIES, 'total' => 0, 'acknowledged' => 0,
             ];
 
             $type = (string)$row['finding_type'];
             $amount = (int)$row['amount'];
+
+            if ((int)$row['acknowledged'] === 1) {
+                $counts[$uid]['acknowledged'] += $amount;
+                continue;
+            }
 
             if (isset($counts[$uid][$type])) {
                 $counts[$uid][$type] += $amount;

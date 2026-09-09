@@ -763,6 +763,42 @@
                 <source>… %s bytes, not shown here</source>
                 <target>… %s Bytes, hier nicht dargestellt</target>
             </trans-unit>
+            <trans-unit id="list.filter.state" approved="yes">
+                <source>State</source>
+                <target>Zustand</target>
+            </trans-unit>
+            <trans-unit id="list.filter.typo3" approved="yes">
+                <source>TYPO3</source>
+                <target>TYPO3</target>
+            </trans-unit>
+            <trans-unit id="list.filter.php" approved="yes">
+                <source>PHP</source>
+                <target>PHP</target>
+            </trans-unit>
+            <trans-unit id="list.filter.group" approved="yes">
+                <source>Group</source>
+                <target>Gruppe</target>
+            </trans-unit>
+            <trans-unit id="list.filter.any" approved="yes">
+                <source>all</source>
+                <target>alle</target>
+            </trans-unit>
+            <trans-unit id="list.filter.apply" approved="yes">
+                <source>Filter</source>
+                <target>Filtern</target>
+            </trans-unit>
+            <trans-unit id="list.filter.reset" approved="yes">
+                <source>Reset</source>
+                <target>Zurücksetzen</target>
+            </trans-unit>
+            <trans-unit id="list.filter.showing" approved="yes">
+                <source>%s of %s instances</source>
+                <target>%s von %s Instanzen</target>
+            </trans-unit>
+            <trans-unit id="list.findings.acknowledged" approved="yes">
+                <source>%s acknowledged findings</source>
+                <target>%s quittierte Befunde</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
