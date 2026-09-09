@@ -19,6 +19,10 @@ use TYPO3\CMS\Backend\Attribute\AsController;
 use TYPO3\CMS\Backend\Breadcrumb\BreadcrumbContext;
 use TYPO3\CMS\Backend\Dto\Breadcrumb\BreadcrumbNode;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
+use TYPO3\CMS\Backend\Template\Components\ComponentFactory;
+use TYPO3\CMS\Backend\Template\ModuleTemplate;
+use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Imaging\IconSize;
 use TYPO3\CMS\Core\Http\RedirectResponse;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Page\PageRenderer;
@@ -48,6 +52,8 @@ final class InstanceListController
         private readonly EvaluationService $evaluation,
         private readonly PageRenderer $pageRenderer,
         private readonly GroupRepository $groups,
+        private readonly ComponentFactory $components,
+        private readonly IconFactory $icons,
     ) {}
 
     public function handleRequest(ServerRequestInterface $request): ResponseInterface
@@ -151,6 +157,12 @@ final class InstanceListController
 
         $view = $this->moduleTemplateFactory->create($request);
         $view->setTitle('Caretaker2', $instance->title);
+
+        if (!$readOnly) {
+            $this->addSubmitButton($view, 'caretaker2-actions', 'trigger', 'Daten aktualisieren', 'actions-refresh');
+            $this->addSubmitButton($view, 'caretaker2-actions', 'evaluate', 'Composer auswerten', 'actions-search');
+        }
+
         $view->getDocHeaderComponent()->setBreadcrumbContext(
             new BreadcrumbContext(null, $this->breadcrumb($instance, $historic))
         );
@@ -213,9 +225,36 @@ final class InstanceListController
         }
 
         $view->assign('hubUrl', $this->publicHubUrl($request));
-        $view->assign('enrollUri', (string)$this->uriBuilder->buildUriFromRoute('ajax_caretaker2_enrollment_code'));
 
+        $enrollUri = (string)$this->uriBuilder->buildUriFromRoute('ajax_caretaker2_enrollment_code');
         $this->pageRenderer->loadJavaScriptModule('@caretaker2/hub/enroll.js');
+
+        $view->addButtonToButtonBar(
+            $this->components->createGenericButton()
+                ->setTag('button')
+                ->setLabel('Instanz hinzufügen')
+                ->setTitle('Instanz hinzufügen')
+                ->setShowLabelText(true)
+                ->setIcon($this->icons->getIcon('actions-plus', IconSize::SMALL))
+                ->setClasses('btn btn-default')
+                ->setAttributes([
+                    'type' => 'submit',
+                    // Der Knopf steht im DocHeader, das Formular im Inhalt.
+                    // Ohne JavaScript trägt so weiterhin der serverseitige Weg.
+                    'form' => 'caretaker2-enroll',
+                    'name' => 'createCode',
+                    'value' => '1',
+                    'data-caretaker2-enroll' => $enrollUri,
+                ])
+        );
+
+        $view->addButtonToButtonBar(
+            $this->components->createLinkButton()
+                ->setHref($this->editUri('tx_caretaker2_group', 0, true))
+                ->setTitle('Gruppe anlegen')
+                ->setShowLabelText(true)
+                ->setIcon($this->icons->getIcon('actions-plus', IconSize::SMALL))
+        );
 
         $now = time();
         $instances = $this->instances->findAll();
@@ -230,7 +269,6 @@ final class InstanceListController
 
         $view->assignMultiple([
             'groups' => $this->groupInstances($presented),
-            'newGroupUri' => $this->editUri('tx_caretaker2_group', 0, true),
             'summary' => $this->summarize($instances, $now),
             'enrollmentCode' => $enrollmentCode,
         ]);
@@ -537,6 +575,35 @@ final class InstanceListController
         }
 
         return $out;
+    }
+
+    /**
+     * Ein Absender im DocHeader, dessen Formular im Inhalt steht. Der Weg über
+     * das form-Attribut hält den serverseitigen Pfad am Leben, den es ohne
+     * JavaScript weiterhin braucht.
+     */
+    private function addSubmitButton(
+        ModuleTemplate $view,
+        string $formId,
+        string $name,
+        string $label,
+        string $icon
+    ): void {
+        $view->addButtonToButtonBar(
+            $this->components->createGenericButton()
+                ->setTag('button')
+                ->setLabel($label)
+                ->setTitle($label)
+                ->setShowLabelText(true)
+                ->setIcon($this->icons->getIcon($icon, IconSize::SMALL))
+                ->setClasses('btn btn-default')
+                ->setAttributes([
+                    'type' => 'submit',
+                    'form' => $formId,
+                    'name' => $name,
+                    'value' => '1',
+                ])
+        );
     }
 
     private function editUri(string $table, int $uid, bool $isNew = false): string
