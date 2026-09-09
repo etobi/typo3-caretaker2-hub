@@ -412,13 +412,9 @@ final class InstanceListController
      */
     private function breadcrumb(Instance $instance, ?array $historic): array
     {
+        // The module hierarchy is prepended by TYPO3 itself, so these are the
+        // nodes below it — anything else would show "Instanzen" twice.
         $nodes = [
-            new BreadcrumbNode(
-                identifier: 'caretaker2-instances',
-                label: 'Instanzen',
-                icon: 'caretaker2-module',
-                url: (string)$this->uriBuilder->buildUriFromRoute(self::ROUTE),
-            ),
             new BreadcrumbNode(
                 identifier: 'caretaker2-instance-' . $instance->uid,
                 label: $instance->title,
