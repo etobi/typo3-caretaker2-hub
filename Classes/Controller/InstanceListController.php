@@ -170,6 +170,7 @@ final class InstanceListController
             ? $historic['inventory']
             : $instance->lastInventory;
 
+        $findingCounts = $this->findings->countsForInstance($instanceId);
         $all = $this->findings->findForInstance($instanceId);
         $open = array_values(array_filter($all, static fn(array $r): bool => (int)$r['acknowledged'] === 0));
         $acknowledged = array_values(array_filter($all, static fn(array $r): bool => (int)$r['acknowledged'] === 1));
@@ -212,7 +213,8 @@ final class InstanceListController
             'evaluatedAt' => $instance->evaluatedAt,
             'findings' => $this->presentFindings($open),
             'acknowledgedFindings' => $this->presentFindings($acknowledged),
-            'findingCounts' => $this->findings->countsForInstance($instanceId),
+            'findingCounts' => $findingCounts,
+            'findingsBySeverity' => $this->severityBadges($findingCounts['severities'] ?? []),
             'hasUnrated' => array_filter($open, static fn(array $r): bool => $r['severity'] === 'unknown') !== [],
         ]);
 
@@ -342,6 +344,13 @@ final class InstanceListController
             }
         }
 
+        // "OK" is a statement, and it is only true when there is nothing at
+        // all. An instance with open findings is not urgent, but it is not
+        // done with either.
+        if ($state === 'ok' && ($findingCounts['total'] ?? 0) > 0) {
+            $state = 'attention';
+        }
+
         return [
             'uid' => $instance->uid,
             'groupUid' => $instance->groupUid,
@@ -372,6 +381,7 @@ final class InstanceListController
             'stateHint' => $this->stateHint($state, $instance, $findingCounts),
             'stateSeverity' => $this->stateSeverity($state),
             'findings' => $findingCounts,
+            'findingsBySeverity' => $this->severityBadges($findingCounts['severities'] ?? []),
         ];
     }
 
@@ -381,7 +391,7 @@ final class InstanceListController
      */
     private function summarize(array $instances, int $now): array
     {
-        $summary = ['total' => count($instances), 'ok' => 0, 'incomplete' => 0, 'stale' => 0, 'vulnerable' => 0, 'unsupported' => 0];
+        $summary = ['total' => count($instances), 'ok' => 0, 'attention' => 0, 'incomplete' => 0, 'stale' => 0, 'vulnerable' => 0, 'unsupported' => 0];
         $counts = $this->findings->countsForInstances(
             array_map(static fn(Instance $i): int => $i->uid, $instances)
         );
@@ -847,6 +857,10 @@ final class InstanceListController
             return $this->ll('state.hint.unsupported', implode(', ', $affected));
         }
 
+        if ($state === 'attention') {
+            return $this->ll('state.hint.attention');
+        }
+
         if ($state === 'incomplete') {
             return $this->ll('state.hint.incomplete');
         }
@@ -878,7 +892,7 @@ final class InstanceListController
         // known is that nothing arrives any more. And "incomplete" is not
         // "error" — nothing is broken, we just do not know everything, which
         // is a statement of its own and must not pass as an all-clear.
-        return in_array($state, ['ok', 'vulnerable', 'unsupported', 'incomplete', 'stale'], true)
+        return in_array($state, ['ok', 'attention', 'vulnerable', 'unsupported', 'incomplete', 'stale'], true)
             ? $this->ll('state.' . $state)
             : $state;
     }
@@ -887,11 +901,52 @@ final class InstanceListController
     {
         return [
             'ok' => 'success',
+            'attention' => 'secondary',
             'incomplete' => 'warning',
             'vulnerable' => 'danger',
             'unsupported' => 'danger',
             'stale' => 'danger',
         ][$state] ?? 'default';
+    }
+
+    /**
+     * Findings grouped by how bad they are, worst first.
+     *
+     * By severity rather than by kind: whether something is an advisory or an
+     * outdated package says what it is, not how much it matters, and the
+     * column has room for one of the two.
+     *
+     * @param array<string, int> $severities
+     * @return list<array<string, string|int>>
+     */
+    private function severityBadges(array $severities): array
+    {
+        $colours = [
+            'critical' => 'danger',
+            'high' => 'danger',
+            'unknown' => 'danger',
+            'medium' => 'warning',
+            'low' => 'info',
+            'info' => 'secondary',
+        ];
+
+        $badges = [];
+        foreach ($severities as $severity => $count) {
+            if ($count < 1) {
+                continue;
+            }
+
+            $label = $this->ll('finding.severity.' . $severity);
+            $badges[] = [
+                'severity' => $severity,
+                'count' => $count,
+                'label' => $label,
+                'colour' => $colours[$severity] ?? 'secondary',
+                'hint' => $this->ll('list.findings.bySeverity', $count, $label),
+            ];
+        }
+
+        return $badges;
     }
 
     /**

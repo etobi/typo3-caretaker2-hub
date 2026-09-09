@@ -14,6 +14,20 @@ final class FindingRepository
 
     private const SEVERITY_ORDER = ['critical', 'high', 'unknown', 'medium', 'low', 'info'];
 
+    /**
+     * In der Reihenfolge, in der sie gezeigt werden: das Dringendste zuerst.
+     * "unknown" steht bei den schweren, weil eine fehlende Einstufung kein
+     * Freibrief ist.
+     */
+    private const EMPTY_SEVERITIES = [
+        'critical' => 0,
+        'high' => 0,
+        'unknown' => 0,
+        'medium' => 0,
+        'low' => 0,
+        'info' => 0,
+    ];
+
     public function __construct(
         private readonly ConnectionPool $connectionPool,
     ) {}
@@ -184,6 +198,8 @@ final class FindingRepository
     public function countsForInstance(int $instance, int $tenant = 1): array
     {
         $counts = ['security' => 0, 'update_safe' => 0, 'update_major' => 0, 'abandoned' => 0, 'unassessable' => 0, 'report' => 0];
+        $counts['severities'] = self::EMPTY_SEVERITIES;
+        $counts['total'] = 0;
 
         foreach ($this->rowsForInstance($instance, $tenant) as $row) {
             if ((int)$row['acknowledged'] === 1) {
@@ -193,6 +209,11 @@ final class FindingRepository
             if (isset($counts[$type])) {
                 $counts[$type]++;
             }
+            $severity = (string)$row['severity'];
+            if (isset($counts['severities'][$severity])) {
+                $counts['severities'][$severity]++;
+            }
+            $counts['total']++;
         }
 
         return $counts;
@@ -228,7 +249,11 @@ final class FindingRepository
         $counts = [];
         foreach ($rows as $row) {
             $uid = (int)$row['instance'];
-            $counts[$uid] ??= ['security' => 0, 'securityHigh' => 0, 'typo3Unsupported' => 0, 'phpUnsupported' => 0, 'update_safe' => 0, 'update_major' => 0, 'abandoned' => 0, 'unassessable' => 0, 'report' => 0];
+            $counts[$uid] ??= [
+                'security' => 0, 'securityHigh' => 0, 'typo3Unsupported' => 0, 'phpUnsupported' => 0,
+                'update_safe' => 0, 'update_major' => 0, 'abandoned' => 0, 'unassessable' => 0, 'report' => 0,
+                'severities' => self::EMPTY_SEVERITIES, 'total' => 0,
+            ];
 
             $type = (string)$row['finding_type'];
             $amount = (int)$row['amount'];
@@ -240,6 +265,12 @@ final class FindingRepository
             // harmlessness — and because the rating comes from the GitHub
             // Advisory Database, which lags the FriendsOfPHP feed by days, the
             // advisories without one are precisely the newest.
+            $severity = (string)$row['severity'];
+            if (isset($counts[$uid]['severities'][$severity])) {
+                $counts[$uid]['severities'][$severity] += $amount;
+            }
+            $counts[$uid]['total'] += $amount;
+
             if ($type === 'security' && in_array($row['severity'], ['critical', 'high', 'unknown'], true)) {
                 $counts[$uid]['securityHigh'] += $amount;
             }

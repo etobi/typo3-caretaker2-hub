@@ -69,7 +69,12 @@
         <f:then>
             <div class="mb-3">
                 <span class="badge badge-secondary"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.summary.total" arguments="{0: summary.total}"/></span>
-                <span class="badge badge-success"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.summary.ok" arguments="{0: summary.ok}"/></span>
+                <f:if condition="{summary.ok}">
+                    <span class="badge badge-success"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.summary.ok" arguments="{0: summary.ok}"/></span>
+                </f:if>
+                <f:if condition="{summary.attention}">
+                    <span class="badge badge-secondary"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.summary.attention" arguments="{0: summary.attention}"/></span>
+                </f:if>
                 <f:if condition="{summary.incomplete}">
                     <span class="badge badge-warning"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.summary.incomplete" arguments="{0: summary.incomplete}"/></span>
                 </f:if>
@@ -146,18 +151,9 @@
                                     </td>
                                     <td class="col-nowrap">{instance.context}</td>
                                     <td class="col-nowrap">
-                                        <f:if condition="{instance.findings.security}">
-                                            <span class="badge badge-danger" title="{f:translate(key: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.findings.security')}">{instance.findings.security}</span>
-                                        </f:if>
-                                        <f:if condition="{instance.findings.update_safe}">
-                                            <span class="badge badge-warning" title="{f:translate(key: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.findings.updateSafe')}">{instance.findings.update_safe}</span>
-                                        </f:if>
-                                        <f:if condition="{instance.findings.update_major}">
-                                            <span class="badge badge-info" title="{f:translate(key: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.findings.updateMajor')}">{instance.findings.update_major}</span>
-                                        </f:if>
-                                        <f:if condition="{instance.findings.report}">
-                                            <span class="badge badge-secondary" title="{f:translate(key: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.findings.report')}">{instance.findings.report}</span>
-                                        </f:if>
+                                        <f:for each="{instance.findingsBySeverity}" as="badge">
+                                            <span class="badge badge-{badge.colour}" title="{badge.hint}">{badge.count}</span>
+                                        </f:for>
                                     </td>
                                     <td class="col-nowrap">
                                         <f:if condition="{instance.lastSeen}">

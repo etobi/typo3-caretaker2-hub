@@ -552,6 +552,18 @@
             <trans-unit id="js.reset.confirm">
                 <source>Delete</source>
             </trans-unit>
+            <trans-unit id="state.attention">
+                <source>Findings open</source>
+            </trans-unit>
+            <trans-unit id="state.hint.attention">
+                <source>There are findings, none of them urgent.</source>
+            </trans-unit>
+            <trans-unit id="list.findings.bySeverity">
+                <source>%s findings of severity %s</source>
+            </trans-unit>
+            <trans-unit id="list.summary.attention">
+                <source>%s with open findings</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>

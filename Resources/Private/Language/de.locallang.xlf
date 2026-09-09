@@ -735,6 +735,22 @@
                 <source>Delete</source>
                 <target>Löschen</target>
             </trans-unit>
+            <trans-unit id="state.attention" approved="yes">
+                <source>Findings open</source>
+                <target>Befunde offen</target>
+            </trans-unit>
+            <trans-unit id="state.hint.attention" approved="yes">
+                <source>There are findings, none of them urgent.</source>
+                <target>Es gibt Befunde, aber keinen dringenden.</target>
+            </trans-unit>
+            <trans-unit id="list.findings.bySeverity" approved="yes">
+                <source>%s findings of severity %s</source>
+                <target>%s Befunde der Schwere %s</target>
+            </trans-unit>
+            <trans-unit id="list.summary.attention" approved="yes">
+                <source>%s with open findings</source>
+                <target>%s mit offenen Befunden</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

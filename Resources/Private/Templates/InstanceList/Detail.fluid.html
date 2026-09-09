@@ -47,12 +47,9 @@
     <f:if condition="{findings} && !{historic}">
         <h2><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.findings.heading"/></h2>
         <div class="mb-2">
-            <f:if condition="{findingCounts.security}"><span class="badge badge-danger"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.findings.count.security" arguments="{0: findingCounts.security}"/></span> </f:if>
-            <f:if condition="{findingCounts.update_safe}"><span class="badge badge-warning"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.findings.count.updateSafe" arguments="{0: findingCounts.update_safe}"/></span> </f:if>
-            <f:if condition="{findingCounts.update_major}"><span class="badge badge-info"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.findings.count.updateMajor" arguments="{0: findingCounts.update_major}"/></span> </f:if>
-            <f:if condition="{findingCounts.abandoned}"><span class="badge badge-info"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.findings.count.abandoned" arguments="{0: findingCounts.abandoned}"/></span> </f:if>
-            <f:if condition="{findingCounts.report}"><span class="badge badge-secondary"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.findings.count.report" arguments="{0: findingCounts.report}"/></span> </f:if>
-            <f:if condition="{findingCounts.unassessable}"><span class="badge badge-secondary"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.findings.count.unassessable" arguments="{0: findingCounts.unassessable}"/></span></f:if>
+            <f:for each="{findingsBySeverity}" as="badge">
+                <span class="badge badge-{badge.colour}">{badge.count} {badge.label}</span>
+            </f:for>
         </div>
 
         <form method="post" data-caretaker2-findings="1">
