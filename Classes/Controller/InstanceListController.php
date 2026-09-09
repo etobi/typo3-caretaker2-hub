@@ -10,6 +10,7 @@ use Caretaker2\Hub\Domain\GroupRepository;
 use Caretaker2\Hub\Domain\InstanceRepository;
 use Caretaker2\Hub\Domain\SnapshotRepository;
 use Caretaker2\Hub\Domain\TriggerClient;
+use Caretaker2\Hub\Domain\Typo3MajorVersions;
 use Caretaker2\Hub\Evaluation\EvaluationException;
 use Caretaker2\Hub\Evaluation\EvaluationService;
 use Caretaker2\Hub\Evaluation\FindingRepository;
@@ -52,6 +53,7 @@ final class InstanceListController
         private readonly EvaluationService $evaluation,
         private readonly PageRenderer $pageRenderer,
         private readonly GroupRepository $groups,
+        private readonly Typo3MajorVersions $majorVersions,
         private readonly ComponentFactory $components,
         private readonly IconFactory $icons,
     ) {}
@@ -308,6 +310,7 @@ final class InstanceListController
             'url' => $instance->instanceUrl,
             'typo3Version' => $instance->typo3Version,
             'typo3Major' => $instance->typo3Major,
+            'typo3Support' => $this->supportBadge($instance->typo3Major),
             'phpVersion' => $instance->phpVersion,
             'database' => trim($instance->dbPlatform . ' ' . $this->shortenDbVersion($instance->dbVersion)),
             'context' => $instance->applicationContext,
@@ -425,6 +428,8 @@ final class InstanceListController
             'update_major' => 'Update blockiert',
             'abandoned' => 'Nicht gepflegt',
             'unassessable' => 'Nicht bewertbar',
+            'typo3_elts' => 'Nur noch ELTS',
+            'typo3_unsupported' => 'Ohne Support',
         ];
         $severityLabels = [
             'critical' => 'kritisch',
@@ -685,6 +690,51 @@ final class InstanceListController
                 ),
             ];
         }, $history);
+    }
+
+    /**
+     * Beschriftung und Farbe für den Support-Status einer TYPO3-Fassung.
+     * Blau für die aktuelle, grün für die noch regulär gepflegten, gelb für
+     * ELTS, rot für alles ohne Unterstützung.
+     *
+     * @return array<string, string>
+     */
+    private function supportBadge(int $major): array
+    {
+        $status = $this->majorVersions->statusOf($major);
+
+        $labels = [
+            Typo3MajorVersions::STATUS_STABLE => 'aktuell',
+            Typo3MajorVersions::STATUS_OLDSTABLE => 'gepflegt',
+            Typo3MajorVersions::STATUS_ELTS => 'ELTS',
+            Typo3MajorVersions::STATUS_UNSUPPORTED => 'ohne Support',
+        ];
+        $colours = [
+            Typo3MajorVersions::STATUS_STABLE => 'info',
+            Typo3MajorVersions::STATUS_OLDSTABLE => 'success',
+            Typo3MajorVersions::STATUS_ELTS => 'warning',
+            Typo3MajorVersions::STATUS_UNSUPPORTED => 'danger',
+        ];
+
+        $hint = '';
+        if ($status['status'] === Typo3MajorVersions::STATUS_ELTS && $status['eltsUntil'] !== null) {
+            $hint = 'ELTS bis ' . date('d.m.Y', $status['eltsUntil']);
+        } elseif ($status['maintainedUntil'] !== null && in_array(
+            $status['status'],
+            [Typo3MajorVersions::STATUS_STABLE, Typo3MajorVersions::STATUS_OLDSTABLE],
+            true
+        )) {
+            $hint = 'regulär gepflegt bis ' . date('d.m.Y', $status['maintainedUntil']);
+        } elseif ($status['status'] === Typo3MajorVersions::STATUS_UNSUPPORTED && $status['eltsUntil'] !== null) {
+            $hint = 'auch ELTS endete am ' . date('d.m.Y', $status['eltsUntil']);
+        }
+
+        return [
+            'status' => $status['status'],
+            'label' => $labels[$status['status']] ?? '',
+            'colour' => $colours[$status['status']] ?? 'secondary',
+            'hint' => $hint,
+        ];
     }
 
     /**

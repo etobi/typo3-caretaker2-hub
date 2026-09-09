@@ -97,7 +97,8 @@
                                         </f:if>
                                     </td>
                                     <td class="col-nowrap">
-                                        <span class="badge badge-secondary">v{instance.typo3Major}</span>
+                                        <span class="badge badge-{instance.typo3Support.colour}"
+                                              title="{instance.typo3Support.hint}">v{instance.typo3Major}</span>
                                         {instance.typo3Version}
                                     </td>
                                     <td class="col-nowrap">{instance.phpVersion}</td>

@@ -15,6 +15,15 @@ services:
       - '../Classes/Evaluation/EvaluationResult.php'
       - '../Classes/Evaluation/EvaluationException.php'
 
+  cache.caretaker2:
+    class: TYPO3\CMS\Core\Cache\Frontend\FrontendInterface
+    factory: ['@TYPO3\CMS\Core\Cache\CacheManager', 'getCache']
+    arguments: ['caretaker2']
+
+  Caretaker2\Hub\Domain\Typo3MajorVersions:
+    arguments:
+      $cache: '@cache.caretaker2'
+
   Caretaker2\Hub\Command\CleanupCommand:
     tags:
       - { name: 'console.command', command: 'caretaker2:cleanup', description: 'Entfernt Verwaistes nach gelöschten Instanzen und Gruppen', schedulable: true }

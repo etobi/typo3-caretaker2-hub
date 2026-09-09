@@ -104,7 +104,8 @@
 
     <div class="mb-3">
         <span class="badge badge-{instance.stateSeverity}">{instance.stateLabel}</span>
-        <span class="badge badge-secondary">TYPO3 {shown.typo3Version}</span>
+        <span class="badge badge-{instance.typo3Support.colour}"
+              title="{instance.typo3Support.hint}">TYPO3 {shown.typo3Version}<f:if condition="{instance.typo3Support.label}"> · {instance.typo3Support.label}</f:if></span>
         <span class="badge badge-secondary">PHP {shown.phpVersion}</span>
         <span class="badge badge-secondary">{shown.database}</span>
         <span class="badge badge-secondary">{shown.context}</span>

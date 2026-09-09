@@ -6,6 +6,7 @@ namespace Caretaker2\Hub\Evaluation;
 
 use Caretaker2\Hub\Domain\Instance;
 use Caretaker2\Hub\Domain\InstanceRepository;
+use Caretaker2\Hub\Domain\Typo3MajorVersions;
 
 final class EvaluationService
 {
@@ -14,6 +15,7 @@ final class EvaluationService
         private readonly FindingFactory $factory,
         private readonly FindingRepository $findings,
         private readonly InstanceRepository $instances,
+        private readonly Typo3MajorVersions $majorVersions,
     ) {}
 
     /**
@@ -32,7 +34,10 @@ final class EvaluationService
         $counts = $this->findings->replaceForInstance(
             $instance->uid,
             $instance->tenant,
-            $this->factory->fromResult($result)
+            array_merge(
+                $this->factory->fromResult($result),
+                $this->versionFindings($instance)
+            )
         );
 
         $this->instances->update($instance->uid, [
@@ -41,5 +46,58 @@ final class EvaluationService
         ]);
 
         return $counts;
+    }
+
+    /**
+     * Der Support-Status der TYPO3-Fassung. Anders als die Composer-Befunde
+     * hängt er nicht an der Instanz, sondern am Kalender: Eine unveränderte
+     * Installation wird allein dadurch verwundbar, dass ein Datum verstreicht.
+     *
+     * @return list<Finding>
+     */
+    private function versionFindings(Instance $instance): array
+    {
+        if ($instance->typo3Major <= 0) {
+            return [];
+        }
+
+        $status = $this->majorVersions->statusOf($instance->typo3Major);
+        $version = 'TYPO3 ' . $instance->typo3Major;
+
+        if ($status['status'] === Typo3MajorVersions::STATUS_ELTS) {
+            return [new Finding(
+                type: Finding::TYPE_TYPO3_ELTS,
+                severity: 'medium',
+                identifier: 'typo3-' . $instance->typo3Major,
+                package: 'typo3/cms-core',
+                installedVersion: $instance->typo3Version,
+                latestVersion: '',
+                title: sprintf(
+                    '%s wird regulär nicht mehr gepflegt. Sicherheitsupdates gibt es nur noch über ELTS%s.',
+                    $version,
+                    $status['eltsUntil'] !== null ? ', bis ' . date('d.m.Y', $status['eltsUntil']) : ''
+                ),
+                link: 'https://typo3.org/cms/roadmap',
+            )];
+        }
+
+        if ($status['status'] === Typo3MajorVersions::STATUS_UNSUPPORTED) {
+            return [new Finding(
+                type: Finding::TYPE_TYPO3_UNSUPPORTED,
+                severity: 'high',
+                identifier: 'typo3-' . $instance->typo3Major,
+                package: 'typo3/cms-core',
+                installedVersion: $instance->typo3Version,
+                latestVersion: '',
+                title: sprintf(
+                    '%s erhält keine Sicherheitsupdates mehr%s.',
+                    $version,
+                    $status['eltsUntil'] !== null ? ' — auch ELTS endete am ' . date('d.m.Y', $status['eltsUntil']) : ''
+                ),
+                link: 'https://typo3.org/cms/roadmap',
+            )];
+        }
+
+        return [];
     }
 }
