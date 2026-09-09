@@ -148,7 +148,7 @@
                 <tr><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.lastSeen"/></th><td>
                     <f:if condition="{instance.lastSeen}">
                         <f:then><f:format.date format="d.m.Y H:i:s">@{instance.lastSeen}</f:format.date></f:then>
-                        <f:else><span class="text-body-secondary">noch nie</span></f:else>
+                        <f:else><span class="text-body-secondary"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.neverReported"/></span></f:else>
                     </f:if>
                 </td></tr>
                 <tr><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.knownSince"/></th><td>
@@ -293,6 +293,17 @@
                 </div>
             </div>
         </f:else>
+    </f:if>
+
+    <f:if condition="!{historic}">
+        <hr>
+        <form method="post" class="mb-4" data-caretaker2-reset="1">
+            <input type="hidden" name="reset" value="1">
+            <button type="submit" class="btn btn-default btn-sm">
+                <f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.reset.button"/>
+            </button>
+            <span class="text-body-secondary ms-2"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.reset.hint"/></span>
+        </form>
     </f:if>
 
 </f:section>

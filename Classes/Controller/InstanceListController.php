@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Caretaker2\Hub\Controller;
 
+use Caretaker2\Hub\Domain\CleanupService;
 use Caretaker2\Hub\Domain\EnrollmentService;
 use Caretaker2\Hub\Domain\Instance;
 use Caretaker2\Hub\Domain\GroupRepository;
@@ -62,6 +63,7 @@ final class InstanceListController
         private readonly ComponentFactory $components,
         private readonly IconFactory $icons,
         private readonly HubTaskInstaller $tasks,
+        private readonly CleanupService $cleanup,
     ) {}
 
     public function handleRequest(ServerRequestInterface $request): ResponseInterface
@@ -119,6 +121,15 @@ final class InstanceListController
                     : $this->ll('message.acknowledged.many', $count);
                 $messageSeverity = 'success';
             }
+        }
+
+        if (!$readOnly && $request->getMethod() === 'POST' && is_array($body) && isset($body['reset'])) {
+            $counts = $this->cleanup->resetInstance($instanceId);
+            $message = $this->ll('message.reset', $counts['snapshots'], $counts['findings']);
+            $messageSeverity = 'success';
+
+            // Everything read below comes from the record we just emptied.
+            $instance = $this->instances->findByUid($instanceId) ?? $instance;
         }
 
         if (!$readOnly && $request->getMethod() === 'POST' && is_array($body) && isset($body['unacknowledge'])) {

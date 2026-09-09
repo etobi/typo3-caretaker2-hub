@@ -71,4 +71,42 @@ class AcknowledgeForm {
   }
 }
 
+/**
+ * Asks before throwing away everything an instance ever reported.
+ *
+ * Deliberately a modal and not a confirm(): the sentence needs room to say
+ * what stays, otherwise "reset" reads like it removes the instance.
+ */
+const confirmReset = (form) => {
+  form.addEventListener('submit', (event) => {
+    if (form.dataset.caretaker2Confirmed === '1') {
+      return;
+    }
+
+    event.preventDefault();
+
+    Modal.advanced({
+      title: lll('js.reset.title'),
+      severity: SeverityEnum.warning,
+      size: Modal.sizes.small,
+      content: html`<p>${lll('js.reset.body')}</p>`,
+      buttons: [
+        { text: lll('js.cancel'), btnClass: 'btn-default', name: 'cancel', trigger: (event, modal) => modal.hideModal() },
+        {
+          text: lll('js.reset.confirm'),
+          btnClass: 'btn-danger',
+          name: 'confirm',
+          active: true,
+          trigger: (event, modal) => {
+            modal.hideModal();
+            form.dataset.caretaker2Confirmed = '1';
+            form.submit();
+          },
+        },
+      ],
+    });
+  });
+};
+
 document.querySelectorAll('form[data-caretaker2-findings]').forEach((form) => new AcknowledgeForm(form));
+document.querySelectorAll('form[data-caretaker2-reset]').forEach((form) => confirmReset(form));

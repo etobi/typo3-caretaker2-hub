@@ -534,6 +534,24 @@
             <trans-unit id="finding.title.evaluatorFailed">
                 <source>The "%s" evaluation broke off and contributed nothing: %s</source>
             </trans-unit>
+            <trans-unit id="detail.reset.button">
+                <source>Reset collected data</source>
+            </trans-unit>
+            <trans-unit id="detail.reset.hint">
+                <source>Snapshots, inventory and findings only — the instance and its connection stay.</source>
+            </trans-unit>
+            <trans-unit id="message.reset">
+                <source>Reset: %s snapshots and %s findings deleted. The instance reports again on its next push.</source>
+            </trans-unit>
+            <trans-unit id="js.reset.title">
+                <source>Reset collected data?</source>
+            </trans-unit>
+            <trans-unit id="js.reset.body">
+                <source>All snapshots, the current inventory and all findings of this instance are deleted, acknowledgements included. This cannot be undone. The instance record and its token stay, so the agent reports into the same instance again.</source>
+            </trans-unit>
+            <trans-unit id="js.reset.confirm">
+                <source>Delete</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>

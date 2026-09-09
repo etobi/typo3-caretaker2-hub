@@ -26,6 +26,41 @@ final class CleanupService
     }
 
     /**
+     * Everything the instance ever reported, gone — snapshots, the current
+     * inventory, the findings and the values derived from them.
+     *
+     * The record itself and its token stay, so the agent keeps reporting into
+     * the same instance instead of enrolling a second one. What comes back on
+     * the next push is a first report, and it is treated as one.
+     *
+     * @return array{snapshots: int, findings: int}
+     */
+    public function resetInstance(int $instanceUid): array
+    {
+        $counts = $this->forgetInstance($instanceUid);
+
+        $qb = $this->connectionPool->getQueryBuilderForTable(InstanceRepository::TABLE);
+        $qb->update(InstanceRepository::TABLE)
+            ->where($qb->expr()->eq('uid', $qb->createNamedParameter($instanceUid, ParameterType::INTEGER)));
+
+        foreach ([
+            'agent_version', 'application_context', 'php_version', 'db_platform', 'db_version',
+            'worst_provider_status', 'site_hosts', 'last_fingerprint', 'last_inventory', 'typo3_version',
+        ] as $column) {
+            $qb->set($column, '');
+        }
+
+        foreach (['schema_version', 'site_count', 'last_seen', 'evaluated_at', 'needs_evaluation', 'typo3_major'] as $column) {
+            $qb->set($column, '0');
+        }
+
+        $qb->set('tstamp', (string)time());
+        $qb->executeStatement();
+
+        return $counts;
+    }
+
+    /**
      * Nur die Zuordnung wird gelöst — die Instanzen selbst gehören keiner
      * Gruppe, sie sind in einer.
      */

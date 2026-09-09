@@ -711,6 +711,30 @@
                 <source>The "%s" evaluation broke off and contributed nothing: %s</source>
                 <target>Die Auswertung "%s" ist abgebrochen und hat nichts beigetragen: %s</target>
             </trans-unit>
+            <trans-unit id="detail.reset.button" approved="yes">
+                <source>Reset collected data</source>
+                <target>Erfasste Daten zurücksetzen</target>
+            </trans-unit>
+            <trans-unit id="detail.reset.hint" approved="yes">
+                <source>Snapshots, inventory and findings only — the instance and its connection stay.</source>
+                <target>Nur Snapshots, Inventar und Befunde — die Instanz und ihre Verbindung bleiben.</target>
+            </trans-unit>
+            <trans-unit id="message.reset" approved="yes">
+                <source>Reset: %s snapshots and %s findings deleted. The instance reports again on its next push.</source>
+                <target>Zurückgesetzt: %s Snapshots und %s Befunde gelöscht. Beim nächsten Push meldet die Instanz von vorn.</target>
+            </trans-unit>
+            <trans-unit id="js.reset.title" approved="yes">
+                <source>Reset collected data?</source>
+                <target>Erfasste Daten zurücksetzen?</target>
+            </trans-unit>
+            <trans-unit id="js.reset.body" approved="yes">
+                <source>All snapshots, the current inventory and all findings of this instance are deleted, acknowledgements included. This cannot be undone. The instance record and its token stay, so the agent reports into the same instance again.</source>
+                <target>Alle Snapshots, das aktuelle Inventar und sämtliche Befunde dieser Instanz werden gelöscht, Quittierungen eingeschlossen. Das lässt sich nicht rückgängig machen. Der Datensatz und das Token bleiben, der Agent meldet also weiter in dieselbe Instanz.</target>
+            </trans-unit>
+            <trans-unit id="js.reset.confirm" approved="yes">
+                <source>Delete</source>
+                <target>Löschen</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
