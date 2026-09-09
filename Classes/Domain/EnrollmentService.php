@@ -59,7 +59,7 @@ final class EnrollmentService
             ->executeQuery()
             ->fetchAssociative();
 
-        if ($row === false) {
+        if ($row === false || !$this->claim((int)$row['uid'])) {
             throw new EnrollmentException('The code is unknown, expired or already redeemed.');
         }
 
@@ -77,11 +77,30 @@ final class EnrollmentService
 
         $this->connectionPool->getConnectionForTable(self::TABLE)->update(
             self::TABLE,
-            ['redeemed_at' => time(), 'instance' => $instanceId],
+            ['instance' => $instanceId],
             ['uid' => (int)$row['uid']],
         );
 
         return $token;
+    }
+
+    /**
+     * Marks the code as redeemed, but only if nobody else did so first. Two
+     * agents sending the same code at the same moment both pass the SELECT
+     * above; the conditional UPDATE lets exactly one of them through.
+     */
+    private function claim(int $uid): bool
+    {
+        $qb = $this->connectionPool->getQueryBuilderForTable(self::TABLE);
+
+        return (int)$qb
+            ->update(self::TABLE)
+            ->set('redeemed_at', time())
+            ->where(
+                $qb->expr()->eq('uid', $qb->createNamedParameter($uid, ParameterType::INTEGER)),
+                $qb->expr()->eq('redeemed_at', $qb->createNamedParameter(0, ParameterType::INTEGER)),
+            )
+            ->executeStatement() === 1;
     }
 
     private function deriveTitle(string $instanceUrl): string
