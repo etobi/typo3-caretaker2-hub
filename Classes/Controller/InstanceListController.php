@@ -87,6 +87,8 @@ final class InstanceListController
             $enrollmentCode = $this->enrollment->createCode();
         }
 
+        $view->assign('hubUrl', $this->publicHubUrl($request));
+
         $now = time();
         $instances = $this->instances->findAll();
 
@@ -100,6 +102,23 @@ final class InstanceListController
         ]);
 
         return $view->renderResponse('InstanceList/Index');
+    }
+
+    /**
+     * The address the administrator is currently reaching the hub on. That is
+     * what has to be typed into the agent, so it is also the only value we can
+     * be sure about without configuration.
+     */
+    private function publicHubUrl(ServerRequestInterface $request): string
+    {
+        $uri = $request->getUri();
+        $url = $uri->getScheme() . '://' . $uri->getHost();
+
+        if ($uri->getPort() !== null && !in_array($uri->getPort(), [80, 443], true)) {
+            $url .= ':' . $uri->getPort();
+        }
+
+        return $url;
     }
 
     /**

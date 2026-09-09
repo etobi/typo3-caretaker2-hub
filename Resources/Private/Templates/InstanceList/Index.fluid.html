@@ -12,9 +12,23 @@
             <div class="callout-content">
                 <div class="callout-title">Instanz verbinden</div>
                 <div class="callout-body">
-                    <p>Diesen Code im Backend-Modul <strong>Caretaker2</strong> der Instanz eintragen.
-                       Er ist 15&nbsp;Minuten gültig und lässt sich genau einmal einlösen.</p>
-                    <p class="h1 mb-0" style="font-family:monospace;letter-spacing:.15em">{enrollmentCode}</p>
+                    <p>Im Backend-Modul <strong>Caretaker2</strong> der Instanz beides eintragen.
+                       Der Code ist 15&nbsp;Minuten gültig und lässt sich genau einmal einlösen.</p>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Adresse des Hubs</label>
+                            <input type="text" class="form-control" readonly="readonly"
+                                   onclick="this.select()" value="{hubUrl}">
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <label class="form-label">Code</label>
+                            <input type="text" class="form-control" readonly="readonly"
+                                   onclick="this.select()"
+                                   style="font-family:monospace;letter-spacing:.1em;font-weight:bold"
+                                   value="{enrollmentCode}">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
