@@ -8,6 +8,7 @@ use Caretaker2\Hub\Domain\EnrollmentService;
 use Caretaker2\Hub\Domain\Instance;
 use Caretaker2\Hub\Domain\InstanceRepository;
 use Caretaker2\Hub\Domain\SnapshotRepository;
+use Caretaker2\Hub\Domain\TriggerClient;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Attribute\AsController;
@@ -33,6 +34,7 @@ final class InstanceListController
         private readonly EnrollmentService $enrollment,
         private readonly SnapshotRepository $snapshots,
         private readonly UriBuilder $uriBuilder,
+        private readonly TriggerClient $triggerClient,
     ) {}
 
     public function handleRequest(ServerRequestInterface $request): ResponseInterface
@@ -56,6 +58,18 @@ final class InstanceListController
             return new RedirectResponse((string)$this->uriBuilder->buildUriFromRoute(self::ROUTE));
         }
 
+        $message = null;
+        $messageSeverity = 'info';
+
+        if ($request->getMethod() === 'POST' && ($request->getParsedBody()['trigger'] ?? null) !== null) {
+            [$ok, $message] = $this->triggerClient->trigger($instance);
+            $messageSeverity = $ok ? 'success' : 'warning';
+
+            // The agent pushes synchronously, so the fresh data is already
+            // here — re-read the instance instead of showing the stale row.
+            $instance = $this->instances->findByUid($instanceId) ?? $instance;
+        }
+
         $view = $this->moduleTemplateFactory->create($request);
         $view->setTitle('Caretaker2', $instance->title);
 
@@ -72,6 +86,8 @@ final class InstanceListController
             'schemaVersion' => $inventory['schemaVersion'] ?? null,
             'history' => $this->snapshots->findHistory($instanceId),
             'snapshotCount' => $this->snapshots->countForInstance($instanceId),
+            'message' => $message,
+            'messageSeverity' => $messageSeverity,
         ]);
 
         return $view->renderResponse('InstanceList/Detail');

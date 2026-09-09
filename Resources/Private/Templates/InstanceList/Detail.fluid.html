@@ -9,6 +9,20 @@
 
     <h1>{instance.title}</h1>
 
+    <f:if condition="{message}">
+        <div class="callout callout-{messageSeverity}">
+            <div class="callout-content">
+                <div class="callout-body">{message}</div>
+            </div>
+        </div>
+    </f:if>
+
+    <form method="post" class="mb-3">
+        <button type="submit" name="trigger" value="1" class="btn btn-primary">
+            Jetzt prüfen
+        </button>
+    </form>
+
     <div class="mb-3">
         <span class="badge badge-{instance.stateSeverity}">{instance.stateLabel}</span>
         <span class="badge badge-secondary">TYPO3 {instance.typo3Version}</span>

@@ -165,12 +165,81 @@ final class IngestService
     }
 
     /**
+     * Values that depend on which PHP runtime collected the inventory rather
+     * than on the instance itself. A scheduler push runs under CLI, a
+     * hub-triggered pull under FPM, and they disagree about all of these.
+     * Left in, every alternation between the two would look like a change.
+     *
+     * The data still reaches the hub and is shown — it just does not decide
+     * whether a snapshot is stored.
+     */
+    private const VOLATILE_PATHS = [
+        ['providers', 'platform', 'data', 'php', 'sapi'],
+        ['providers', 'platform', 'data', 'php', 'settings'],
+    ];
+
+    private const SAPI_BOUND_EXTENSIONS = [
+        'ext-pcntl',
+        'ext-posix',
+        'ext-readline',
+        'ext-cgi-fcgi',
+        'ext-litespeed',
+    ];
+
+    /**
      * @param array<string, mixed> $inventory
      */
     private function fingerprint(array $inventory): string
     {
+        return hash('sha256', (string)json_encode($this->normalize($inventory)));
+    }
+
+    /**
+     * @param array<string, mixed> $inventory
+     * @return array<string, mixed>
+     */
+    private function normalize(array $inventory): array
+    {
         unset($inventory['generatedAt']);
 
-        return hash('sha256', (string)json_encode($inventory));
+        foreach (self::VOLATILE_PATHS as $path) {
+            $inventory = $this->forget($inventory, $path);
+        }
+
+        $extensions = &$inventory['providers']['platform']['data']['php']['extensions'];
+        if (is_array($extensions)) {
+            foreach (self::SAPI_BOUND_EXTENSIONS as $name) {
+                unset($extensions[$name]);
+            }
+        }
+        unset($extensions);
+
+        return $inventory;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @param list<string> $path
+     * @return array<string, mixed>
+     */
+    private function forget(array $data, array $path): array
+    {
+        $key = array_shift($path);
+
+        if (!array_key_exists($key, $data)) {
+            return $data;
+        }
+
+        if ($path === []) {
+            unset($data[$key]);
+
+            return $data;
+        }
+
+        if (is_array($data[$key])) {
+            $data[$key] = $this->forget($data[$key], $path);
+        }
+
+        return $data;
     }
 }
