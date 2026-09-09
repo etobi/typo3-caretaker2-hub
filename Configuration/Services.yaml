@@ -26,6 +26,12 @@ services:
     factory: ['@TYPO3\CMS\Core\Cache\CacheManager', 'getCache']
     arguments: ['caretaker2']
 
+  # Der DataHandler baut Hooks über GeneralUtility::makeInstance(), und das
+  # löst nur öffentliche Services auf. Ohne dies wirft der Hook beim Löschen
+  # eines beliebigen Datensatzes — nicht nur bei unseren.
+  Caretaker2\Hub\Domain\CleanupService:
+    public: true
+
   Caretaker2\Hub\Evaluation\EvaluationService:
     arguments:
       $evaluators: !tagged_iterator caretaker2.evaluator
