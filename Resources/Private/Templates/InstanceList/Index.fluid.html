@@ -1,0 +1,100 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      data-namespace-typo3-fluid="true">
+
+<f:layout name="Module" />
+
+<f:section name="Content">
+
+    <h1>Instanzen</h1>
+
+    <f:if condition="{enrollmentCode}">
+        <div class="callout callout-success">
+            <div class="callout-content">
+                <div class="callout-title">Instanz verbinden</div>
+                <div class="callout-body">
+                    <p>Diesen Code im Backend-Modul <strong>Caretaker2</strong> der Instanz eintragen.
+                       Er ist 15&nbsp;Minuten gültig und lässt sich genau einmal einlösen.</p>
+                    <p class="h1 mb-0" style="font-family:monospace;letter-spacing:.15em">{enrollmentCode}</p>
+                </div>
+            </div>
+        </div>
+    </f:if>
+
+    <f:if condition="{summary.total}">
+        <f:then>
+            <div class="mb-3">
+                <span class="badge badge-secondary">{summary.total} Instanzen</span>
+                <span class="badge badge-success">{summary.ok} aktuell</span>
+                <f:if condition="{summary.incomplete}">
+                    <span class="badge badge-warning">{summary.incomplete} unvollständig geprüft</span>
+                </f:if>
+                <f:if condition="{summary.stale}">
+                    <span class="badge badge-danger">{summary.stale} melden sich nicht</span>
+                </f:if>
+            </div>
+
+            <div class="table-fit mb-3">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Zustand</th>
+                            <th>Instanz</th>
+                            <th>TYPO3</th>
+                            <th>PHP</th>
+                            <th>Datenbank</th>
+                            <th>Kontext</th>
+                            <th>Zuletzt gemeldet</th>
+                            <th>Agent</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <f:for each="{instances}" as="instance">
+                            <tr>
+                                <td class="col-nowrap">
+                                    <span class="badge badge-{instance.stateSeverity}">{instance.stateLabel}</span>
+                                </td>
+                                <td>
+                                    <strong>{instance.title}</strong>
+                                    <div class="text-body-secondary">{instance.url}</div>
+                                </td>
+                                <td class="col-nowrap">
+                                    <span class="badge badge-secondary">v{instance.typo3Major}</span>
+                                    {instance.typo3Version}
+                                </td>
+                                <td class="col-nowrap">{instance.phpVersion}</td>
+                                <td class="col-nowrap">{instance.database}</td>
+                                <td class="col-nowrap">{instance.context}</td>
+                                <td class="col-nowrap">
+                                    <f:if condition="{instance.lastSeen}">
+                                        <f:then><f:format.date format="d.m.Y H:i">@{instance.lastSeen}</f:format.date></f:then>
+                                        <f:else><span class="text-body-secondary">noch nie</span></f:else>
+                                    </f:if>
+                                </td>
+                                <td class="col-nowrap text-body-secondary">{instance.agentVersion}</td>
+                            </tr>
+                        </f:for>
+                    </tbody>
+                </table>
+            </div>
+        </f:then>
+        <f:else>
+            <div class="callout callout-info">
+                <div class="callout-content">
+                    <div class="callout-title">Noch keine Instanz verbunden</div>
+                    <div class="callout-body">
+                        <p>Einen Code erzeugen, ihn im Backend-Modul der Instanz eintragen — fertig.
+                           Kein Schlüsselaustausch, keine Freischaltung von außen.</p>
+                    </div>
+                </div>
+            </div>
+        </f:else>
+    </f:if>
+
+    <form method="post">
+        <button type="submit" name="createCode" value="1" class="btn btn-primary">
+            Instanz hinzufügen
+        </button>
+    </form>
+
+</f:section>
+</html>
