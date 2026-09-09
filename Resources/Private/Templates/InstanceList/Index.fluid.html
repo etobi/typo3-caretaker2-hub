@@ -51,38 +51,41 @@
                 </f:if>
             </div>
 
-            <f:for each="{groups}" as="group">
-                <h2 class="h4 mt-4">
-                    {group.title}
-                    <span class="badge badge-secondary">{group.instances -> f:count()}</span>
-                    <f:if condition="{group.editUri}">
-                        <a href="{group.editUri}" class="btn btn-default btn-sm"
-                           title="Gruppe bearbeiten">
-                            <core:icon identifier="actions-open" size="small"/>
-                        </a>
-                    </f:if>
-                </h2>
-                <f:if condition="{group.description}">
-                    <p class="text-body-secondary">{group.description}</p>
-                </f:if>
-
-                <div class="table-fit mb-3">
-                    <table class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>Zustand</th>
-                                <th>Instanz und Domains</th>
-                                <th>TYPO3</th>
-                                <th>PHP</th>
-                                <th>Datenbank</th>
-                                <th>Kontext</th>
-                                <th>Befunde</th>
-                                <th>Zuletzt gemeldet</th>
-                                <th>Agent</th>
-                                <th class="col-control"></th>
-                            </tr>
-                        </thead>
+            <div class="table-fit mb-3">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Zustand</th>
+                            <th>Instanz und Domains</th>
+                            <th>TYPO3</th>
+                            <th>PHP</th>
+                            <th>Datenbank</th>
+                            <th>Kontext</th>
+                            <th>Befunde</th>
+                            <th>Zuletzt gemeldet</th>
+                            <th>Agent</th>
+                            <th class="col-control"></th>
+                        </tr>
+                    </thead>
+                    <f:for each="{groups}" as="group">
                         <tbody>
+                            <f:if condition="{showGroupHeadings}">
+                                <tr class="table-active">
+                                    <th colspan="10" scope="colgroup">
+                                        {group.title}
+                                        <span class="badge badge-secondary">{group.instances -> f:count()}</span>
+                                        <f:if condition="{group.editUri}">
+                                            <a href="{group.editUri}" class="btn btn-default btn-sm"
+                                               title="Gruppe bearbeiten">
+                                                <core:icon identifier="actions-open" size="small"/>
+                                            </a>
+                                        </f:if>
+                                        <f:if condition="{group.description}">
+                                            <span class="fw-normal text-body-secondary ms-2">{group.description}</span>
+                                        </f:if>
+                                    </th>
+                                </tr>
+                            </f:if>
                             <f:for each="{group.instances}" as="instance">
                                 <tr>
                                     <td class="col-nowrap">
@@ -131,9 +134,9 @@
                                 </tr>
                             </f:for>
                         </tbody>
-                    </table>
-                </div>
-            </f:for>
+                    </f:for>
+                </table>
+            </div>
         </f:then>
         <f:else>
             <div class="callout callout-info">

@@ -15,6 +15,12 @@ use TYPO3\CMS\Core\Http\RequestFactory;
  * The dates are not ours to keep: they move when the TYPO3 project moves them,
  * and a hardcoded table would quietly go wrong. Cached for a day, because they
  * change a few times a year at most.
+ *
+ * The major alone does not settle the status. ELTS releases carry patch levels
+ * beyond the last public one — 11.5.42 and up, where 11.5.41 was the last free
+ * release — so an installation sitting on that last free release is inside the
+ * ELTS window without receiving any of it. That case is the dangerous one, and
+ * it looks identical to a supported instance if only the major is considered.
  */
 final class Typo3MajorVersions implements LoggerAwareInterface
 {
@@ -23,11 +29,13 @@ final class Typo3MajorVersions implements LoggerAwareInterface
     public const STATUS_STABLE = 'stable';
     public const STATUS_OLDSTABLE = 'oldstable';
     public const STATUS_ELTS = 'elts';
+    public const STATUS_ELTS_UNPATCHED = 'elts_unpatched';
     public const STATUS_UNSUPPORTED = 'unsupported';
     public const STATUS_UNKNOWN = 'unknown';
 
-    private const ENDPOINT = 'https://get.typo3.org/api/v1/major/';
-    private const CACHE_KEY = 'typo3-major-versions';
+    private const ENDPOINT_MAJORS = 'https://get.typo3.org/api/v1/major/';
+    private const ENDPOINT_RELEASES = 'https://get.typo3.org/api/v1/release/';
+    private const CACHE_KEY = 'typo3-major-versions-v2';
     private const TIMEOUT_SECONDS = 15;
 
     public function __construct(
@@ -36,23 +44,40 @@ final class Typo3MajorVersions implements LoggerAwareInterface
     ) {}
 
     /**
-     * @return array{status: string, maintainedUntil: ?int, eltsUntil: ?int, title: string}
+     * @return array{status: string, maintainedUntil: ?int, eltsUntil: ?int, title: string, lastPublic: string, latest: string}
      */
-    public function statusOf(int $major): array
+    public function statusOf(string $version): array
     {
-        $versions = $this->load();
         $unknown = [
             'status' => self::STATUS_UNKNOWN,
             'maintainedUntil' => null,
             'eltsUntil' => null,
             'title' => '',
+            'lastPublic' => '',
+            'latest' => '',
         ];
 
-        if ($versions === [] || !isset($versions[$major])) {
+        $major = (int)$version;
+        $versions = $this->load();
+
+        if ($major <= 0 || $versions === [] || !isset($versions[$major])) {
             return $unknown;
         }
 
-        return $versions[$major];
+        $entry = $versions[$major];
+
+        // Inside the ELTS window the patch level decides: past the last public
+        // release means ELTS is actually being applied, at or below it means
+        // the installation gets nothing.
+        if ($entry['status'] === self::STATUS_ELTS
+            && $entry['lastPublic'] !== ''
+            && substr_count($version, '.') >= 2
+            && version_compare($version, $entry['lastPublic'], '<=')
+        ) {
+            $entry['status'] = self::STATUS_ELTS_UNPATCHED;
+        }
+
+        return $entry;
     }
 
     /**
@@ -65,13 +90,14 @@ final class Typo3MajorVersions implements LoggerAwareInterface
             return $cached;
         }
 
-        $raw = $this->fetch();
-        if ($raw === null) {
+        $majors = $this->fetch(self::ENDPOINT_MAJORS);
+        $releases = $this->fetch(self::ENDPOINT_RELEASES);
+        if ($majors === null || $releases === null) {
             // Nothing cached: better to say "unknown" than to invent a status.
             return [];
         }
 
-        $versions = $this->classify($raw);
+        $versions = $this->classify($majors, $this->boundaries($releases));
         $this->cache->set(self::CACHE_KEY, $versions, [], 86400);
 
         return $versions;
@@ -80,10 +106,10 @@ final class Typo3MajorVersions implements LoggerAwareInterface
     /**
      * @return list<array<string, mixed>>|null
      */
-    private function fetch(): ?array
+    private function fetch(string $endpoint): ?array
     {
         try {
-            $response = $this->requestFactory->request(self::ENDPOINT, 'GET', [
+            $response = $this->requestFactory->request($endpoint, 'GET', [
                 'timeout' => self::TIMEOUT_SECONDS,
                 'headers' => ['Accept' => 'application/json'],
             ]);
@@ -99,10 +125,46 @@ final class Typo3MajorVersions implements LoggerAwareInterface
     }
 
     /**
-     * @param list<array<string, mixed>> $raw
-     * @return array<int, array{status: string, maintainedUntil: ?int, eltsUntil: ?int, title: string}>
+     * Letztes öffentliches und neuestes Release je Hauptversion.
+     *
+     * @param list<array<string, mixed>> $releases
+     * @return array<int, array{lastPublic: string, latest: string}>
      */
-    private function classify(array $raw): array
+    private function boundaries(array $releases): array
+    {
+        $out = [];
+
+        foreach ($releases as $release) {
+            if (!is_array($release) || !is_string($release['version'] ?? null)) {
+                continue;
+            }
+
+            $version = $release['version'];
+            $major = (int)$version;
+            $out[$major] ??= ['lastPublic' => '', 'latest' => ''];
+
+            if ($out[$major]['latest'] === '' || version_compare($version, $out[$major]['latest'], '>')) {
+                $out[$major]['latest'] = $version;
+            }
+
+            if (($release['elts'] ?? false) === true) {
+                continue;
+            }
+
+            if ($out[$major]['lastPublic'] === '' || version_compare($version, $out[$major]['lastPublic'], '>')) {
+                $out[$major]['lastPublic'] = $version;
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * @param list<array<string, mixed>> $raw
+     * @param array<int, array{lastPublic: string, latest: string}> $boundaries
+     * @return array<int, array{status: string, maintainedUntil: ?int, eltsUntil: ?int, title: string, lastPublic: string, latest: string}>
+     */
+    private function classify(array $raw, array $boundaries): array
     {
         $now = time();
         $entries = [];
@@ -135,6 +197,8 @@ final class Typo3MajorVersions implements LoggerAwareInterface
                 'maintainedUntil' => $maintained,
                 'eltsUntil' => $elts,
                 'title' => (string)($entry['title'] ?? ''),
+                'lastPublic' => $boundaries[$major]['lastPublic'] ?? '',
+                'latest' => $boundaries[$major]['latest'] ?? '',
             ];
         }
 

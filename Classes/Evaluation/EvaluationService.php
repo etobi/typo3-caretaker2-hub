@@ -61,8 +61,30 @@ final class EvaluationService
             return [];
         }
 
-        $status = $this->majorVersions->statusOf($instance->typo3Major);
+        $status = $this->majorVersions->statusOf(
+            $instance->typo3Version !== '' ? $instance->typo3Version : (string)$instance->typo3Major
+        );
         $version = 'TYPO3 ' . $instance->typo3Major;
+
+        // Im ELTS-Zeitraum, aber auf dem letzten frei veroeffentlichten Stand:
+        // die Instanz bekommt nichts. Das wiegt schwerer als ELTS zu fahren.
+        if ($status['status'] === Typo3MajorVersions::STATUS_ELTS_UNPATCHED) {
+            return [new Finding(
+                type: Finding::TYPE_TYPO3_ELTS_UNPATCHED,
+                severity: 'high',
+                identifier: 'typo3-' . $instance->typo3Major,
+                package: 'typo3/cms-core',
+                installedVersion: $instance->typo3Version,
+                latestVersion: $status['latest'],
+                title: sprintf(
+                    '%s wird regulär nicht mehr gepflegt, und %s ist das letzte frei veröffentlichte Release. Sicherheitsupdates gibt es seither nur über ELTS%s — diese Instanz erhält keine.',
+                    $version,
+                    $status['lastPublic'],
+                    $status['eltsUntil'] !== null ? ', noch bis ' . date('d.m.Y', $status['eltsUntil']) : ''
+                ),
+                link: 'https://typo3.com/elts',
+            )];
+        }
 
         if ($status['status'] === Typo3MajorVersions::STATUS_ELTS) {
             return [new Finding(

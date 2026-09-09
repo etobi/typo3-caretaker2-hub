@@ -12,6 +12,7 @@ final readonly class Finding
     public const TYPE_ABANDONED = 'abandoned';
     public const TYPE_UNASSESSABLE = 'unassessable';
     public const TYPE_TYPO3_ELTS = 'typo3_elts';
+    public const TYPE_TYPO3_ELTS_UNPATCHED = 'typo3_elts_unpatched';
     public const TYPE_TYPO3_UNSUPPORTED = 'typo3_unsupported';
 
     public function __construct(

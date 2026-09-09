@@ -258,9 +258,13 @@ final class InstanceListController
             fn(Instance $i): array => $this->present($i, $now, $counts[$i->uid] ?? []),
             $instances
         );
+        $groups = $this->groupInstances($presented);
 
         $view->assignMultiple([
-            'groups' => $this->groupInstances($presented),
+            'groups' => $groups,
+            // Eine einzige Sammelgruppe ist keine Gruppierung: dann bleibt die
+            // Zwischenzeile weg.
+            'showGroupHeadings' => count($groups) > 1 || ($groups[0]['uid'] ?? 0) !== 0,
             'summary' => $this->summarize($instances, $now),
             'enrollmentCode' => $enrollmentCode,
         ]);
@@ -310,7 +314,7 @@ final class InstanceListController
             'url' => $instance->instanceUrl,
             'typo3Version' => $instance->typo3Version,
             'typo3Major' => $instance->typo3Major,
-            'typo3Support' => $this->supportBadge($instance->typo3Major),
+            'typo3Support' => $this->supportBadge($instance),
             'phpVersion' => $instance->phpVersion,
             'database' => trim($instance->dbPlatform . ' ' . $this->shortenDbVersion($instance->dbVersion)),
             'context' => $instance->applicationContext,
@@ -429,6 +433,7 @@ final class InstanceListController
             'abandoned' => 'Nicht gepflegt',
             'unassessable' => 'Nicht bewertbar',
             'typo3_elts' => 'Nur noch ELTS',
+            'typo3_elts_unpatched' => 'ELTS nicht eingespielt',
             'typo3_unsupported' => 'Ohne Support',
         ];
         $severityLabels = [
@@ -699,25 +704,34 @@ final class InstanceListController
      *
      * @return array<string, string>
      */
-    private function supportBadge(int $major): array
+    private function supportBadge(Instance $instance): array
     {
-        $status = $this->majorVersions->statusOf($major);
+        $status = $this->majorVersions->statusOf(
+            $instance->typo3Version !== '' ? $instance->typo3Version : (string)$instance->typo3Major
+        );
 
         $labels = [
             Typo3MajorVersions::STATUS_STABLE => 'aktuell',
             Typo3MajorVersions::STATUS_OLDSTABLE => 'gepflegt',
             Typo3MajorVersions::STATUS_ELTS => 'ELTS',
+            Typo3MajorVersions::STATUS_ELTS_UNPATCHED => 'ohne Updates',
             Typo3MajorVersions::STATUS_UNSUPPORTED => 'ohne Support',
         ];
         $colours = [
             Typo3MajorVersions::STATUS_STABLE => 'info',
             Typo3MajorVersions::STATUS_OLDSTABLE => 'success',
             Typo3MajorVersions::STATUS_ELTS => 'warning',
+            Typo3MajorVersions::STATUS_ELTS_UNPATCHED => 'danger',
             Typo3MajorVersions::STATUS_UNSUPPORTED => 'danger',
         ];
 
         $hint = '';
-        if ($status['status'] === Typo3MajorVersions::STATUS_ELTS && $status['eltsUntil'] !== null) {
+        if ($status['status'] === Typo3MajorVersions::STATUS_ELTS_UNPATCHED) {
+            $hint = sprintf(
+                'seit %s nur noch über ELTS gepflegt — diese Instanz steht auf dem letzten freien Release',
+                $status['lastPublic']
+            );
+        } elseif ($status['status'] === Typo3MajorVersions::STATUS_ELTS && $status['eltsUntil'] !== null) {
             $hint = 'ELTS bis ' . date('d.m.Y', $status['eltsUntil']);
         } elseif ($status['maintainedUntil'] !== null && in_array(
             $status['status'],
