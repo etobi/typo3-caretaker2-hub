@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Caretaker2\Hub\Evaluation;
 
 use Caretaker2\Hub\Domain\Instance;
+use Caretaker2\Hub\Domain\InstanceRepository;
 use Caretaker2\Hub\Domain\SnapshotRepository;
 
 final class EvaluationService
@@ -14,6 +15,7 @@ final class EvaluationService
         private readonly ComposerEvaluator $evaluator,
         private readonly FindingFactory $factory,
         private readonly FindingRepository $findings,
+        private readonly InstanceRepository $instances,
     ) {}
 
     /**
@@ -29,10 +31,17 @@ final class EvaluationService
 
         $result = $this->evaluator->evaluate($instance->uid, $instance->tenant, $inventory);
 
-        return $this->findings->replaceForInstance(
+        $counts = $this->findings->replaceForInstance(
             $instance->uid,
             $instance->tenant,
             $this->factory->fromResult($result)
         );
+
+        $this->instances->update($instance->uid, [
+            'needs_evaluation' => 0,
+            'evaluated_at' => time(),
+        ]);
+
+        return $counts;
     }
 }

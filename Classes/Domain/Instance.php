@@ -31,6 +31,8 @@ final readonly class Instance
         public int $siteCount,
         public int $lastSeen,
         public string $lastFingerprint,
+        public bool $needsEvaluation,
+        public int $evaluatedAt,
     ) {}
 
     /**
@@ -58,6 +60,8 @@ final readonly class Instance
             siteCount: (int)($row['site_count'] ?? 0),
             lastSeen: (int)($row['last_seen'] ?? 0),
             lastFingerprint: (string)($row['last_fingerprint'] ?? ''),
+            needsEvaluation: (bool)($row['needs_evaluation'] ?? false),
+            evaluatedAt: (int)($row['evaluated_at'] ?? 0),
         );
     }
 

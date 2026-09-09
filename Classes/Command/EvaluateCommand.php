@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Caretaker2\Hub\Command;
 
-use Caretaker2\Hub\Domain\Instance;
 use Caretaker2\Hub\Domain\InstanceRepository;
 use Caretaker2\Hub\Evaluation\EvaluationException;
 use Caretaker2\Hub\Evaluation\EvaluationService;
@@ -16,6 +15,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class EvaluateCommand extends Command
 {
+    private const DEFAULT_MAX_AGE_HOURS = 24;
+
+    private const DEFAULT_LIMIT = 25;
+
     public function __construct(
         private readonly InstanceRepository $instances,
         private readonly EvaluationService $evaluation,
@@ -27,7 +30,27 @@ final class EvaluateCommand extends Command
     {
         $this
             ->setDescription('Wertet die Composer-Daten der Instanzen aus und schreibt Befunde')
-            ->addOption('instance', 'i', InputOption::VALUE_REQUIRED, 'Nur diese Instanz auswerten');
+            ->addOption('instance', 'i', InputOption::VALUE_REQUIRED, 'Nur diese Instanz auswerten')
+            ->addOption(
+                'pending',
+                'p',
+                InputOption::VALUE_NONE,
+                'Nur Instanzen auswerten, deren Inventar sich geändert hat oder deren Auswertung zu alt ist'
+            )
+            ->addOption(
+                'max-age',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Ab welchem Alter in Stunden eine Auswertung als überfällig gilt',
+                (string)self::DEFAULT_MAX_AGE_HOURS
+            )
+            ->addOption(
+                'limit',
+                'l',
+                InputOption::VALUE_REQUIRED,
+                'Höchstens so viele Instanzen in einem Lauf',
+                (string)self::DEFAULT_LIMIT
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -35,12 +58,22 @@ final class EvaluateCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         $only = $input->getOption('instance');
-        $instances = $only !== null
-            ? array_filter([$this->instances->findByUid((int)$only)])
-            : $this->instances->findAll();
+
+        if ($only !== null) {
+            $instances = array_values(array_filter([$this->instances->findByUid((int)$only)]));
+        } elseif ($input->getOption('pending')) {
+            $instances = $this->instances->findPendingEvaluation(
+                max(1, (int)$input->getOption('max-age')) * 3600,
+                max(1, (int)$input->getOption('limit'))
+            );
+        } else {
+            $instances = $this->instances->findAll();
+        }
 
         if ($instances === []) {
-            $io->warning('Keine Instanz gefunden.');
+            // Nothing pending is the normal case for a frequent run, so it is
+            // not a warning.
+            $io->writeln('Nichts auszuwerten.');
 
             return Command::SUCCESS;
         }

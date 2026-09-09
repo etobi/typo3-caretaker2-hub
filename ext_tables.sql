@@ -39,9 +39,16 @@ CREATE TABLE tx_caretaker2_instance (
     last_seen int(11) unsigned DEFAULT 0 NOT NULL,
     last_fingerprint varchar(64) DEFAULT '' NOT NULL,
 
+    # Die Auswertung dauert Sekunden bis Minuten und kann deshalb nicht im
+    # Push-Request laufen. Der Empfang setzt nur die Marke, ein Scheduler-Lauf
+    # arbeitet sie ab.
+    needs_evaluation tinyint(1) unsigned DEFAULT 0 NOT NULL,
+    evaluated_at int(11) unsigned DEFAULT 0 NOT NULL,
+
     PRIMARY KEY (uid),
     KEY token_hash (token_hash),
-    KEY tenant_seen (tenant, last_seen)
+    KEY tenant_seen (tenant, last_seen),
+    KEY pending (needs_evaluation, evaluated_at)
 );
 
 #

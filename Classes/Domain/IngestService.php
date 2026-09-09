@@ -73,6 +73,10 @@ final class IngestService
                 'schema_version' => $schemaVersion,
                 'agent_version' => (string)($inventory['agent']['version'] ?? ''),
                 'worst_provider_status' => $this->worstStatus($providers),
+                // Changed manifest means the findings are stale. Unchanged
+                // ones are re-evaluated by age instead, because a new advisory
+                // can make an untouched instance vulnerable overnight.
+                'needs_evaluation' => $changed ? 1 : (int)$instance->needsEvaluation,
             ],
             $this->summaryFromCore($providers['core'] ?? null),
             $this->summaryFromPlatform($providers['platform'] ?? null),

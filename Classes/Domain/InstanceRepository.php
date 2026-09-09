@@ -78,6 +78,40 @@ final class InstanceRepository
         return $row === false ? null : Instance::fromRow($row);
     }
 
+    /**
+     * Instances waiting for an evaluation: either their inventory changed, or
+     * their last evaluation is old enough that a newly published advisory
+     * could have appeared since. An untouched instance can become vulnerable
+     * overnight without sending anything.
+     *
+     * @return list<Instance>
+     */
+    public function findPendingEvaluation(int $maxAgeSeconds, int $limit, int $tenant = 1): array
+    {
+        $qb = $this->connectionPool->getQueryBuilderForTable(self::TABLE);
+        $rows = $qb
+            ->select('*')
+            ->from(self::TABLE)
+            ->where(
+                $qb->expr()->eq('tenant', $qb->createNamedParameter($tenant, ParameterType::INTEGER)),
+                $qb->expr()->gt('last_seen', $qb->createNamedParameter(0, ParameterType::INTEGER)),
+                $qb->expr()->or(
+                    $qb->expr()->eq('needs_evaluation', $qb->createNamedParameter(1, ParameterType::INTEGER)),
+                    $qb->expr()->lt(
+                        'evaluated_at',
+                        $qb->createNamedParameter(time() - $maxAgeSeconds, ParameterType::INTEGER)
+                    ),
+                ),
+            )
+            // Never evaluated first, then longest ago.
+            ->orderBy('evaluated_at', 'ASC')
+            ->setMaxResults($limit)
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        return array_map(static fn(array $row): Instance => Instance::fromRow($row), $rows);
+    }
+
     public function create(int $tenant, string $title, string $instanceUrl, string $tokenHash): int
     {
         $connection = $this->connectionPool->getConnectionForTable(self::TABLE);
