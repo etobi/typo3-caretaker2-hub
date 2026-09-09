@@ -272,7 +272,12 @@ final class InstanceListController
             'phpVersion' => $instance->phpVersion,
             'database' => trim($instance->dbPlatform . ' ' . $this->shortenDbVersion($instance->dbVersion)),
             'context' => $instance->applicationContext,
-            'siteHosts' => $instance->siteHosts,
+            // Ohne Site-Konfiguration bleibt nur die Instanz-Adresse. Die ist
+            // eine vollständige URL, die Site-Domains sind Hostnamen — nebeneinander
+            // sähe das eine mit und das andere ohne Schema aus.
+            'siteHosts' => $instance->siteHosts !== []
+                ? $instance->siteHosts
+                : array_values(array_filter([parse_url($instance->instanceUrl, PHP_URL_HOST)])),
             'siteCount' => $instance->siteCount,
             'agentVersion' => $instance->agentVersion,
             'lastSeen' => $instance->lastSeen,

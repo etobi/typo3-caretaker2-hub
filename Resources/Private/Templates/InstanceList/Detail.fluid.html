@@ -129,10 +129,11 @@
         <table class="table">
             <tbody>
                 <tr><th style="width:16rem">Adresse</th><td>{instance.url}</td></tr>
-                <f:if condition="{instance.siteHosts}">
+                <f:if condition="{instance.siteCount}">
                     <tr><th>Sites und Domains</th><td>
-                        {instance.siteCount} Site<f:if condition="{instance.siteCount} > 1">s</f:if>,
-                        {instance.siteHosts -> f:count()} Domains
+                        {instance.siteCount} Site<f:if condition="{instance.siteCount} > 1">s</f:if>
+                        mit <f:variable name="domainCount">{instance.siteHosts -> f:count()}</f:variable>{domainCount}
+                        Domain<f:if condition="{domainCount} > 1">s</f:if>
                         <div class="mt-1">
                             <f:for each="{instance.siteHosts}" as="host">
                                 <a class="badge badge-secondary" href="https://{host}/"
