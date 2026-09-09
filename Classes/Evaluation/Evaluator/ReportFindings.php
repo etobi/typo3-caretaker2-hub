@@ -91,6 +91,15 @@ final class ReportFindings implements EvaluatorInterface
 
             $group = (string)($issue['provider'] ?? '');
             $title = (string)($issue['title'] ?? '');
+            $message = (string)($issue['message'] ?? '');
+
+            // A check without a title is not a check we can tell apart from
+            // the next one by its title. Two of them collided in the unique
+            // index, so the message stands in when there is no title.
+            $distinct = $title !== '' ? $title : $message;
+            if ($distinct === '') {
+                continue;
+            }
 
             $findings[] = new Finding(
                 type: Finding::TYPE_REPORT,
@@ -99,11 +108,11 @@ final class ReportFindings implements EvaluatorInterface
                 // came from and what it is called. Both are stable as long as
                 // the check is; a renamed check counts as a new one, which is
                 // the honest reading anyway.
-                identifier: 'report-' . substr(hash('sha256', $group . "\0" . $title), 0, 24),
+                identifier: 'report-' . substr(hash('sha256', $group . "\0" . $distinct), 0, 24),
                 package: $group,
                 installedVersion: (string)($issue['value'] ?? ''),
                 latestVersion: '',
-                title: $this->sentence($title, (string)($issue['message'] ?? '')),
+                title: $this->sentence($title, $message),
                 link: '',
             );
         }
@@ -117,7 +126,11 @@ final class ReportFindings implements EvaluatorInterface
      */
     private function sentence(string $title, string $message): string
     {
-        $text = $message === '' ? $title : $title . ': ' . $message;
+        if ($title === '' || $message === '') {
+            $text = $title . $message;
+        } else {
+            $text = $title . ': ' . $message;
+        }
 
         return mb_strlen($text) > self::MAX_TITLE_LENGTH
             ? mb_substr($text, 0, self::MAX_TITLE_LENGTH) . '…'

@@ -100,7 +100,7 @@
                 <source>Create a code, enter it in the backend module of the instance — done. No key exchange, nothing to open up from outside.</source>
             </trans-unit>
             <trans-unit id="state.ok">
-                <source>Current</source>
+                <source>OK</source>
             </trans-unit>
             <trans-unit id="state.vulnerable">
                 <source>Security hole</source>

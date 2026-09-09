@@ -132,8 +132,8 @@
                 <target>Einen Code erzeugen, ihn im Backend-Modul der Instanz eintragen — fertig. Kein Schlüsselaustausch, keine Freischaltung von außen.</target>
             </trans-unit>
             <trans-unit id="state.ok" approved="yes">
-                <source>Current</source>
-                <target>Aktuell</target>
+                <source>OK</source>
+                <target>OK</target>
             </trans-unit>
             <trans-unit id="state.vulnerable" approved="yes">
                 <source>Security hole</source>
