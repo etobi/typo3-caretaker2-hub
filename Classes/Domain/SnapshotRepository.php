@@ -41,6 +41,37 @@ final class SnapshotRepository
     }
 
     /**
+     * Ein bestimmter Snapshot. Auf die Instanz eingegrenzt, damit eine
+     * geratene uid nicht in fremde Daten führt.
+     *
+     * @return array{crdate: int, inventory: array<string, mixed>}|null
+     */
+    public function findInventoryByUid(int $snapshotUid, int $instanceId): ?array
+    {
+        $qb = $this->connectionPool->getQueryBuilderForTable(self::TABLE);
+        $row = $qb
+            ->select('crdate', 'payload')
+            ->from(self::TABLE)
+            ->where(
+                $qb->expr()->eq('uid', $qb->createNamedParameter($snapshotUid, ParameterType::INTEGER)),
+                $qb->expr()->eq('instance', $qb->createNamedParameter($instanceId, ParameterType::INTEGER)),
+            )
+            ->setMaxResults(1)
+            ->executeQuery()
+            ->fetchAssociative();
+
+        if ($row === false) {
+            return null;
+        }
+
+        $decoded = json_decode((string)$row['payload'], true);
+
+        return is_array($decoded)
+            ? ['crdate' => (int)$row['crdate'], 'inventory' => $decoded]
+            : null;
+    }
+
+    /**
      * Nur die Metadaten — die Payloads wären für eine Liste zu groß.
      *
      * @return list<array{uid: int, crdate: int, fingerprint: string}>

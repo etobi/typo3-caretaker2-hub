@@ -139,7 +139,16 @@ final class InstanceListController
         $view = $this->moduleTemplateFactory->create($request);
         $view->setTitle('Caretaker2', $instance->title);
 
-        $inventory = $this->snapshots->findLatestInventory($instanceId);
+        $wanted = (int)($request->getQueryParams()['snapshot'] ?? 0);
+        $historic = null;
+
+        if ($wanted > 0) {
+            $historic = $this->snapshots->findInventoryByUid($wanted, $instanceId);
+        }
+
+        $inventory = $historic !== null
+            ? $historic['inventory']
+            : $this->snapshots->findLatestInventory($instanceId);
 
         $all = $this->findings->findForInstance($instanceId);
         $open = array_values(array_filter($all, static fn(array $r): bool => (int)$r['acknowledged'] === 0));
@@ -148,13 +157,23 @@ final class InstanceListController
         $view->assignMultiple([
             'instance' => $this->present($instance, time()),
             'listUri' => (string)$this->uriBuilder->buildUriFromRoute(self::ROUTE),
+            // Findings always describe the current state, so they are hidden
+            // while an older snapshot is on screen rather than shown next to
+            // data they do not belong to.
+            'historic' => $historic !== null,
+            'historicAt' => $historic['crdate'] ?? 0,
+            'shown' => $this->inventorySummary($inventory),
+            'currentUri' => (string)$this->uriBuilder->buildUriFromRoute(
+                self::ROUTE,
+                ['instance' => $instanceId]
+            ),
             'providers' => $this->describeProviders($inventory),
             'inventorySize' => $inventory === null
                 ? 0
                 : strlen((string)json_encode($inventory)),
             'generatedAt' => $inventory['generatedAt'] ?? null,
             'schemaVersion' => $inventory['schemaVersion'] ?? null,
-            'history' => $this->snapshots->findHistory($instanceId),
+            'history' => $this->presentHistory($this->snapshots->findHistory($instanceId), $instanceId, $wanted),
             'snapshotCount' => $this->snapshots->countForInstance($instanceId),
             'message' => $message,
             'messageSeverity' => $messageSeverity,
@@ -379,6 +398,55 @@ final class InstanceListController
                 'ackAt' => (int)$row['ack_at'],
             ];
         }, $rows);
+    }
+
+    /**
+     * The header values of whichever snapshot is on screen — not of the
+     * instance row, which always holds the latest.
+     *
+     * @param array<string, mixed>|null $inventory
+     * @return array<string, string>
+     */
+    private function inventorySummary(?array $inventory): array
+    {
+        $core = $inventory['providers']['core']['data'] ?? [];
+        $platform = $inventory['providers']['platform']['data'] ?? [];
+
+        $database = trim(sprintf(
+            '%s %s',
+            (string)($platform['database']['platform'] ?? ''),
+            $this->shortenDbVersion((string)($platform['database']['serverVersion'] ?? ''))
+        ));
+
+        return [
+            'typo3Version' => (string)($core['version'] ?? ''),
+            'context' => (string)($core['applicationContext'] ?? ''),
+            'phpVersion' => (string)($platform['php']['version'] ?? ''),
+            'database' => $database,
+        ];
+    }
+
+    /**
+     * @param list<array{uid: int, crdate: int, fingerprint: string}> $history
+     * @return list<array<string, mixed>>
+     */
+    private function presentHistory(array $history, int $instanceId, int $current): array
+    {
+        $latest = $history[0]['uid'] ?? 0;
+
+        return array_map(function (array $entry) use ($instanceId, $current, $latest): array {
+            return [
+                'uid' => $entry['uid'],
+                'crdate' => $entry['crdate'],
+                'fingerprint' => $entry['fingerprint'],
+                'isLatest' => $entry['uid'] === $latest,
+                'isActive' => $entry['uid'] === $current || ($current === 0 && $entry['uid'] === $latest),
+                'uri' => (string)$this->uriBuilder->buildUriFromRoute(
+                    self::ROUTE,
+                    ['instance' => $instanceId, 'snapshot' => $entry['uid']]
+                ),
+            ];
+        }, $history);
     }
 
     /**

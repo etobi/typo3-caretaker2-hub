@@ -9,6 +9,20 @@
 
     <h1>{instance.title}</h1>
 
+    <f:if condition="{historic}">
+        <div class="callout callout-info">
+            <div class="callout-content">
+                <div class="callout-title">Älterer Stand</div>
+                <div class="callout-body">
+                    <p>Angezeigt wird der Stand vom
+                       <strong><f:format.date format="d.m.Y H:i:s">@{historicAt}</f:format.date></strong>.
+                       Befunde beziehen sich immer auf den aktuellen Stand und sind deshalb ausgeblendet.</p>
+                    <p class="mb-0"><a href="{currentUri}" class="btn btn-default btn-sm">Zum aktuellen Stand</a></p>
+                </div>
+            </div>
+        </div>
+    </f:if>
+
     <f:if condition="{message}">
         <div class="callout callout-{messageSeverity}">
             <div class="callout-content">
@@ -19,14 +33,14 @@
 
     <form method="post" class="mb-3">
         <button type="submit" name="trigger" value="1" class="btn btn-primary">
-            Jetzt melden lassen
+            Daten aktualisieren
         </button>
         <button type="submit" name="evaluate" value="1" class="btn btn-default">
             Composer auswerten
         </button>
     </form>
 
-    <f:if condition="{findings}">
+    <f:if condition="{findings} && !{historic}">
         <h2>Befunde</h2>
         <div class="mb-2">
             <f:if condition="{findingCounts.security}"><span class="badge badge-danger">{findingCounts.security} Sicherheit</span> </f:if>
@@ -99,10 +113,10 @@
 
     <div class="mb-3">
         <span class="badge badge-{instance.stateSeverity}">{instance.stateLabel}</span>
-        <span class="badge badge-secondary">TYPO3 {instance.typo3Version}</span>
-        <span class="badge badge-secondary">PHP {instance.phpVersion}</span>
-        <span class="badge badge-secondary">{instance.database}</span>
-        <span class="badge badge-secondary">{instance.context}</span>
+        <span class="badge badge-secondary">TYPO3 {shown.typo3Version}</span>
+        <span class="badge badge-secondary">PHP {shown.phpVersion}</span>
+        <span class="badge badge-secondary">{shown.database}</span>
+        <span class="badge badge-secondary">{shown.context}</span>
     </div>
 
     <div class="table-fit mb-4">
@@ -115,7 +129,8 @@
                         {instance.siteHosts -> f:count()} Domains
                         <div class="mt-1">
                             <f:for each="{instance.siteHosts}" as="host">
-                                <span class="badge badge-secondary">{host}</span>
+                                <a class="badge badge-secondary" href="https://{host}/"
+                                   target="_blank" rel="noreferrer noopener">{host}</a>
                             </f:for>
                         </div>
                     </td></tr>
@@ -138,7 +153,7 @@
         </table>
     </div>
 
-    <f:if condition="{acknowledgedFindings}">
+    <f:if condition="{acknowledgedFindings} && !{historic}">
         <details class="mb-4">
             <summary>Quittierte Befunde ({acknowledgedFindings -> f:count()})</summary>
             <div class="table-fit mt-2">
@@ -158,7 +173,7 @@
                                         <f:else><em class="text-body-secondary">ohne Begründung</em></f:else>
                                     </f:if>
                                     <div class="text-body-secondary">
-                                        {finding.ackUser}, <f:format.date format="d.m.Y">@{finding.ackAt}</f:format.date>
+                                        {finding.ackUser}, <f:format.date format="d.m.Y H:i">@{finding.ackAt}</f:format.date>
                                     </div>
                                 </td>
                                 <td class="col-nowrap">
@@ -223,12 +238,22 @@
                 <h2>Veränderungen</h2>
                 <div class="table-fit">
                     <table class="table table-striped">
-                        <thead><tr><th>Zeitpunkt</th><th>Fingerabdruck</th></tr></thead>
+                        <thead><tr><th>Zeitpunkt</th><th></th><th>Fingerabdruck</th></tr></thead>
                         <tbody>
                             <f:for each="{history}" as="entry">
                                 <tr>
                                     <td class="col-nowrap">
-                                        <f:format.date format="d.m.Y H:i:s">@{entry.crdate}</f:format.date>
+                                        <a href="{entry.uri}">
+                                            <f:format.date format="d.m.Y H:i:s">@{entry.crdate}</f:format.date>
+                                        </a>
+                                    </td>
+                                    <td class="col-nowrap">
+                                        <f:if condition="{entry.isLatest}">
+                                            <span class="badge badge-success">aktuell</span>
+                                        </f:if>
+                                        <f:if condition="{entry.isActive}">
+                                            <span class="badge badge-info">angezeigt</span>
+                                        </f:if>
                                     </td>
                                     <td><code class="text-body-secondary">{entry.fingerprint -> f:format.crop(maxCharacters: 16, append: '…')}</code></td>
                                 </tr>
