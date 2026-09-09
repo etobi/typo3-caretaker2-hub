@@ -86,19 +86,57 @@ final class FindingRepository
         return ['added' => $added, 'kept' => $kept, 'resolved' => count($stale)];
     }
 
-    public function acknowledge(int $uid, string $user, string $note): void
+    /**
+     * @param list<int> $uids
+     * @return int how many were actually acknowledged
+     */
+    public function acknowledgeMany(array $uids, int $instance, int $tenant, string $user, string $note): int
     {
-        $this->connectionPool->getConnectionForTable(self::TABLE)->update(
-            self::TABLE,
-            [
-                'acknowledged' => 1,
-                'ack_note' => $note,
-                'ack_user' => $user,
-                'ack_at' => time(),
-                'tstamp' => time(),
-            ],
-            ['uid' => $uid]
-        );
+        $uids = array_values(array_unique(array_filter($uids)));
+        if ($uids === []) {
+            return 0;
+        }
+
+        $qb = $this->connectionPool->getQueryBuilderForTable(self::TABLE);
+        $now = time();
+
+        return (int)$qb
+            ->update(self::TABLE)
+            ->set('acknowledged', 1)
+            ->set('ack_note', $note)
+            ->set('ack_user', $user)
+            ->set('ack_at', $now)
+            ->set('tstamp', $now)
+            ->where(
+                $qb->expr()->in('uid', $qb->createNamedParameter($uids, ArrayParameterType::INTEGER)),
+                // Scoped to the instance and tenant on purpose: the uids come
+                // from a form and must not be able to reach another instance's
+                // findings.
+                $qb->expr()->eq('instance', $qb->createNamedParameter($instance, ParameterType::INTEGER)),
+                $qb->expr()->eq('tenant', $qb->createNamedParameter($tenant, ParameterType::INTEGER)),
+            )
+            ->executeStatement();
+    }
+
+    /**
+     * @return list<int>
+     */
+    public function findOpenUidsByType(int $instance, int $tenant, string $type): array
+    {
+        $qb = $this->connectionPool->getQueryBuilderForTable(self::TABLE);
+        $rows = $qb
+            ->select('uid')
+            ->from(self::TABLE)
+            ->where(
+                $qb->expr()->eq('instance', $qb->createNamedParameter($instance, ParameterType::INTEGER)),
+                $qb->expr()->eq('tenant', $qb->createNamedParameter($tenant, ParameterType::INTEGER)),
+                $qb->expr()->eq('finding_type', $qb->createNamedParameter($type)),
+                $qb->expr()->eq('acknowledged', $qb->createNamedParameter(0, ParameterType::INTEGER)),
+            )
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        return array_map(static fn(array $r): int => (int)$r['uid'], $rows);
     }
 
     public function unacknowledge(int $uid): void

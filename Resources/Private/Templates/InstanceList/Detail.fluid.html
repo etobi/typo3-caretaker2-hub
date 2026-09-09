@@ -36,64 +36,57 @@
             <f:if condition="{findingCounts.unassessable}"><span class="badge badge-secondary">{findingCounts.unassessable} nicht bewertbar</span></f:if>
         </div>
 
-        <div class="table-fit mb-4">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Schwere</th><th>Art</th><th>Paket</th>
-                        <th>Installiert</th><th>Verfügbar</th><th>Befund</th><th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <f:for each="{findings}" as="finding">
-                        <tr id="befund-{finding.uid}">
-                            <td class="col-nowrap"><span class="badge badge-{finding.severityColour}">{finding.severity}</span></td>
-                            <td class="col-nowrap">{finding.typeLabel}</td>
-                            <td class="col-nowrap"><code>{finding.package}</code></td>
-                            <td class="col-nowrap">{finding.installedVersion}</td>
-                            <td class="col-nowrap">{finding.latestVersion}</td>
-                            <td>
-                                <f:if condition="{finding.link}">
-                                    <f:then><a href="{finding.link}" target="_blank" rel="noreferrer">{finding.title}</a></f:then>
-                                    <f:else>{finding.title}</f:else>
-                                </f:if>
-                            </td>
-                            <td class="col-nowrap">
-                                <f:if condition="{noteFor} != {finding.uid}">
-                                    <a href="{finding.noteUri}" class="btn btn-default btn-sm">Ignorieren</a>
-                                </f:if>
-                            </td>
+        <form method="post" data-caretaker2-findings="1">
+            <input type="hidden" name="acknowledge" value="1">
+            <input type="hidden" name="acknowledgeType" value="">
+            <input type="hidden" name="note" value="">
+
+            <div class="table-fit mb-3">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Schwere</th><th>Art</th><th>Paket</th>
+                            <th>Installiert</th><th>Verfügbar</th><th>Befund</th>
                         </tr>
-                        <f:if condition="{noteFor} == {finding.uid}">
+                    </thead>
+                    <tbody>
+                        <f:for each="{findings}" as="finding">
                             <tr>
-                                <td colspan="7">
-                                    <form method="post">
-                                        <label class="form-label" for="note-{finding.uid}">
-                                            Warum wird dieser Befund ignoriert?
-                                        </label>
-                                        <div class="row">
-                                            <div class="col-md-8">
-                                                <input type="text" class="form-control" id="note-{finding.uid}"
-                                                       name="note" autofocus="autofocus"
-                                                       placeholder="z.B. Kunde zahlt kein Major-Update, Neubau für Q2 geplant">
-                                            </div>
-                                            <div class="col-md-4">
-                                                <button type="submit" name="acknowledge" value="{finding.uid}"
-                                                        class="btn btn-primary">Quittieren</button>
-                                            </div>
-                                        </div>
-                                        <p class="text-body-secondary mt-2 mb-0">
-                                            Der Befund verschwindet dauerhaft aus der Ampel — ohne Frist.
-                                            Wird er später schwerwiegender, taucht er von selbst wieder auf.
-                                        </p>
-                                    </form>
+                                <td>
+                                    <input type="checkbox" class="form-check-input"
+                                           name="findings[]" value="{finding.uid}"
+                                           aria-label="{finding.package} auswählen">
+                                </td>
+                                <td class="col-nowrap"><span class="badge badge-{finding.severityColour}">{finding.severity}</span></td>
+                                <td class="col-nowrap">{finding.typeLabel}</td>
+                                <td class="col-nowrap"><code>{finding.package}</code></td>
+                                <td class="col-nowrap">{finding.installedVersion}</td>
+                                <td class="col-nowrap">{finding.latestVersion}</td>
+                                <td>
+                                    <f:if condition="{finding.link}">
+                                        <f:then><a href="{finding.link}" target="_blank" rel="noreferrer">{finding.title}</a></f:then>
+                                        <f:else>{finding.title}</f:else>
+                                    </f:if>
                                 </td>
                             </tr>
-                        </f:if>
-                    </f:for>
-                </tbody>
-            </table>
-        </div>
+                        </f:for>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mb-4">
+                <button type="button" class="btn btn-default" data-caretaker2-ack="1">
+                    Markierte quittieren
+                </button>
+                <f:for each="{openByType}" as="group">
+                    <button type="button" class="btn btn-default"
+                            data-caretaker2-ack="1" data-ack-type="{group.type}">
+                        Alle {group.count} {group.label}
+                    </button>
+                </f:for>
+            </div>
+        </form>
     </f:if>
 
     <div class="mb-3">

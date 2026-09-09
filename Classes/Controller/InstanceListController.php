@@ -18,6 +18,7 @@ use TYPO3\CMS\Backend\Attribute\AsController;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Http\RedirectResponse;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
+use TYPO3\CMS\Core\Page\PageRenderer;
 
 /**
  * Die Übersicht: alle Instanzen, ihr Zustand und der Knopf zum Verbinden
@@ -42,6 +43,7 @@ final class InstanceListController
         private readonly TriggerClient $triggerClient,
         private readonly FindingRepository $findings,
         private readonly EvaluationService $evaluation,
+        private readonly PageRenderer $pageRenderer,
     ) {}
 
     public function handleRequest(ServerRequestInterface $request): ResponseInterface
@@ -71,13 +73,34 @@ final class InstanceListController
         $body = $request->getParsedBody();
 
         if ($request->getMethod() === 'POST' && is_array($body) && isset($body['acknowledge'])) {
-            $this->findings->acknowledge(
-                (int)$body['acknowledge'],
+            $note = trim((string)($body['note'] ?? ''));
+
+            $uids = $body['acknowledgeType'] ?? null;
+            if (is_string($uids) && $uids !== '') {
+                // "All 24 blocked updates" — the case where acknowledging one
+                // at a time is what stops people using this at all.
+                $selected = $this->findings->findOpenUidsByType($instanceId, $instance->tenant, $uids);
+            } else {
+                $selected = array_map('intval', (array)($body['findings'] ?? []));
+            }
+
+            $count = $this->findings->acknowledgeMany(
+                $selected,
+                $instanceId,
+                $instance->tenant,
                 $this->currentUser($request),
-                trim((string)($body['note'] ?? ''))
+                $note
             );
-            $message = 'Befund quittiert.';
-            $messageSeverity = 'success';
+
+            if ($count === 0) {
+                $message = 'Nichts ausgewählt.';
+                $messageSeverity = 'warning';
+            } else {
+                $message = $count === 1
+                    ? 'Ein Befund quittiert.'
+                    : sprintf('%d Befunde quittiert.', $count);
+                $messageSeverity = 'success';
+            }
         }
 
         if ($request->getMethod() === 'POST' && is_array($body) && isset($body['unacknowledge'])) {
@@ -111,6 +134,8 @@ final class InstanceListController
             $instance = $this->instances->findByUid($instanceId) ?? $instance;
         }
 
+        $this->pageRenderer->loadJavaScriptModule('@caretaker2/hub/acknowledge.js');
+
         $view = $this->moduleTemplateFactory->create($request);
         $view->setTitle('Caretaker2', $instance->title);
 
@@ -133,13 +158,10 @@ final class InstanceListController
             'snapshotCount' => $this->snapshots->countForInstance($instanceId),
             'message' => $message,
             'messageSeverity' => $messageSeverity,
-            'findings' => $this->presentFindings($open, $instanceId),
-            'acknowledgedFindings' => $this->presentFindings($acknowledged, $instanceId),
+            'findings' => $this->presentFindings($open),
+            'acknowledgedFindings' => $this->presentFindings($acknowledged),
             'findingCounts' => $this->findings->countsForInstance($instanceId),
-            // Which finding is currently having its note written.
-            'noteFor' => isset($request->getQueryParams()['note'])
-                ? (int)$request->getQueryParams()['note']
-                : null,
+            'openByType' => $this->openByType($open),
         ]);
 
         return $view->renderResponse('InstanceList/Detail');
@@ -319,7 +341,7 @@ final class InstanceListController
      * @param list<array<string, mixed>> $rows
      * @return list<array<string, mixed>>
      */
-    private function presentFindings(array $rows, int $instanceId): array
+    private function presentFindings(array $rows): array
     {
         $typeLabels = [
             'security' => 'Sicherheit',
@@ -337,9 +359,7 @@ final class InstanceListController
             'info' => 'secondary',
         ];
 
-        $uriBuilder = $this->uriBuilder;
-
-        return array_map(static function (array $row) use ($typeLabels, $severityColours, $uriBuilder, $instanceId): array {
+        return array_map(static function (array $row) use ($typeLabels, $severityColours): array {
             $severity = (string)$row['severity'];
 
             return [
@@ -357,12 +377,42 @@ final class InstanceListController
                 'ackNote' => (string)($row['ack_note'] ?? ''),
                 'ackUser' => (string)$row['ack_user'],
                 'ackAt' => (int)$row['ack_at'],
-                'noteUri' => (string)$uriBuilder->buildUriFromRoute(
-                    self::ROUTE,
-                    ['instance' => $instanceId, 'note' => (int)$row['uid']]
-                ) . '#befund-' . (int)$row['uid'],
             ];
         }, $rows);
+    }
+
+    /**
+     * How many open findings there are per type, for the bulk buttons.
+     *
+     * @param list<array<string, mixed>> $open
+     * @return list<array<string, mixed>>
+     */
+    private function openByType(array $open): array
+    {
+        $labels = [
+            'security' => 'Sicherheitsbefunde',
+            'update_safe' => 'mögliche Updates',
+            'update_major' => 'blockierte Updates',
+            'abandoned' => 'nicht gepflegte Pakete',
+            'unassessable' => 'nicht bewertbare Repositories',
+        ];
+
+        $counts = [];
+        foreach ($open as $row) {
+            $type = (string)$row['finding_type'];
+            $counts[$type] = ($counts[$type] ?? 0) + 1;
+        }
+
+        $out = [];
+        foreach ($counts as $type => $count) {
+            $out[] = [
+                'type' => $type,
+                'count' => $count,
+                'label' => $labels[$type] ?? $type,
+            ];
+        }
+
+        return $out;
     }
 
     /**
