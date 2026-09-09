@@ -52,7 +52,7 @@
                     <thead>
                         <tr>
                             <th>Zustand</th>
-                            <th>Instanz</th>
+                            <th>Instanz und Domains</th>
                             <th>TYPO3</th>
                             <th>PHP</th>
                             <th>Datenbank</th>
@@ -69,7 +69,16 @@
                                 </td>
                                 <td>
                                     <a href="{instance.detailUri}"><strong>{instance.title}</strong></a>
-                                    <div class="text-body-secondary">{instance.url}</div>
+                                    <f:if condition="{instance.siteHosts}">
+                                        <f:then>
+                                            <div class="text-body-secondary">
+                                                <f:for each="{instance.siteHosts}" as="host" iteration="i">{host}<f:if condition="!{i.isLast}">, </f:if></f:for>
+                                            </div>
+                                        </f:then>
+                                        <f:else>
+                                            <div class="text-body-secondary">{instance.url}</div>
+                                        </f:else>
+                                    </f:if>
                                 </td>
                                 <td class="col-nowrap">
                                     <span class="badge badge-secondary">v{instance.typo3Major}</span>

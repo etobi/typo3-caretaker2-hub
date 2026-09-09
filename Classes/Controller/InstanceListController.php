@@ -157,6 +157,8 @@ final class InstanceListController
             'phpVersion' => $instance->phpVersion,
             'database' => trim($instance->dbPlatform . ' ' . $this->shortenDbVersion($instance->dbVersion)),
             'context' => $instance->applicationContext,
+            'siteHosts' => $instance->siteHosts,
+            'siteCount' => $instance->siteCount,
             'agentVersion' => $instance->agentVersion,
             'lastSeen' => $instance->lastSeen,
             'state' => $state,

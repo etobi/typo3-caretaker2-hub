@@ -76,6 +76,7 @@ final class IngestService
             ],
             $this->summaryFromCore($providers['core'] ?? null),
             $this->summaryFromPlatform($providers['platform'] ?? null),
+            $this->summaryFromSites($providers['sites'] ?? null),
         ));
 
         return ['stored' => $changed, 'fingerprint' => $fingerprint];
@@ -137,6 +138,29 @@ final class IngestService
             'php_version' => (string)($data['php']['version'] ?? ''),
             'db_platform' => (string)($data['database']['platform'] ?? ''),
             'db_version' => (string)($data['database']['serverVersion'] ?? ''),
+        ];
+    }
+
+    /**
+     * @param mixed $sites
+     * @return array<string, mixed>
+     */
+    private function summaryFromSites($sites): array
+    {
+        $empty = ['site_hosts' => '', 'site_count' => 0];
+
+        if (!is_array($sites)
+            || !in_array($sites['status'] ?? null, ['ok', 'degraded'], true)
+            || !is_array($sites['data'] ?? null)
+        ) {
+            return $empty;
+        }
+
+        $hosts = $sites['data']['hosts'] ?? [];
+
+        return [
+            'site_hosts' => is_array($hosts) ? implode("\n", $hosts) : '',
+            'site_count' => (int)($sites['data']['count'] ?? 0),
         ];
     }
 

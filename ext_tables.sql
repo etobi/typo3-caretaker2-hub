@@ -31,6 +31,11 @@ CREATE TABLE tx_caretaker2_instance (
     # ein Provider nichts liefern konnte, darf nicht wie eine saubere aussehen.
     worst_provider_status varchar(16) DEFAULT '' NOT NULL,
 
+    # Alle Domains der Instanz, eine pro Zeile. Damit ist "wo liegt
+    # kunde-zwei.fr" eine Abfrage und keine Suche durch alle Snapshots.
+    site_hosts text,
+    site_count int(11) unsigned DEFAULT 0 NOT NULL,
+
     last_seen int(11) unsigned DEFAULT 0 NOT NULL,
     last_fingerprint varchar(64) DEFAULT '' NOT NULL,
 

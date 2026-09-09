@@ -35,6 +35,17 @@
         <table class="table">
             <tbody>
                 <tr><th style="width:16rem">Adresse</th><td>{instance.url}</td></tr>
+                <f:if condition="{instance.siteHosts}">
+                    <tr><th>Sites und Domains</th><td>
+                        {instance.siteCount} Site<f:if condition="{instance.siteCount} > 1">s</f:if>,
+                        {instance.siteHosts -> f:count()} Domains
+                        <div class="mt-1">
+                            <f:for each="{instance.siteHosts}" as="host">
+                                <span class="badge badge-secondary">{host}</span>
+                            </f:for>
+                        </div>
+                    </td></tr>
+                </f:if>
                 <tr><th>Zuletzt gemeldet</th><td>
                     <f:if condition="{instance.lastSeen}">
                         <f:then><f:format.date format="d.m.Y H:i:s">@{instance.lastSeen}</f:format.date></f:then>

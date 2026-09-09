@@ -26,6 +26,9 @@ final readonly class Instance
         public string $dbPlatform,
         public string $dbVersion,
         public string $worstProviderStatus,
+        /** @var list<string> */
+        public array $siteHosts,
+        public int $siteCount,
         public int $lastSeen,
         public string $lastFingerprint,
     ) {}
@@ -49,6 +52,10 @@ final readonly class Instance
             dbPlatform: (string)($row['db_platform'] ?? ''),
             dbVersion: (string)($row['db_version'] ?? ''),
             worstProviderStatus: (string)($row['worst_provider_status'] ?? ''),
+            siteHosts: array_values(array_filter(
+                preg_split('/\R/', (string)($row['site_hosts'] ?? '')) ?: []
+            )),
+            siteCount: (int)($row['site_count'] ?? 0),
             lastSeen: (int)($row['last_seen'] ?? 0),
             lastFingerprint: (string)($row['last_fingerprint'] ?? ''),
         );
