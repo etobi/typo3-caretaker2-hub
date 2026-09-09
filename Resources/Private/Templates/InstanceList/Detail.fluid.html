@@ -55,6 +55,7 @@
                 <tr><th>Inventar erstellt</th><td>{generatedAt}</td></tr>
                 <tr><th>Agent-Version</th><td>{instance.agentVersion}</td></tr>
                 <tr><th>Schemaversion</th><td>{schemaVersion}</td></tr>
+                <tr><th>Größe des Inventars</th><td>{inventorySize} Bytes</td></tr>
                 <tr><th>Veränderungen bisher</th><td>
                     {snapshotCount} <span class="text-body-secondary">Snapshots — es wird nur
                     gespeichert, wenn sich etwas geändert hat</span>
@@ -63,7 +64,7 @@
         </table>
     </div>
 
-    <f:if condition="{inventoryJson}">
+    <f:if condition="{inventorySize}">
         <f:then>
 
             <h2>Provider</h2>
@@ -87,6 +88,13 @@
                             </div>
                         </f:if>
 
+                        <f:if condition="{provider.omitted}">
+                            <p class="text-body-secondary">
+                                Zu groß für die Anzeige, im Snapshot aber vollständig enthalten:
+                                <f:for each="{provider.omitted}" as="o" iteration="i"><code>{o.key}</code> ({o.bytes} Bytes)<f:if condition="!{i.isLast}">, </f:if></f:for>
+                            </p>
+                        </f:if>
+
                         <f:if condition="{provider.json}">
                             <f:then>
                                 <pre style="max-height:22rem;overflow:auto;margin:0"><code>{provider.json}</code></pre>
@@ -99,9 +107,6 @@
                 </div>
             </f:for>
 
-            <h2>Vollständiges Inventar</h2>
-            <p class="text-body-secondary">Unverändert so, wie der Agent es geschickt hat.</p>
-            <pre style="max-height:32rem;overflow:auto"><code>{inventoryJson}</code></pre>
 
             <f:if condition="{history}">
                 <h2>Veränderungen</h2>

@@ -28,6 +28,8 @@ final class InstanceListController
 {
     private const ROUTE = 'caretaker2_instances';
 
+    private const MAX_RENDERED_VALUE_BYTES = 8192;
+
     public function __construct(
         private readonly ModuleTemplateFactory $moduleTemplateFactory,
         private readonly InstanceRepository $instances,
@@ -79,9 +81,9 @@ final class InstanceListController
             'instance' => $this->present($instance, time()),
             'listUri' => (string)$this->uriBuilder->buildUriFromRoute(self::ROUTE),
             'providers' => $this->describeProviders($inventory),
-            'inventoryJson' => $inventory === null
-                ? null
-                : json_encode($inventory, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            'inventorySize' => $inventory === null
+                ? 0
+                : strlen((string)json_encode($inventory)),
             'generatedAt' => $inventory['generatedAt'] ?? null,
             'schemaVersion' => $inventory['schemaVersion'] ?? null,
             'history' => $this->snapshots->findHistory($instanceId),
@@ -201,6 +203,7 @@ final class InstanceListController
         foreach ($providers as $key => $entry) {
             $status = is_array($entry) ? (string)($entry['status'] ?? 'unavailable') : 'unavailable';
             $data = is_array($entry) ? ($entry['data'] ?? null) : null;
+            [$json, $omitted] = $this->renderable($data);
 
             $out[] = [
                 'key' => (string)$key,
@@ -208,13 +211,44 @@ final class InstanceListController
                 'severity' => ['ok' => 'success', 'degraded' => 'warning'][$status] ?? 'danger',
                 'reason' => is_array($entry) ? ($entry['reason'] ?? null) : null,
                 'message' => is_array($entry) ? ($entry['message'] ?? null) : null,
-                'json' => $data === null
-                    ? null
-                    : json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+                'json' => $json,
+                'omitted' => $omitted,
             ];
         }
 
         return $out;
+    }
+
+    /**
+     * A composer.lock is a quarter of a megabyte. Dumping it into the page
+     * would make the whole view unusable, so oversized values are replaced by
+     * a note naming their size — the data itself is untouched in the snapshot.
+     *
+     * @param mixed $data
+     * @return array{0: string|null, 1: list<array{key: string, bytes: int}>}
+     */
+    private function renderable($data): array
+    {
+        if ($data === null) {
+            return [null, []];
+        }
+
+        $omitted = [];
+
+        if (is_array($data)) {
+            foreach ($data as $key => $value) {
+                $size = strlen((string)json_encode($value));
+                if ($size > self::MAX_RENDERED_VALUE_BYTES) {
+                    $omitted[] = ['key' => (string)$key, 'bytes' => $size];
+                    $data[$key] = sprintf('… %s Bytes, hier nicht dargestellt', number_format($size, 0, ',', '.'));
+                }
+            }
+        }
+
+        return [
+            json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            $omitted,
+        ];
     }
 
     private function stateLabel(string $state): string
