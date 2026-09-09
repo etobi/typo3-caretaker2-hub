@@ -50,65 +50,82 @@
                 </f:if>
             </div>
 
-            <div class="table-fit mb-3">
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>Zustand</th>
-                            <th>Instanz und Domains</th>
-                            <th>TYPO3</th>
-                            <th>PHP</th>
-                            <th>Datenbank</th>
-                            <th>Kontext</th>
-                            <th>Befunde</th>
-                            <th>Zuletzt gemeldet</th>
-                            <th>Agent</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <f:for each="{instances}" as="instance">
+            <f:for each="{groups}" as="group">
+                <h2 class="h4 mt-4">
+                    {group.title}
+                    <span class="badge badge-secondary">{group.instances -> f:count()}</span>
+                    <f:if condition="{group.editUri}">
+                        <a href="{group.editUri}" class="btn btn-link btn-sm">bearbeiten</a>
+                    </f:if>
+                </h2>
+                <f:if condition="{group.description}">
+                    <p class="text-body-secondary">{group.description}</p>
+                </f:if>
+
+                <div class="table-fit mb-3">
+                    <table class="table table-striped table-hover">
+                        <thead>
                             <tr>
-                                <td class="col-nowrap">
-                                    <span class="badge badge-{instance.stateSeverity}">{instance.stateLabel}</span>
-                                </td>
-                                <td>
-                                    <a href="{instance.detailUri}"><strong>{instance.title}</strong></a>
-                                    <f:if condition="{instance.siteHosts}">
-                                        <div class="text-body-secondary">
-                                            <f:for each="{instance.siteHosts}" as="host" iteration="i">{host}<f:if condition="!{i.isLast}">, </f:if></f:for>
-                                        </div>
-                                    </f:if>
-                                </td>
-                                <td class="col-nowrap">
-                                    <span class="badge badge-secondary">v{instance.typo3Major}</span>
-                                    {instance.typo3Version}
-                                </td>
-                                <td class="col-nowrap">{instance.phpVersion}</td>
-                                <td class="col-nowrap">{instance.database}</td>
-                                <td class="col-nowrap">{instance.context}</td>
-                                <td class="col-nowrap">
-                                    <f:if condition="{instance.findings.security}">
-                                        <span class="badge badge-danger" title="Sicherheitsbefunde">{instance.findings.security}</span>
-                                    </f:if>
-                                    <f:if condition="{instance.findings.update_safe}">
-                                        <span class="badge badge-warning" title="Updates im Rahmen des Constraints">{instance.findings.update_safe}</span>
-                                    </f:if>
-                                    <f:if condition="{instance.findings.update_major}">
-                                        <span class="badge badge-info" title="Updates, die den Constraint ändern würden">{instance.findings.update_major}</span>
-                                    </f:if>
-                                </td>
-                                <td class="col-nowrap">
-                                    <f:if condition="{instance.lastSeen}">
-                                        <f:then><f:format.date format="d.m.Y H:i">@{instance.lastSeen}</f:format.date></f:then>
-                                        <f:else><span class="text-body-secondary">noch nie</span></f:else>
-                                    </f:if>
-                                </td>
-                                <td class="col-nowrap text-body-secondary">{instance.agentVersion}</td>
+                                <th>Zustand</th>
+                                <th>Instanz und Domains</th>
+                                <th>TYPO3</th>
+                                <th>PHP</th>
+                                <th>Datenbank</th>
+                                <th>Kontext</th>
+                                <th>Befunde</th>
+                                <th>Zuletzt gemeldet</th>
+                                <th>Agent</th>
+                                <th></th>
                             </tr>
-                        </f:for>
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            <f:for each="{group.instances}" as="instance">
+                                <tr>
+                                    <td class="col-nowrap">
+                                        <span class="badge badge-{instance.stateSeverity}">{instance.stateLabel}</span>
+                                    </td>
+                                    <td>
+                                        <a href="{instance.detailUri}"><strong>{instance.title}</strong></a>
+                                        <f:if condition="{instance.siteHosts}">
+                                            <div class="text-body-secondary">
+                                                <f:for each="{instance.siteHosts}" as="host" iteration="i">{host}<f:if condition="!{i.isLast}">, </f:if></f:for>
+                                            </div>
+                                        </f:if>
+                                    </td>
+                                    <td class="col-nowrap">
+                                        <span class="badge badge-secondary">v{instance.typo3Major}</span>
+                                        {instance.typo3Version}
+                                    </td>
+                                    <td class="col-nowrap">{instance.phpVersion}</td>
+                                    <td class="col-nowrap">{instance.database}</td>
+                                    <td class="col-nowrap">{instance.context}</td>
+                                    <td class="col-nowrap">
+                                        <f:if condition="{instance.findings.security}">
+                                            <span class="badge badge-danger" title="Sicherheitsbefunde">{instance.findings.security}</span>
+                                        </f:if>
+                                        <f:if condition="{instance.findings.update_safe}">
+                                            <span class="badge badge-warning" title="Updates im Rahmen des Constraints">{instance.findings.update_safe}</span>
+                                        </f:if>
+                                        <f:if condition="{instance.findings.update_major}">
+                                            <span class="badge badge-info" title="Updates, die den Constraint ändern würden">{instance.findings.update_major}</span>
+                                        </f:if>
+                                    </td>
+                                    <td class="col-nowrap">
+                                        <f:if condition="{instance.lastSeen}">
+                                            <f:then><f:format.date format="d.m.Y H:i">@{instance.lastSeen}</f:format.date></f:then>
+                                            <f:else><span class="text-body-secondary">noch nie</span></f:else>
+                                        </f:if>
+                                    </td>
+                                    <td class="col-nowrap text-body-secondary">{instance.agentVersion}</td>
+                                    <td class="col-nowrap">
+                                        <a href="{instance.editUri}" class="btn btn-link btn-sm">bearbeiten</a>
+                                    </td>
+                                </tr>
+                            </f:for>
+                        </tbody>
+                    </table>
+                </div>
+            </f:for>
         </f:then>
         <f:else>
             <div class="callout callout-info">
@@ -128,6 +145,7 @@
                 data-caretaker2-enroll="{enrollUri}">
             Instanz hinzufügen
         </button>
+        <a href="{newGroupUri}" class="btn btn-default">Gruppe anlegen</a>
     </form>
 
 </f:section>

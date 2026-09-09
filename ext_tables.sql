@@ -18,6 +18,10 @@ CREATE TABLE tx_caretaker2_instance (
     # nachträglich in ein gewachsenes Datenmodell einzuziehen ist Wochenarbeit.
     tenant int(11) unsigned DEFAULT 1 NOT NULL,
 
+    # Eine Instanz gehört zu höchstens einer Gruppe. Bewusst keine Mehrfach-
+    # zuordnung: gruppieren heißt aufteilen. Schlagworte wären etwas anderes.
+    instance_group int(11) unsigned DEFAULT 0 NOT NULL,
+
     agent_version varchar(32) DEFAULT '' NOT NULL,
     schema_version int(11) unsigned DEFAULT 0 NOT NULL,
     typo3_version varchar(32) DEFAULT '' NOT NULL,
@@ -133,4 +137,23 @@ CREATE TABLE tx_caretaker2_finding (
     PRIMARY KEY (uid),
     UNIQUE KEY finding_key (instance, finding_type, identifier),
     KEY tenant_severity (tenant, severity)
+);
+
+#
+# Eine Gruppe von Instanzen — in der Regel ein Kunde, aber die Bezeichnung
+# bleibt offen, damit auch nach Umgebung oder Team gruppiert werden kann.
+#
+CREATE TABLE tx_caretaker2_group (
+    uid int(11) NOT NULL auto_increment,
+    pid int(11) DEFAULT 0 NOT NULL,
+    tstamp int(11) unsigned DEFAULT 0 NOT NULL,
+    crdate int(11) unsigned DEFAULT 0 NOT NULL,
+    sorting int(11) unsigned DEFAULT 0 NOT NULL,
+
+    tenant int(11) unsigned DEFAULT 1 NOT NULL,
+    title varchar(255) DEFAULT '' NOT NULL,
+    description text,
+
+    PRIMARY KEY (uid),
+    KEY tenant_sorting (tenant, sorting)
 );

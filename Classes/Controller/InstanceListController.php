@@ -6,6 +6,7 @@ namespace Caretaker2\Hub\Controller;
 
 use Caretaker2\Hub\Domain\EnrollmentService;
 use Caretaker2\Hub\Domain\Instance;
+use Caretaker2\Hub\Domain\GroupRepository;
 use Caretaker2\Hub\Domain\InstanceRepository;
 use Caretaker2\Hub\Domain\SnapshotRepository;
 use Caretaker2\Hub\Domain\TriggerClient;
@@ -46,6 +47,7 @@ final class InstanceListController
         private readonly FindingRepository $findings,
         private readonly EvaluationService $evaluation,
         private readonly PageRenderer $pageRenderer,
+        private readonly GroupRepository $groups,
     ) {}
 
     public function handleRequest(ServerRequestInterface $request): ResponseInterface
@@ -221,11 +223,14 @@ final class InstanceListController
             array_map(static fn(Instance $i): int => $i->uid, $instances)
         );
 
+        $presented = array_map(
+            fn(Instance $i): array => $this->present($i, $now, $counts[$i->uid] ?? []),
+            $instances
+        );
+
         $view->assignMultiple([
-            'instances' => array_map(
-                fn(Instance $i): array => $this->present($i, $now, $counts[$i->uid] ?? []),
-                $instances
-            ),
+            'groups' => $this->groupInstances($presented),
+            'newGroupUri' => $this->editUri('tx_caretaker2_group', 0, true),
             'summary' => $this->summarize($instances, $now),
             'enrollmentCode' => $enrollmentCode,
         ]);
@@ -265,6 +270,8 @@ final class InstanceListController
 
         return [
             'uid' => $instance->uid,
+            'groupUid' => $instance->groupUid,
+            'editUri' => $this->editUri('tx_caretaker2_instance', $instance->uid),
             'detailUri' => (string)$this->uriBuilder->buildUriFromRoute(
                 self::ROUTE,
                 ['instance' => $instance->uid]
@@ -478,6 +485,66 @@ final class InstanceListController
         }
 
         return $nodes;
+    }
+
+    /**
+     * Instances arranged under their group, ungrouped ones last. A group with
+     * no instances is left out — the list answers "what do I have", not "what
+     * have I defined".
+     *
+     * @param list<array<string, mixed>> $instances
+     * @return list<array<string, mixed>>
+     */
+    private function groupInstances(array $instances): array
+    {
+        $definitions = $this->groups->findAllIndexed();
+        $buckets = [];
+
+        foreach ($instances as $instance) {
+            $buckets[$instance['groupUid']][] = $instance;
+        }
+
+        $out = [];
+        foreach ($definitions as $uid => $group) {
+            if (!isset($buckets[$uid])) {
+                continue;
+            }
+            $out[] = [
+                'uid' => $uid,
+                'title' => $group['title'],
+                'description' => $group['description'],
+                'editUri' => $this->editUri('tx_caretaker2_group', $uid),
+                'instances' => $buckets[$uid],
+            ];
+            unset($buckets[$uid]);
+        }
+
+        // Also catches instances whose group was deleted: they must not vanish
+        // from the list just because the record they pointed at is gone.
+        $remaining = [];
+        foreach ($buckets as $rest) {
+            $remaining = array_merge($remaining, $rest);
+        }
+
+        if ($remaining !== []) {
+            $out[] = [
+                'uid' => 0,
+                'title' => 'Ohne Gruppe',
+                'description' => '',
+                'editUri' => '',
+                'instances' => $remaining,
+            ];
+        }
+
+        return $out;
+    }
+
+    private function editUri(string $table, int $uid, bool $isNew = false): string
+    {
+        return (string)$this->uriBuilder->buildUriFromRoute('record_edit', [
+            'edit' => [$table => [$isNew ? 0 : $uid => $isNew ? 'new' : 'edit']],
+            'returnUrl' => (string)$this->uriBuilder->buildUriFromRoute(self::ROUTE),
+        ]);
     }
 
     /**
