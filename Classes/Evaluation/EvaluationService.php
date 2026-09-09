@@ -85,7 +85,7 @@ final class EvaluationService
                     $status['lastPublic'],
                     $status['eltsUntil'] !== null ? ', noch bis ' . date('d.m.Y', $status['eltsUntil']) : ''
                 ),
-                link: 'https://typo3.com/elts',
+                link: '',
             )];
         }
 
@@ -102,7 +102,7 @@ final class EvaluationService
                     $version,
                     $status['eltsUntil'] !== null ? ', bis ' . date('d.m.Y', $status['eltsUntil']) : ''
                 ),
-                link: 'https://typo3.org/cms/roadmap',
+                link: '',
             )];
         }
 
