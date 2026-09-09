@@ -40,7 +40,7 @@
                 <source>%s incompletely checked</source>
             </trans-unit>
             <trans-unit id="list.summary.vulnerable">
-                <source>%s with a security hole</source>
+                <source>%s with a security issue</source>
             </trans-unit>
             <trans-unit id="list.summary.unsupported">
                 <source>%s without security updates</source>
@@ -103,7 +103,7 @@
                 <source>OK</source>
             </trans-unit>
             <trans-unit id="state.vulnerable">
-                <source>Security hole</source>
+                <source>Security issue</source>
             </trans-unit>
             <trans-unit id="state.unsupported">
                 <source>Without security updates</source>
@@ -115,7 +115,7 @@
                 <source>Not reporting</source>
             </trans-unit>
             <trans-unit id="state.hint.vulnerable">
-                <source>Known security hole in an installed package.</source>
+                <source>Known security issue in an installed package.</source>
             </trans-unit>
             <trans-unit id="state.hint.unsupported">
                 <source>%s receives no security updates any more.</source>

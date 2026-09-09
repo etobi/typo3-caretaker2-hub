@@ -52,7 +52,7 @@
                 <target>%s unvollständig geprüft</target>
             </trans-unit>
             <trans-unit id="list.summary.vulnerable" approved="yes">
-                <source>%s with a security hole</source>
+                <source>%s with a security issue</source>
                 <target>%s mit Sicherheitslücke</target>
             </trans-unit>
             <trans-unit id="list.summary.unsupported" approved="yes">
@@ -136,7 +136,7 @@
                 <target>OK</target>
             </trans-unit>
             <trans-unit id="state.vulnerable" approved="yes">
-                <source>Security hole</source>
+                <source>Security issue</source>
                 <target>Sicherheitslücke</target>
             </trans-unit>
             <trans-unit id="state.unsupported" approved="yes">
@@ -152,7 +152,7 @@
                 <target>Meldet sich nicht</target>
             </trans-unit>
             <trans-unit id="state.hint.vulnerable" approved="yes">
-                <source>Known security hole in an installed package.</source>
+                <source>Known security issue in an installed package.</source>
                 <target>Bekannte Sicherheitslücke in einem installierten Paket.</target>
             </trans-unit>
             <trans-unit id="state.hint.unsupported" approved="yes">
