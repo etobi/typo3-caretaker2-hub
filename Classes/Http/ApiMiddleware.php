@@ -18,11 +18,10 @@ use Psr\Log\LoggerAwareTrait;
 use TYPO3\CMS\Core\Http\JsonResponse;
 
 /**
- * Die API, über die die Agents sprechen.
+ * The API the agents speak to.
  *
- * Läuft vor der Site-Auflösung, damit sie auch dann funktioniert, wenn der
- * Hub gar keine Site konfiguriert hat oder das Frontend anderweitig
- * beschäftigt ist.
+ * Runs ahead of site resolution so that it works even when the hub has no site
+ * configured at all, or the frontend is busy with something else.
  */
 final class ApiMiddleware implements MiddlewareInterface, LoggerAwareInterface
 {
@@ -54,9 +53,9 @@ final class ApiMiddleware implements MiddlewareInterface, LoggerAwareInterface
             return $this->error('Body ist kein gültiges JSON.', 400);
         }
 
-        // Ab hier antwortet der Hub immer JSON. Eine durchgereichte Exception
-        // würde als HTML-Fehlerseite beim Agent landen, und der kann daraus
-        // keine brauchbare Meldung für die Konsole machen.
+        // From here on the hub always answers JSON. An exception passed through
+        // would reach the agent as an HTML error page, out of which it can make
+        // no usable message for the console.
         try {
             return $path === self::PATH_ENROLL
                 ? $this->handleEnroll($payload)

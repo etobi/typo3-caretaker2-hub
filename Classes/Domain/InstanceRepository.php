@@ -25,9 +25,9 @@ final class InstanceRepository
         $rows = $qb
             ->select('*')
             ->from(self::TABLE)
-            // Die Mandantenbedingung steht hier und nicht beim Aufrufer.
-            // Ein optionaler Parameter, den man vergessen kann, wäre genau
-            // die Lücke, die man später als Datenleck wiederfindet.
+            // The tenant condition lives here and not at the call site. An
+            // optional parameter one can forget is exactly the gap that turns
+            // up later as a data leak.
             ->where($qb->expr()->eq('tenant', $qb->createNamedParameter($tenant, ParameterType::INTEGER)))
             ->orderBy('title')
             ->executeQuery()
@@ -37,8 +37,8 @@ final class InstanceRepository
     }
 
     /**
-     * Sucht die Instanz zu einem Token. Verglichen wird der Hash — das
-     * Klartext-Token steht nirgends in der Datenbank.
+     * Finds the instance for a token. The hash is what is compared; the token
+     * itself is nowhere in the database.
      */
     public function findByToken(string $token): ?Instance
     {
@@ -58,8 +58,8 @@ final class InstanceRepository
     }
 
     /**
-     * Die Mandantenbedingung steht auch hier, nicht nur in findAll() — sonst
-     * wäre eine geratene uid der Weg an ihr vorbei.
+     * The tenant condition is here too, not only in findAll() — otherwise a
+     * guessed uid would be the way around it.
      */
     public function findByUid(int $uid, int $tenant = 1): ?Instance
     {

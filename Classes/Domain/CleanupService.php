@@ -61,8 +61,8 @@ final class CleanupService
     }
 
     /**
-     * Nur die Zuordnung wird gelöst — die Instanzen selbst gehören keiner
-     * Gruppe, sie sind in einer.
+     * Only the assignment is undone — instances do not belong to a group,
+     * they are in one.
      */
     public function detachGroup(int $groupUid): int
     {
@@ -79,9 +79,8 @@ final class CleanupService
     }
 
     /**
-     * Verwaistes aufräumen, das nicht über den DataHandler entstanden ist —
-     * ein direkter Eingriff in die Datenbank etwa, oder eine neu aufgebaute
-     * Tabelle.
+     * Clears out what was orphaned outside the DataHandler — a direct write to
+     * the database, say, or a rebuilt table.
      *
      * @return array{snapshots: int, findings: int, groups: int}
      */

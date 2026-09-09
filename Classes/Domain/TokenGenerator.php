@@ -7,8 +7,8 @@ namespace Caretaker2\Hub\Domain;
 final class TokenGenerator
 {
     /**
-     * Der Mandant steckt im Token selbst. Das kostet jetzt nichts und
-     * erspart später, alle ausgerollten Tokens neu verteilen zu müssen.
+     * The tenant sits in the token itself. It costs nothing now and saves
+     * having to redistribute every rolled-out token later.
      */
     public static function issue(int $tenant): string
     {
@@ -21,8 +21,8 @@ final class TokenGenerator
     }
 
     /**
-     * Enrollment-Code: kurz genug zum Abtippen, ohne die Zeichen, die man
-     * beim Vorlesen verwechselt (0/O, 1/I).
+     * An enrollment code: short enough to type, without the characters that
+     * get confused when read out (0/O, 1/I).
      */
     public static function enrollmentCode(): string
     {

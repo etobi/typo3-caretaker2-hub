@@ -15,9 +15,8 @@ final class FindingRepository
     private const SEVERITY_ORDER = ['critical', 'high', 'unknown', 'medium', 'low', 'info'];
 
     /**
-     * In der Reihenfolge, in der sie gezeigt werden: das Dringendste zuerst.
-     * "unknown" steht bei den schweren, weil eine fehlende Einstufung kein
-     * Freibrief ist.
+     * In the order they are shown: the most urgent first. "unknown" sits with
+     * the severe ones, because a missing rating is not a clean bill.
      */
     private const EMPTY_SEVERITIES = [
         'critical' => 0,

@@ -7,15 +7,15 @@ namespace Caretaker2\Hub\Domain;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 
 /**
- * Nimmt ein Inventar entgegen, speichert es und zieht die Kennzahlen heraus,
- * die in der Instanzliste stehen.
+ * Takes an inventory in, stores it and pulls out the figures the instance
+ * list shows.
  */
 final class IngestService
 {
     public const TABLE_SNAPSHOT = 'tx_caretaker2_snapshot';
 
     /**
-     * Der Hub versteht die aktuelle Schemaversion und zwei davor.
+     * The hub understands the current schema version and two before it.
      */
     public const SCHEMA_VERSION = 1;
     public const SCHEMA_MIN_SUPPORTED = 1;
@@ -49,9 +49,9 @@ final class IngestService
         $fingerprint = $this->fingerprint($inventory);
         $changed = $fingerprint !== $instance->lastFingerprint;
 
-        // Nur bei Änderung ein neuer Snapshot. Die Update-Historie ergibt
-        // sich dadurch als Diff-Kette, ohne dass wir sie extra führen — und
-        // ein täglicher Push kostet an unveränderten Tagen nichts.
+        // A snapshot only when something changed. The history falls out of
+        // that as a chain of differences, without being kept separately, and a
+        // daily push costs nothing on the days nothing moved.
         if ($changed) {
             $this->connectionPool->getConnectionForTable(self::TABLE_SNAPSHOT)->insert(
                 self::TABLE_SNAPSHOT,
@@ -88,9 +88,9 @@ final class IngestService
     }
 
     /**
-     * Die Kennzahlen für die Instanzliste. Fehlt der core-Provider oder hat
-     * er nichts geliefert, bleiben die Felder leer — und die Liste zeigt das
-     * an, statt einen alten Wert weiterzuschleppen.
+     * The figures for the instance list. If the core provider is missing or
+     * delivered nothing, the fields stay empty and the list says so, rather
+     * than carrying an old value forward.
      *
      * @param mixed $core
      * @return array<string, mixed>
@@ -117,9 +117,9 @@ final class IngestService
     }
 
     /**
-     * PHP- und Datenbankversion für die Liste. Der Hub baut aus denselben
-     * Rohwerten später den config.platform-Block für Composer — deshalb
-     * meldet der Agent sie roh und bewertet nichts.
+     * PHP and database version for the list. The hub later builds composer's
+     * config.platform block from the same raw values, which is why the agent
+     * reports them raw and judges nothing.
      *
      * @param mixed $platform
      * @return array<string, mixed>
@@ -128,8 +128,8 @@ final class IngestService
     {
         $empty = ['php_version' => '', 'db_platform' => '', 'db_version' => ''];
 
-        // Auch ein degraded-Ergebnis trägt Daten — die nehmen wir mit, statt
-        // die Instanz so aussehen zu lassen, als hätte sie gar nichts gemeldet.
+        // A degraded result still carries data. Taking it beats letting the
+        // instance look as though it had reported nothing at all.
         if (!is_array($platform)
             || !in_array($platform['status'] ?? null, ['ok', 'degraded'], true)
             || !is_array($platform['data'] ?? null)
@@ -170,9 +170,9 @@ final class IngestService
     }
 
     /**
-     * Der schlechteste Zustand gewinnt. Ein einziger Provider, der nichts
-     * liefern konnte, macht die ganze Instanz "unvollständig geprüft" —
-     * denn niemand weiß, was in der Lücke gesteckt hätte.
+     * The worst state wins. A single provider that could deliver nothing makes
+     * the whole instance "incompletely checked", because nobody knows what
+     * would have been in the gap.
      *
      * @param array<string, mixed> $providers
      */

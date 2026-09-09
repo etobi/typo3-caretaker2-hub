@@ -8,11 +8,11 @@ use Doctrine\DBAL\ParameterType;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 
 /**
- * Der Ersatz für den Schlüsseltausch des Vorgängers.
+ * Connecting an instance without a key exchange.
  *
- * Der Hub gibt einen kurzlebigen Code aus, die Instanz tauscht ihn gegen ein
- * dauerhaftes Token. Kein Redirect, kein Callback, keine sich gegenseitig
- * erreichenden Systeme — die Instanz spricht, der Hub antwortet.
+ * The hub hands out a short-lived code, the instance trades it for a lasting
+ * token. No redirect, no callback, no two systems that have to reach each
+ * other — the instance speaks, the hub answers.
  */
 final class EnrollmentService
 {
@@ -41,8 +41,8 @@ final class EnrollmentService
     }
 
     /**
-     * Löst den Code ein und gibt das Klartext-Token zurück — das einzige Mal,
-     * dass es existiert. Gespeichert wird nur sein Hash.
+     * Redeems the code and returns the token in clear text, the only time it
+     * exists. Only its hash is stored.
      *
      * @throws EnrollmentException
      */
@@ -64,9 +64,8 @@ final class EnrollmentService
             ->fetchAssociative();
 
         if ($row === false) {
-            // Absichtlich eine Meldung für alle drei Fälle — unbekannt,
-            // abgelaufen, schon benutzt. Wer Codes raten will, soll nicht
-            // erfahren, welcher davon zutrifft.
+            // Deliberately one message for all three cases — unknown, expired,
+            // already used. Whoever guesses codes should not learn which.
             throw new EnrollmentException('Code ist unbekannt, abgelaufen oder bereits eingelöst.');
         }
 
@@ -92,8 +91,8 @@ final class EnrollmentService
     }
 
     /**
-     * Ein brauchbarer Anzeigename ohne Nachfrage: der Hostname.
-     * Umbenennen kann man später im Backend.
+     * A usable display name without asking: the host name. Renaming it later
+     * is a backend edit away.
      */
     private function deriveTitle(string $instanceUrl): string
     {

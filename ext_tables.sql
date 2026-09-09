@@ -1,5 +1,5 @@
 #
-# Eine überwachte Instanz.
+# A monitored instance.
 #
 CREATE TABLE tx_caretaker2_instance (
     uid int(11) NOT NULL auto_increment,
@@ -10,16 +10,16 @@ CREATE TABLE tx_caretaker2_instance (
     title varchar(255) DEFAULT '' NOT NULL,
     instance_url varchar(2048) DEFAULT '' NOT NULL,
 
-    # Nur der Hash. Das Token selbst sieht der Hub genau einmal — beim
-    # Ausstellen. Danach ist es nirgends mehr auslesbar.
+    # The hash only. The hub sees the token itself exactly once, when issuing
+    # it; afterwards it is readable nowhere.
     token_hash varchar(64) DEFAULT '' NOT NULL,
 
-    # Mandant. Steht auf Jahre auf 1, muss aber von Anfang an da sein:
-    # nachträglich in ein gewachsenes Datenmodell einzuziehen ist Wochenarbeit.
+    # The tenant. Will read 1 for years, but has to be here from the start:
+    # threading it through a grown data model later is weeks of work.
     tenant int(11) unsigned DEFAULT 1 NOT NULL,
 
-    # Eine Instanz gehört zu höchstens einer Gruppe. Bewusst keine Mehrfach-
-    # zuordnung: gruppieren heißt aufteilen. Schlagworte wären etwas anderes.
+    # An instance belongs to at most one group. Deliberately not a multiple
+    # assignment: grouping means dividing. Tags would be a different thing.
     instance_group int(11) unsigned DEFAULT 0 NOT NULL,
 
     agent_version varchar(32) DEFAULT '' NOT NULL,
@@ -31,26 +31,26 @@ CREATE TABLE tx_caretaker2_instance (
     db_platform varchar(32) DEFAULT '' NOT NULL,
     db_version varchar(64) DEFAULT '' NOT NULL,
 
-    # Der schlechteste Providerstatus dieses Inventars. Eine Instanz, bei der
-    # ein Provider nichts liefern konnte, darf nicht wie eine saubere aussehen.
+    # The worst provider status in this inventory. An instance where one
+    # provider could deliver nothing must not look like a clean one.
     worst_provider_status varchar(16) DEFAULT '' NOT NULL,
 
-    # Alle Domains der Instanz, eine pro Zeile. Damit ist "wo liegt
-    # kunde-zwei.fr" eine Abfrage und keine Suche durch alle Snapshots.
+    # Every domain of the instance, one per line. That makes "where does
+    # kunde-zwei.fr live" a query instead of a search through all snapshots.
     site_hosts text,
     site_count int(11) unsigned DEFAULT 0 NOT NULL,
 
     last_seen int(11) unsigned DEFAULT 0 NOT NULL,
     last_fingerprint varchar(64) DEFAULT '' NOT NULL,
 
-    # Das zuletzt empfangene Inventar, immer überschrieben. Getrennt von den
-    # Snapshots, weil beide verschiedene Fragen beantworten: dieses hier "was
-    # ist jetzt", die Snapshots "was hat sich wann geändert".
+    # The inventory received last, always overwritten. Kept apart from the
+    # snapshots because the two answer different questions: this one "what is
+    # now", the snapshots "what changed when".
     last_inventory mediumtext,
 
-    # Die Auswertung dauert Sekunden bis Minuten und kann deshalb nicht im
-    # Push-Request laufen. Der Empfang setzt nur die Marke, ein Scheduler-Lauf
-    # arbeitet sie ab.
+    # An evaluation takes seconds to minutes and therefore cannot run inside
+    # the push request. Receiving only sets the mark; a scheduler run works
+    # through it.
     needs_evaluation tinyint(1) unsigned DEFAULT 0 NOT NULL,
     evaluated_at int(11) unsigned DEFAULT 0 NOT NULL,
 
@@ -61,9 +61,9 @@ CREATE TABLE tx_caretaker2_instance (
 );
 
 #
-# Ein Inventar-Snapshot. Wird nur geschrieben, wenn sich der Fingerabdruck
-# gegenüber dem vorherigen unterscheidet — die Update-Historie ergibt sich
-# damit als Diff-Kette, ohne dass wir sie extra pflegen.
+# An inventory snapshot. Written only when the fingerprint differs from the
+# previous one, so the history of changes falls out as a chain of differences
+# without being maintained separately.
 #
 CREATE TABLE tx_caretaker2_snapshot (
     uid int(11) NOT NULL auto_increment,
@@ -80,7 +80,7 @@ CREATE TABLE tx_caretaker2_snapshot (
 );
 
 #
-# Kurzlebiger Enrollment-Code. Ersetzt den Schlüsseltausch des Vorgängers.
+# A short-lived enrollment code, traded for a lasting token.
 #
 CREATE TABLE tx_caretaker2_enrollment (
     uid int(11) NOT NULL auto_increment,
@@ -98,8 +98,8 @@ CREATE TABLE tx_caretaker2_enrollment (
 );
 
 #
-# Ein Befund. Wird bei jeder Auswertung neu abgeglichen: bekannte Befunde
-# behalten ihr first_seen und ihre Quittierung, verschwundene werden entfernt.
+# A finding. Reconciled on every evaluation: known findings keep their
+# first_seen and their acknowledgement, vanished ones are removed.
 #
 CREATE TABLE tx_caretaker2_finding (
     uid int(11) NOT NULL auto_increment,
@@ -114,16 +114,16 @@ CREATE TABLE tx_caretaker2_finding (
     finding_type varchar(24) DEFAULT '' NOT NULL,
     severity varchar(16) DEFAULT '' NOT NULL,
 
-    # Eindeutig je Instanz: Typ + dieser Schlüssel. Bei Sicherheitsbefunden die
-    # Advisory-ID, sonst der Paketname.
+    # Unique per instance together with the type. The advisory id for security
+    # findings, the package name otherwise.
     identifier varchar(190) DEFAULT '' NOT NULL,
     package varchar(190) DEFAULT '' NOT NULL,
     installed_version varchar(64) DEFAULT '' NOT NULL,
     latest_version varchar(64) DEFAULT '' NOT NULL,
 
-    # Entweder ein fertiger Satz — Advisory-Titel von Packagist, Meldungen aus
-    # TYPO3s eigenen Prüfungen — oder ein LLL-Schlüssel, dessen Platzhalter aus
-    # title_args gefüllt werden. Übersetzt wird erst bei der Anzeige.
+    # Either a finished sentence — an advisory title from Packagist, a message
+    # from TYPO3's own checks — or an LLL key whose placeholders come from
+    # title_args. Translated when it is shown, not before.
     title text,
     title_args text,
     link varchar(2048) DEFAULT '' NOT NULL,
@@ -131,8 +131,8 @@ CREATE TABLE tx_caretaker2_finding (
     first_seen int(11) unsigned DEFAULT 0 NOT NULL,
     last_seen int(11) unsigned DEFAULT 0 NOT NULL,
 
-    # Quittierung ohne Ablauffrist. Die Notiz ist der eigentliche Wert — in
-    # einem halben Jahr will man wissen, warum jemand das weggeklickt hat.
+    # An acknowledgement without an expiry date. The note is the actual value:
+    # in half a year the question is why somebody waved this through.
     acknowledged tinyint(1) unsigned DEFAULT 0 NOT NULL,
     ack_note text,
     ack_user varchar(190) DEFAULT '' NOT NULL,

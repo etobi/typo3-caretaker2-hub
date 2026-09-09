@@ -32,12 +32,12 @@ use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Page\PageRenderer;
 
 /**
- * Die Übersicht: alle Instanzen, ihr Zustand und der Knopf zum Verbinden
+ * The overview: every instance, its state, and the way to connect a new one
  * einer neuen.
  */
-// Modul-Routen werden über den Container aufgelöst. Ohne diesen Tag ist der
-// Controller kein öffentlicher Service, und TYPO3 fällt auf makeInstance()
-// ohne Konstruktor-Argumente zurück.
+// Module routes are resolved through the container. Without this tag the
+// controller is not a public service, and TYPO3 falls back to makeInstance()
+// without constructor arguments.
 #[AsController]
 final class InstanceListController
 {
@@ -89,8 +89,8 @@ final class InstanceListController
     }
 
     /**
-     * Das vollständige Inventar einer Instanz, so wie der Agent es geliefert
-     * hat — inklusive der Provider, die nichts liefern konnten.
+     * The full inventory of one instance as the agent delivered it, including
+     * the providers that could deliver nothing.
      */
     private function detail(ServerRequestInterface $request, int $instanceId): ResponseInterface
     {
@@ -175,9 +175,9 @@ final class InstanceListController
             new BreadcrumbContext(null, $this->breadcrumb($instance, $historic))
         );
 
-        // Der aktuelle Zustand kommt aus last_inventory, nicht aus dem letzten
-        // Snapshot: Snapshots entstehen nur bei Änderung und wären für alles,
-        // was von der Laufzeit abhängt, veraltet.
+        // The current state comes from last_inventory, not from the latest
+        // snapshot: snapshots are only written on change and would be stale for
+        // everything that depends on the runtime.
         $inventory = $historic !== null
             ? $historic['inventory']
             : $instance->lastInventory;
@@ -188,8 +188,8 @@ final class InstanceListController
         $acknowledged = array_values(array_filter($all, static fn(array $r): bool => (int)$r['acknowledged'] === 1));
 
         $view->assignMultiple([
-            // Mit den Befundzahlen, sonst zeigte die Detailansicht "OK", wo
-            // die Liste "ohne Sicherheitsupdates" sagt.
+            // With the finding counts, or the detail view would say "OK" where
+            // the list says "without security updates".
             'instance' => $this->present(
                 $instance,
                 time(),
@@ -275,8 +275,8 @@ final class InstanceListController
                 ->setClasses('btn btn-default')
                 ->setAttributes([
                     'type' => 'submit',
-                    // Der Knopf steht im DocHeader, das Formular im Inhalt.
-                    // Ohne JavaScript trägt so weiterhin der serverseitige Weg.
+                    // The button sits in the doc header, the form in the content.
+                    // That way the server-side path still carries without JavaScript.
                     'form' => 'caretaker2-enroll',
                     'name' => 'createCode',
                     'value' => '1',
@@ -306,8 +306,8 @@ final class InstanceListController
 
         $view->assignMultiple([
             'groups' => $groups,
-            // Eine einzige Sammelgruppe ist keine Gruppierung: dann bleibt die
-            // Zwischenzeile weg.
+            // A single catch-all group is not a grouping, so the heading row
+            // stays away.
             'showGroupHeadings' => count($groups) > 1 || ($groups[0]['uid'] ?? 0) !== 0,
             'summary' => $this->summarize($instances, $now),
             'enrollmentCode' => $enrollmentCode,
@@ -379,9 +379,9 @@ final class InstanceListController
             'phpVersion' => $instance->phpVersion,
             'phpSupport' => $this->phpBadge($instance),
             'context' => $instance->applicationContext,
-            // Ohne Site-Konfiguration bleibt nur die Instanz-Adresse. Die ist
-            // eine vollständige URL, die Site-Domains sind Hostnamen — nebeneinander
-            // sähe das eine mit und das andere ohne Schema aus.
+            // Without a site configuration only the instance address is left.
+            // That one is a full URL where site domains are host names — side by
+            // side, one would carry a scheme and the other would not.
             'siteHosts' => $instance->siteHosts !== []
                 ? $instance->siteHosts
                 : array_values(array_filter([parse_url($instance->instanceUrl, PHP_URL_HOST)])),
@@ -422,9 +422,9 @@ final class InstanceListController
     }
 
     /**
-     * Der Providerstatus mit Grund und Klartext. Das ist der Punkt, an dem
-     * "keine Daten" sichtbar von "keine Befunde" unterscheidbar wird — hier
-     * steht, warum etwas fehlt.
+     * The provider status with its reason in plain words. This is where "no
+     * data" becomes visibly different from "no findings": it says why something
+     * is missing.
      *
      * @param array<string, mixed>|null $inventory
      * @return list<array<string, mixed>>
@@ -641,9 +641,9 @@ final class InstanceListController
     }
 
     /**
-     * Ein Absender im DocHeader, dessen Formular im Inhalt steht. Der Weg über
-     * das form-Attribut hält den serverseitigen Pfad am Leben, den es ohne
-     * JavaScript weiterhin braucht.
+     * A submit button in the doc header whose form lives in the content. Going
+     * through the form attribute keeps the server-side path alive, which is
+     * still needed without JavaScript.
      */
     private function addSubmitButton(
         ModuleTemplate $view,
@@ -761,9 +761,9 @@ final class InstanceListController
     }
 
     /**
-     * Beschriftung und Farbe für den Support-Status einer TYPO3-Fassung.
-     * Grün für die aktuelle, blau für die noch regulär gepflegten, gelb für
-     * ELTS, rot für alles ohne Unterstützung.
+     * Label and colour for the support status of a TYPO3 version. Green for
+     * the latest, blue for the ones still in regular maintenance, yellow for
+     * ELTS, red for anything without support.
      *
      * @return array<string, string>
      */
@@ -812,8 +812,8 @@ final class InstanceListController
     }
 
     /**
-     * Dasselbe für den PHP-Zweig. Grün, solange er aktiv unterstützt wird,
-     * gelb in der Phase, in der nur noch Sicherheitsfixes kommen, rot danach.
+     * The same for the PHP branch. Green while it is actively supported,
+     * yellow while only security fixes arrive, red after that.
      *
      * @return array<string, string>
      */
@@ -851,8 +851,8 @@ final class InstanceListController
     }
 
     /**
-     * Zwei rote Zustände nebeneinander sagen von sich aus nicht, worin sie
-     * sich unterscheiden. Der Hover-Text sagt es.
+     * Two red states next to each other do not say how they differ. The hover
+     * text does.
      *
      * @param array<string, int> $counts
      */

@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 /**
- * Fast alle Felder schreibt der Agent. Bearbeitbar sind nur die beiden, die
- * eine Entscheidung des Betreibers festhalten: der Anzeigename und die Gruppe.
- * Der Rest steht schreibgeschützt daneben, damit man in einem Datensatz alles
- * beisammen hat, ohne es versehentlich zu überschreiben.
+ * The agent writes almost every field. Editable are the two that hold a
+ * decision of the operator's: the display name and the group. The rest sits
+ * next to them read-only, so that one record has everything together without
+ * inviting an accidental overwrite.
  */
 return [
     'ctrl' => [
@@ -20,8 +20,8 @@ return [
         'iconfile' => 'EXT:caretaker2_hub/Resources/Public/Icons/module-caretaker2.svg',
         'enablecolumns' => [],
         'searchFields' => 'title,instance_url,site_hosts',
-        // Das Token gibt es nur als Hash, aber ein kopierter Datensatz hätte
-        // denselben — und damit zwei Instanzen, die sich als dieselbe melden.
+        // The token exists only as a hash, but a copied record would carry the
+        // same one — and with it two instances reporting as the same.
         'hideTable' => false,
         'readOnly' => false,
     ],

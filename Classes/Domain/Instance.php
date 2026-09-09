@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Caretaker2\Hub\Domain;
 
 /**
- * Eine überwachte Instanz, so wie der Hub sie kennt.
+ * A monitored instance as the hub knows it.
  *
- * Bewusst ein schlichtes Objekt über einer Doctrine-Tabelle statt eines
- * Extbase-Models: Diese Datensätze werden fast nur maschinell geschrieben.
+ * Deliberately a plain object over a Doctrine table rather than an Extbase
+ * model: these records are written by machines almost exclusively.
  */
 final readonly class Instance
 {
@@ -86,9 +86,9 @@ final readonly class Instance
     }
 
     /**
-     * Weil der Agent pusht, ist ausbleibender Push das Lebenszeichen.
-     * Eine Instanz, die sich zwei Tage nicht gemeldet hat, ist auffällig,
-     * ohne dass der Hub irgendetwas anpingen müsste.
+     * Because the agent pushes, a missing push is the sign of life. An
+     * instance that has not reported for two days stands out without the hub
+     * having to ping anything.
      */
     public function isStale(int $now, int $toleranceSeconds = 172800): bool
     {
@@ -96,9 +96,9 @@ final readonly class Instance
     }
 
     /**
-     * Vier Zustände, nicht drei. "unvollständig geprüft" ist bewusst weder
-     * grün noch rot: Wer nicht alles sehen konnte, darf keine Entwarnung
-     * geben, hat aber auch nichts Schlimmes gefunden.
+     * Four states, not three. "incompletely checked" is deliberately neither
+     * green nor red: whoever could not see everything must not give an
+     * all-clear, but has not found anything bad either.
      */
     public function healthState(int $now): string
     {

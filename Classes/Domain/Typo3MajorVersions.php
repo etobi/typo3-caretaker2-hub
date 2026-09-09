@@ -125,7 +125,7 @@ final class Typo3MajorVersions implements LoggerAwareInterface
     }
 
     /**
-     * Letztes öffentliches und neuestes Release je Hauptversion.
+     * The last public and the newest release of each major.
      *
      * @param list<array<string, mixed>> $releases
      * @return array<int, array{lastPublic: string, latest: string}>

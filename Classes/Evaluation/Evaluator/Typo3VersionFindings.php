@@ -36,8 +36,8 @@ final class Typo3VersionFindings implements EvaluatorInterface
         $status = $this->majorVersions->statusOf(
             $instance->typo3Version !== '' ? $instance->typo3Version : (string)$instance->typo3Major
         );
-        // Im ELTS-Zeitraum, aber auf dem letzten frei veroeffentlichten Stand:
-        // die Instanz bekommt nichts. Das wiegt schwerer als ELTS zu fahren.
+        // Inside the ELTS window but on the last freely published release: the
+        // instance gets nothing. That weighs more than running ELTS does.
         if ($status['status'] === Typo3MajorVersions::STATUS_ELTS_UNPATCHED) {
             return [new Finding(
                 type: Finding::TYPE_TYPO3_ELTS_UNPATCHED,

@@ -4,9 +4,9 @@ services:
     autoconfigure: true
     public: false
 
-  # Wie die Provider im Agent: Jede Klasse, die EvaluatorInterface
-  # implementiert, wird automatisch mitgeprüft — auch aus einer fremden
-  # Extension.
+  # Like the providers in the agent: every class implementing
+  # EvaluatorInterface is asked automatically, including from another
+  # extension.
   _instanceof:
     Caretaker2\Hub\Evaluation\EvaluatorInterface:
       tags: ['caretaker2.evaluator']

@@ -8,9 +8,8 @@ use Doctrine\DBAL\ParameterType;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 
 /**
- * Snapshots werden nur bei Änderung geschrieben. Ihre Reihenfolge ist damit
- * bereits die Veränderungshistorie der Instanz — ohne dass wir sie separat
- * führen müssten.
+ * Snapshots are only written on change, so their order already is the
+ * instance's history of changes, without it being kept separately.
  */
 final class SnapshotRepository
 {
@@ -21,7 +20,7 @@ final class SnapshotRepository
     ) {}
 
     /**
-     * @return array<string, mixed>|null Das Inventar, wie es der Agent geschickt hat
+     * @return array<string, mixed>|null the inventory as the agent sent it
      */
     public function findLatestInventory(int $instanceId): ?array
     {
@@ -41,8 +40,8 @@ final class SnapshotRepository
     }
 
     /**
-     * Ein bestimmter Snapshot. Auf die Instanz eingegrenzt, damit eine
-     * geratene uid nicht in fremde Daten führt.
+     * One particular snapshot, restricted to the instance so that a guessed
+     * uid does not lead into someone else's data.
      *
      * @return array{crdate: int, inventory: array<string, mixed>}|null
      */
@@ -72,7 +71,7 @@ final class SnapshotRepository
     }
 
     /**
-     * Nur die Metadaten — die Payloads wären für eine Liste zu groß.
+     * Metadata only — the payloads would be far too large for a list.
      *
      * @return list<array{uid: int, crdate: int, fingerprint: string}>
      */
