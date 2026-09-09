@@ -354,6 +354,9 @@
             <trans-unit id="detail.noInventory.body">
                 <source>This instance is connected but has not reported anything yet. Trigger it from the backend module of the instance or with caretaker2:push.</source>
             </trans-unit>
+            <trans-unit id="message.unacknowledgeMissed">
+                <source>That finding does not belong to this instance, nothing was changed.</source>
+            </trans-unit>
             <trans-unit id="message.nothingSelected">
                 <source>Nothing selected.</source>
             </trans-unit>

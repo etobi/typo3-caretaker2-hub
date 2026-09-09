@@ -471,6 +471,10 @@
                 <source>This instance is connected but has not reported anything yet. Trigger it from the backend module of the instance or with caretaker2:push.</source>
                 <target>Diese Instanz ist verbunden, hat aber noch nichts gemeldet. Im Backend-Modul der Instanz oder per caretaker2:push auslösen.</target>
             </trans-unit>
+            <trans-unit id="message.unacknowledgeMissed" approved="yes">
+                <source>That finding does not belong to this instance, nothing was changed.</source>
+                <target>Dieser Befund gehört nicht zu dieser Instanz, es wurde nichts geändert.</target>
+            </trans-unit>
             <trans-unit id="message.nothingSelected" approved="yes">
                 <source>Nothing selected.</source>
                 <target>Nichts ausgewählt.</target>

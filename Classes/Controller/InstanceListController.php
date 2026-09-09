@@ -137,9 +137,11 @@ final class InstanceListController
         }
 
         if (!$readOnly && $request->getMethod() === 'POST' && is_array($body) && isset($body['unacknowledge'])) {
-            $this->findings->unacknowledge((int)$body['unacknowledge']);
-            $message = $this->ll('message.unacknowledged');
-            $messageSeverity = 'info';
+            $taken = $this->findings->unacknowledge((int)$body['unacknowledge'], $instanceId, $instance->tenant);
+            $message = $taken === 1
+                ? $this->ll('message.unacknowledged')
+                : $this->ll('message.unacknowledgeMissed');
+            $messageSeverity = $taken === 1 ? 'info' : 'warning';
         }
 
         if (!$readOnly && $request->getMethod() === 'POST' && ($request->getParsedBody()['trigger'] ?? null) !== null) {

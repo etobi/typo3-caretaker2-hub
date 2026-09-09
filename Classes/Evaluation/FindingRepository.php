@@ -116,9 +116,12 @@ final class FindingRepository
             ->executeStatement();
     }
 
-    public function unacknowledge(int $uid): void
+    /**
+     * @return int how many were actually taken back, 0 or 1
+     */
+    public function unacknowledge(int $uid, int $instance, int $tenant): int
     {
-        $this->connectionPool->getConnectionForTable(self::TABLE)->update(
+        return (int)$this->connectionPool->getConnectionForTable(self::TABLE)->update(
             self::TABLE,
             [
                 'acknowledged' => 0,
@@ -127,7 +130,7 @@ final class FindingRepository
                 'ack_at' => 0,
                 'tstamp' => time(),
             ],
-            ['uid' => $uid]
+            ['uid' => $uid, 'instance' => $instance, 'tenant' => $tenant]
         );
     }
 
