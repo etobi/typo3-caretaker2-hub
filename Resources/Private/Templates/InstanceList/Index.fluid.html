@@ -42,6 +42,9 @@
                 <f:if condition="{summary.incomplete}">
                     <span class="badge badge-warning">{summary.incomplete} unvollständig geprüft</span>
                 </f:if>
+                <f:if condition="{summary.vulnerable}">
+                    <span class="badge badge-danger">{summary.vulnerable} mit Sicherheitslücke</span>
+                </f:if>
                 <f:if condition="{summary.stale}">
                     <span class="badge badge-danger">{summary.stale} melden sich nicht</span>
                 </f:if>
@@ -57,6 +60,7 @@
                             <th>PHP</th>
                             <th>Datenbank</th>
                             <th>Kontext</th>
+                            <th>Befunde</th>
                             <th>Zuletzt gemeldet</th>
                             <th>Agent</th>
                         </tr>
@@ -87,6 +91,17 @@
                                 <td class="col-nowrap">{instance.phpVersion}</td>
                                 <td class="col-nowrap">{instance.database}</td>
                                 <td class="col-nowrap">{instance.context}</td>
+                                <td class="col-nowrap">
+                                    <f:if condition="{instance.findings.security}">
+                                        <span class="badge badge-danger" title="Sicherheitsbefunde">{instance.findings.security}</span>
+                                    </f:if>
+                                    <f:if condition="{instance.findings.update_safe}">
+                                        <span class="badge badge-warning" title="Updates im Rahmen des Constraints">{instance.findings.update_safe}</span>
+                                    </f:if>
+                                    <f:if condition="{instance.findings.update_major}">
+                                        <span class="badge badge-info" title="Updates, die den Constraint ändern würden">{instance.findings.update_major}</span>
+                                    </f:if>
+                                </td>
                                 <td class="col-nowrap">
                                     <f:if condition="{instance.lastSeen}">
                                         <f:then><f:format.date format="d.m.Y H:i">@{instance.lastSeen}</f:format.date></f:then>

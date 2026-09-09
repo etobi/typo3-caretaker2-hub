@@ -9,6 +9,9 @@ use Caretaker2\Hub\Domain\Instance;
 use Caretaker2\Hub\Domain\InstanceRepository;
 use Caretaker2\Hub\Domain\SnapshotRepository;
 use Caretaker2\Hub\Domain\TriggerClient;
+use Caretaker2\Hub\Evaluation\EvaluationException;
+use Caretaker2\Hub\Evaluation\EvaluationService;
+use Caretaker2\Hub\Evaluation\FindingRepository;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Attribute\AsController;
@@ -37,6 +40,8 @@ final class InstanceListController
         private readonly SnapshotRepository $snapshots,
         private readonly UriBuilder $uriBuilder,
         private readonly TriggerClient $triggerClient,
+        private readonly FindingRepository $findings,
+        private readonly EvaluationService $evaluation,
     ) {}
 
     public function handleRequest(ServerRequestInterface $request): ResponseInterface
@@ -62,6 +67,22 @@ final class InstanceListController
 
         $message = null;
         $messageSeverity = 'info';
+
+        if ($request->getMethod() === 'POST' && ($request->getParsedBody()['evaluate'] ?? null) !== null) {
+            try {
+                $counts = $this->evaluation->evaluate($instance);
+                $message = sprintf(
+                    'Auswertung fertig: %d neu, %d unverändert, %d erledigt.',
+                    $counts['added'],
+                    $counts['kept'],
+                    $counts['resolved']
+                );
+                $messageSeverity = 'success';
+            } catch (EvaluationException $e) {
+                $message = $e->getMessage();
+                $messageSeverity = 'danger';
+            }
+        }
 
         if ($request->getMethod() === 'POST' && ($request->getParsedBody()['trigger'] ?? null) !== null) {
             [$ok, $message] = $this->triggerClient->trigger($instance);
@@ -90,6 +111,8 @@ final class InstanceListController
             'snapshotCount' => $this->snapshots->countForInstance($instanceId),
             'message' => $message,
             'messageSeverity' => $messageSeverity,
+            'findings' => $this->presentFindings($this->findings->findForInstance($instanceId)),
+            'findingCounts' => $this->findings->countsForInstance($instanceId),
         ]);
 
         return $view->renderResponse('InstanceList/Detail');
@@ -109,10 +132,13 @@ final class InstanceListController
 
         $now = time();
         $instances = $this->instances->findAll();
+        $counts = $this->findings->countsForInstances(
+            array_map(static fn(Instance $i): int => $i->uid, $instances)
+        );
 
         $view->assignMultiple([
             'instances' => array_map(
-                fn(Instance $i): array => $this->present($i, $now),
+                fn(Instance $i): array => $this->present($i, $now, $counts[$i->uid] ?? []),
                 $instances
             ),
             'summary' => $this->summarize($instances, $now),
@@ -142,9 +168,15 @@ final class InstanceListController
     /**
      * @return array<string, mixed>
      */
-    private function present(Instance $instance, int $now): array
+    private function present(Instance $instance, int $now, array $findingCounts = []): array
     {
         $state = $instance->healthState($now);
+
+        // A high or critical security finding outranks everything else. An
+        // instance that is reporting cleanly but is vulnerable is not "current".
+        if (($findingCounts['securityHigh'] ?? 0) > 0 && $state !== 'stale') {
+            $state = 'vulnerable';
+        }
 
         return [
             'uid' => $instance->uid,
@@ -166,6 +198,7 @@ final class InstanceListController
             'state' => $state,
             'stateLabel' => $this->stateLabel($state),
             'stateSeverity' => $this->stateSeverity($state),
+            'findings' => $findingCounts,
         ];
     }
 
@@ -175,10 +208,14 @@ final class InstanceListController
      */
     private function summarize(array $instances, int $now): array
     {
-        $summary = ['total' => count($instances), 'ok' => 0, 'incomplete' => 0, 'stale' => 0];
+        $summary = ['total' => count($instances), 'ok' => 0, 'incomplete' => 0, 'stale' => 0, 'vulnerable' => 0];
+        $counts = $this->findings->countsForInstances(
+            array_map(static fn(Instance $i): int => $i->uid, $instances)
+        );
 
         foreach ($instances as $instance) {
-            $summary[$instance->healthState($now)]++;
+            $state = $this->present($instance, $now, $counts[$instance->uid] ?? [])['state'];
+            $summary[$state]++;
         }
 
         return $summary;
@@ -251,10 +288,51 @@ final class InstanceListController
         ];
     }
 
+    /**
+     * @param list<array<string, mixed>> $rows
+     * @return list<array<string, mixed>>
+     */
+    private function presentFindings(array $rows): array
+    {
+        $typeLabels = [
+            'security' => 'Sicherheit',
+            'update_safe' => 'Update möglich',
+            'update_major' => 'Update blockiert',
+            'abandoned' => 'Nicht gepflegt',
+            'unassessable' => 'Nicht bewertbar',
+        ];
+        $severityColours = [
+            'critical' => 'danger',
+            'high' => 'danger',
+            'unknown' => 'warning',
+            'medium' => 'warning',
+            'low' => 'info',
+            'info' => 'secondary',
+        ];
+
+        return array_map(static function (array $row) use ($typeLabels, $severityColours): array {
+            $severity = (string)$row['severity'];
+
+            return [
+                'type' => (string)$row['finding_type'],
+                'typeLabel' => $typeLabels[$row['finding_type']] ?? (string)$row['finding_type'],
+                'severity' => $severity,
+                'severityColour' => $severityColours[$severity] ?? 'secondary',
+                'package' => (string)$row['package'],
+                'installedVersion' => (string)$row['installed_version'],
+                'latestVersion' => (string)$row['latest_version'],
+                'title' => (string)$row['title'],
+                'link' => (string)$row['link'],
+                'firstSeen' => (int)$row['first_seen'],
+            ];
+        }, $rows);
+    }
+
     private function stateLabel(string $state): string
     {
         return [
             'ok' => 'Aktuell',
+            'vulnerable' => 'Sicherheitslücke',
             // Bewusst nicht "Fehler": Es ist nichts kaputt, wir wissen nur
             // nicht alles. Das ist eine eigene Aussage und darf nicht als
             // Entwarnung durchgehen.
@@ -265,7 +343,12 @@ final class InstanceListController
 
     private function stateSeverity(string $state): string
     {
-        return ['ok' => 'success', 'incomplete' => 'warning', 'stale' => 'danger'][$state] ?? 'default';
+        return [
+            'ok' => 'success',
+            'incomplete' => 'warning',
+            'vulnerable' => 'danger',
+            'stale' => 'danger',
+        ][$state] ?? 'default';
     }
 
     /**

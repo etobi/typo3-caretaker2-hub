@@ -80,3 +80,45 @@ CREATE TABLE tx_caretaker2_enrollment (
     PRIMARY KEY (uid),
     UNIQUE KEY code (code)
 );
+
+#
+# Ein Befund. Wird bei jeder Auswertung neu abgeglichen: bekannte Befunde
+# behalten ihr first_seen und ihre Quittierung, verschwundene werden entfernt.
+#
+CREATE TABLE tx_caretaker2_finding (
+    uid int(11) NOT NULL auto_increment,
+    pid int(11) DEFAULT 0 NOT NULL,
+    crdate int(11) unsigned DEFAULT 0 NOT NULL,
+    tstamp int(11) unsigned DEFAULT 0 NOT NULL,
+
+    instance int(11) unsigned DEFAULT 0 NOT NULL,
+    tenant int(11) unsigned DEFAULT 1 NOT NULL,
+
+    # security | update_safe | update_major | abandoned | unassessable
+    finding_type varchar(24) DEFAULT '' NOT NULL,
+    severity varchar(16) DEFAULT '' NOT NULL,
+
+    # Eindeutig je Instanz: Typ + dieser Schlüssel. Bei Sicherheitsbefunden die
+    # Advisory-ID, sonst der Paketname.
+    identifier varchar(190) DEFAULT '' NOT NULL,
+    package varchar(190) DEFAULT '' NOT NULL,
+    installed_version varchar(64) DEFAULT '' NOT NULL,
+    latest_version varchar(64) DEFAULT '' NOT NULL,
+
+    title text,
+    link varchar(2048) DEFAULT '' NOT NULL,
+
+    first_seen int(11) unsigned DEFAULT 0 NOT NULL,
+    last_seen int(11) unsigned DEFAULT 0 NOT NULL,
+
+    # Quittierung ohne Ablauffrist. Die Notiz ist der eigentliche Wert — in
+    # einem halben Jahr will man wissen, warum jemand das weggeklickt hat.
+    acknowledged tinyint(1) unsigned DEFAULT 0 NOT NULL,
+    ack_note text,
+    ack_user varchar(190) DEFAULT '' NOT NULL,
+    ack_at int(11) unsigned DEFAULT 0 NOT NULL,
+
+    PRIMARY KEY (uid),
+    UNIQUE KEY finding_key (instance, finding_type, identifier),
+    KEY tenant_severity (tenant, severity)
+);

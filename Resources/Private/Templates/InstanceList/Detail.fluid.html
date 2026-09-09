@@ -19,9 +19,51 @@
 
     <form method="post" class="mb-3">
         <button type="submit" name="trigger" value="1" class="btn btn-primary">
-            Jetzt prüfen
+            Jetzt melden lassen
+        </button>
+        <button type="submit" name="evaluate" value="1" class="btn btn-default">
+            Composer auswerten
         </button>
     </form>
+
+    <f:if condition="{findings}">
+        <h2>Befunde</h2>
+        <div class="mb-2">
+            <f:if condition="{findingCounts.security}"><span class="badge badge-danger">{findingCounts.security} Sicherheit</span> </f:if>
+            <f:if condition="{findingCounts.update_safe}"><span class="badge badge-warning">{findingCounts.update_safe} Update möglich</span> </f:if>
+            <f:if condition="{findingCounts.update_major}"><span class="badge badge-info">{findingCounts.update_major} Update blockiert</span> </f:if>
+            <f:if condition="{findingCounts.abandoned}"><span class="badge badge-info">{findingCounts.abandoned} nicht gepflegt</span> </f:if>
+            <f:if condition="{findingCounts.unassessable}"><span class="badge badge-secondary">{findingCounts.unassessable} nicht bewertbar</span></f:if>
+        </div>
+
+        <div class="table-fit mb-4">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Schwere</th><th>Art</th><th>Paket</th>
+                        <th>Installiert</th><th>Verfügbar</th><th>Befund</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <f:for each="{findings}" as="finding">
+                        <tr>
+                            <td class="col-nowrap"><span class="badge badge-{finding.severityColour}">{finding.severity}</span></td>
+                            <td class="col-nowrap">{finding.typeLabel}</td>
+                            <td class="col-nowrap"><code>{finding.package}</code></td>
+                            <td class="col-nowrap">{finding.installedVersion}</td>
+                            <td class="col-nowrap">{finding.latestVersion}</td>
+                            <td>
+                                <f:if condition="{finding.link}">
+                                    <f:then><a href="{finding.link}" target="_blank" rel="noreferrer">{finding.title}</a></f:then>
+                                    <f:else>{finding.title}</f:else>
+                                </f:if>
+                            </td>
+                        </tr>
+                    </f:for>
+                </tbody>
+            </table>
+        </div>
+    </f:if>
 
     <div class="mb-3">
         <span class="badge badge-{instance.stateSeverity}">{instance.stateLabel}</span>

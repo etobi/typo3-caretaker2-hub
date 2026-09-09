@@ -11,6 +11,13 @@ services:
       - '../Classes/Domain/EnrollmentException.php'
       - '../Classes/Domain/IngestException.php'
       - '../Classes/Domain/TokenGenerator.php'
+      - '../Classes/Evaluation/Finding.php'
+      - '../Classes/Evaluation/EvaluationResult.php'
+      - '../Classes/Evaluation/EvaluationException.php'
+
+  Caretaker2\Hub\Command\EvaluateCommand:
+    tags:
+      - { name: 'console.command', command: 'caretaker2:evaluate', description: 'Wertet die Composer-Daten der Instanzen aus', schedulable: true }
 
   Caretaker2\Hub\Command\CreateEnrollmentCodeCommand:
     tags:
