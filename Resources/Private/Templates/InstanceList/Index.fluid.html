@@ -62,11 +62,9 @@
                             <th>Instanz und Domains</th>
                             <th>TYPO3</th>
                             <th>PHP</th>
-                            <th>Datenbank</th>
                             <th>Kontext</th>
                             <th>Befunde</th>
                             <th>Zuletzt gemeldet</th>
-                            <th>Agent</th>
                             <th class="col-control"></th>
                         </tr>
                     </thead>
@@ -74,7 +72,7 @@
                         <tbody>
                             <f:if condition="{showGroupHeadings}">
                                 <tr class="table-active">
-                                    <th colspan="10" scope="colgroup">
+                                    <th colspan="8" scope="colgroup">
                                         <div class="d-flex align-items-center justify-content-between gap-2">
                                             <span>
                                                 {group.title}
@@ -112,7 +110,6 @@
                                         {instance.typo3Version}
                                     </td>
                                     <td class="col-nowrap">{instance.phpVersion}</td>
-                                    <td class="col-nowrap">{instance.database}</td>
                                     <td class="col-nowrap">{instance.context}</td>
                                     <td class="col-nowrap">
                                         <f:if condition="{instance.findings.security}">
@@ -131,7 +128,6 @@
                                             <f:else><span class="text-body-secondary">noch nie</span></f:else>
                                         </f:if>
                                     </td>
-                                    <td class="col-nowrap text-body-secondary">{instance.agentVersion}</td>
                                     <td class="col-control">
                                         <div class="btn-group">
                                             <a href="{instance.detailUri}" class="btn btn-default"

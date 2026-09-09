@@ -322,7 +322,6 @@ final class InstanceListController
             'typo3Major' => $instance->typo3Major,
             'typo3Support' => $this->supportBadge($instance),
             'phpVersion' => $instance->phpVersion,
-            'database' => trim($instance->dbPlatform . ' ' . $this->shortenDbVersion($instance->dbVersion)),
             'context' => $instance->applicationContext,
             // Ohne Site-Konfiguration bleibt nur die Instanz-Adresse. Die ist
             // eine vollständige URL, die Site-Domains sind Hostnamen — nebeneinander
