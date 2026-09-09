@@ -69,12 +69,21 @@ final class InstanceListController
             return new RedirectResponse((string)$this->uriBuilder->buildUriFromRoute(self::ROUTE));
         }
 
+        $wanted = (int)($request->getQueryParams()['snapshot'] ?? 0);
+        $historic = $wanted > 0
+            ? $this->snapshots->findInventoryByUid($wanted, $instanceId)
+            : null;
+
+        // Hiding the buttons is not enough — every action describes the
+        // current state and must not run from a view of an older one.
+        $readOnly = $historic !== null;
+
         $message = null;
         $messageSeverity = 'info';
 
         $body = $request->getParsedBody();
 
-        if ($request->getMethod() === 'POST' && is_array($body) && isset($body['acknowledge'])) {
+        if (!$readOnly && $request->getMethod() === 'POST' && is_array($body) && isset($body['acknowledge'])) {
             $note = trim((string)($body['note'] ?? ''));
 
             $uids = $body['acknowledgeType'] ?? null;
@@ -105,13 +114,13 @@ final class InstanceListController
             }
         }
 
-        if ($request->getMethod() === 'POST' && is_array($body) && isset($body['unacknowledge'])) {
+        if (!$readOnly && $request->getMethod() === 'POST' && is_array($body) && isset($body['unacknowledge'])) {
             $this->findings->unacknowledge((int)$body['unacknowledge']);
             $message = 'Quittierung aufgehoben.';
             $messageSeverity = 'info';
         }
 
-        if ($request->getMethod() === 'POST' && ($request->getParsedBody()['evaluate'] ?? null) !== null) {
+        if (!$readOnly && $request->getMethod() === 'POST' && ($request->getParsedBody()['evaluate'] ?? null) !== null) {
             try {
                 $counts = $this->evaluation->evaluate($instance);
                 $message = sprintf(
@@ -127,7 +136,7 @@ final class InstanceListController
             }
         }
 
-        if ($request->getMethod() === 'POST' && ($request->getParsedBody()['trigger'] ?? null) !== null) {
+        if (!$readOnly && $request->getMethod() === 'POST' && ($request->getParsedBody()['trigger'] ?? null) !== null) {
             [$ok, $message] = $this->triggerClient->trigger($instance);
             $messageSeverity = $ok ? 'success' : 'warning';
 
@@ -143,13 +152,6 @@ final class InstanceListController
         $view->getDocHeaderComponent()->setBreadcrumbContext(
             new BreadcrumbContext(null, $this->breadcrumb($instance, $historic))
         );
-
-        $wanted = (int)($request->getQueryParams()['snapshot'] ?? 0);
-        $historic = null;
-
-        if ($wanted > 0) {
-            $historic = $this->snapshots->findInventoryByUid($wanted, $instanceId);
-        }
 
         $inventory = $historic !== null
             ? $historic['inventory']

@@ -28,14 +28,16 @@
         </div>
     </f:if>
 
-    <form method="post" class="mb-3">
-        <button type="submit" name="trigger" value="1" class="btn btn-primary">
-            Daten aktualisieren
-        </button>
-        <button type="submit" name="evaluate" value="1" class="btn btn-default">
-            Composer auswerten
-        </button>
-    </form>
+    <f:if condition="!{historic}">
+        <form method="post" class="mb-3">
+            <button type="submit" name="trigger" value="1" class="btn btn-primary">
+                Daten aktualisieren
+            </button>
+            <button type="submit" name="evaluate" value="1" class="btn btn-default">
+                Composer auswerten
+            </button>
+        </form>
+    </f:if>
 
     <f:if condition="{findings} && !{historic}">
         <h2>Befunde</h2>
