@@ -75,15 +75,6 @@
             <trans-unit id="list.group.ungrouped">
                 <source>Without group</source>
             </trans-unit>
-            <trans-unit id="list.findings.security">
-                <source>Security findings</source>
-            </trans-unit>
-            <trans-unit id="list.findings.updateSafe">
-                <source>Updates within the constraint</source>
-            </trans-unit>
-            <trans-unit id="list.findings.updateMajor">
-                <source>Updates that would change the constraint</source>
-            </trans-unit>
             <trans-unit id="list.neverReported">
                 <source>never</source>
             </trans-unit>
@@ -228,9 +219,6 @@
             <trans-unit id="detail.button.refresh">
                 <source>Refresh data</source>
             </trans-unit>
-            <trans-unit id="detail.button.evaluate">
-                <source>Evaluate Composer data</source>
-            </trans-unit>
             <trans-unit id="detail.historic.title">
                 <source>Older state</source>
             </trans-unit>
@@ -242,21 +230,6 @@
             </trans-unit>
             <trans-unit id="detail.findings.heading">
                 <source>Findings</source>
-            </trans-unit>
-            <trans-unit id="detail.findings.count.security">
-                <source>%s security</source>
-            </trans-unit>
-            <trans-unit id="detail.findings.count.updateSafe">
-                <source>%s update available</source>
-            </trans-unit>
-            <trans-unit id="detail.findings.count.updateMajor">
-                <source>%s update blocked</source>
-            </trans-unit>
-            <trans-unit id="detail.findings.count.abandoned">
-                <source>%s not maintained</source>
-            </trans-unit>
-            <trans-unit id="detail.findings.count.unassessable">
-                <source>%s not assessable</source>
             </trans-unit>
             <trans-unit id="detail.findings.acknowledgeSelected">
                 <source>Acknowledge selected</source>
@@ -369,9 +342,6 @@
             <trans-unit id="message.unacknowledged">
                 <source>Acknowledgement withdrawn.</source>
             </trans-unit>
-            <trans-unit id="message.evaluated">
-                <source>Evaluation done: %s new, %s unchanged, %s resolved.</source>
-            </trans-unit>
             <trans-unit id="message.unknownUser">
                 <source>unknown</source>
             </trans-unit>
@@ -395,9 +365,6 @@
             </trans-unit>
             <trans-unit id="finding.type.report">
                 <source>TYPO3 check</source>
-            </trans-unit>
-            <trans-unit id="list.findings.report">
-                <source>Findings from TYPO3's own checks</source>
             </trans-unit>
             <trans-unit id="scheduler.title">
                 <source>Scheduled evaluation</source>
@@ -425,9 +392,6 @@
             </trans-unit>
             <trans-unit id="detail.pending.never">
                 <source>This instance has not been evaluated yet. The scheduler gets to it within a few minutes.</source>
-            </trans-unit>
-            <trans-unit id="detail.findings.count.report">
-                <source>%s from TYPO3's own checks</source>
             </trans-unit>
             <trans-unit id="js.cancel">
                 <source>Cancel</source>

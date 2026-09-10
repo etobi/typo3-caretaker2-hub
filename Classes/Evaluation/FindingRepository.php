@@ -124,26 +124,6 @@ final class FindingRepository
     }
 
     /**
-     * @return array<string, mixed>|null
-     */
-    public function findByUid(int $uid, int $tenant = 1): ?array
-    {
-        $qb = $this->connectionPool->getQueryBuilderForTable(self::TABLE);
-        $row = $qb
-            ->select('*')
-            ->from(self::TABLE)
-            ->where(
-                $qb->expr()->eq('uid', $qb->createNamedParameter($uid, ParameterType::INTEGER)),
-                $qb->expr()->eq('tenant', $qb->createNamedParameter($tenant, ParameterType::INTEGER)),
-            )
-            ->setMaxResults(1)
-            ->executeQuery()
-            ->fetchAssociative();
-
-        return $row === false ? null : $row;
-    }
-
-    /**
      * Most severe first, then by package.
      *
      * @return list<array<string, mixed>>

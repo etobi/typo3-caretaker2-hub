@@ -20,26 +20,6 @@ final class SnapshotRepository
     ) {}
 
     /**
-     * @return array<string, mixed>|null the inventory as the agent sent it
-     */
-    public function findLatestInventory(int $instanceId): ?array
-    {
-        $row = $this->query($instanceId)
-            ->select('payload')
-            ->setMaxResults(1)
-            ->executeQuery()
-            ->fetchAssociative();
-
-        if ($row === false) {
-            return null;
-        }
-
-        $decoded = json_decode((string)$row['payload'], true);
-
-        return is_array($decoded) ? $decoded : null;
-    }
-
-    /**
      * @return array{crdate: int, inventory: array<string, mixed>}|null
      */
     public function findInventoryByUid(int $snapshotUid, int $instanceId): ?array

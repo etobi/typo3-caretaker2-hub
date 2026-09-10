@@ -12,12 +12,10 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
  */
 final class IngestService
 {
-    public const TABLE_SNAPSHOT = 'tx_caretaker2_snapshot';
-
     /**
-     * The hub understands the current schema version and two before it.
+     * The oldest inventory format the hub still understands. Rises only when
+     * a format change cannot be read across any more.
      */
-    public const SCHEMA_VERSION = 1;
     public const SCHEMA_MIN_SUPPORTED = 1;
 
     public function __construct(
@@ -50,8 +48,8 @@ final class IngestService
         $changed = $fingerprint !== $instance->lastFingerprint;
 
         if ($changed) {
-            $this->connectionPool->getConnectionForTable(self::TABLE_SNAPSHOT)->insert(
-                self::TABLE_SNAPSHOT,
+            $this->connectionPool->getConnectionForTable(SnapshotRepository::TABLE)->insert(
+                SnapshotRepository::TABLE,
                 [
                     'pid' => 0,
                     'crdate' => time(),

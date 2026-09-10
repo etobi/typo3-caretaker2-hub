@@ -99,18 +99,6 @@
                 <source>Without group</source>
                 <target>Ohne Gruppe</target>
             </trans-unit>
-            <trans-unit id="list.findings.security" approved="yes">
-                <source>Security findings</source>
-                <target>Sicherheitsbefunde</target>
-            </trans-unit>
-            <trans-unit id="list.findings.updateSafe" approved="yes">
-                <source>Updates within the constraint</source>
-                <target>Updates im Rahmen des Constraints</target>
-            </trans-unit>
-            <trans-unit id="list.findings.updateMajor" approved="yes">
-                <source>Updates that would change the constraint</source>
-                <target>Updates, die den Constraint ändern würden</target>
-            </trans-unit>
             <trans-unit id="list.neverReported" approved="yes">
                 <source>never</source>
                 <target>noch nie</target>
@@ -303,10 +291,6 @@
                 <source>Refresh data</source>
                 <target>Daten aktualisieren</target>
             </trans-unit>
-            <trans-unit id="detail.button.evaluate" approved="yes">
-                <source>Evaluate Composer data</source>
-                <target>Composer auswerten</target>
-            </trans-unit>
             <trans-unit id="detail.historic.title" approved="yes">
                 <source>Older state</source>
                 <target>Älterer Stand</target>
@@ -322,26 +306,6 @@
             <trans-unit id="detail.findings.heading" approved="yes">
                 <source>Findings</source>
                 <target>Befunde</target>
-            </trans-unit>
-            <trans-unit id="detail.findings.count.security" approved="yes">
-                <source>%s security</source>
-                <target>%s Sicherheit</target>
-            </trans-unit>
-            <trans-unit id="detail.findings.count.updateSafe" approved="yes">
-                <source>%s update available</source>
-                <target>%s Update möglich</target>
-            </trans-unit>
-            <trans-unit id="detail.findings.count.updateMajor" approved="yes">
-                <source>%s update blocked</source>
-                <target>%s Update blockiert</target>
-            </trans-unit>
-            <trans-unit id="detail.findings.count.abandoned" approved="yes">
-                <source>%s not maintained</source>
-                <target>%s nicht gepflegt</target>
-            </trans-unit>
-            <trans-unit id="detail.findings.count.unassessable" approved="yes">
-                <source>%s not assessable</source>
-                <target>%s nicht bewertbar</target>
             </trans-unit>
             <trans-unit id="detail.findings.acknowledgeSelected" approved="yes">
                 <source>Acknowledge selected</source>
@@ -491,10 +455,6 @@
                 <source>Acknowledgement withdrawn.</source>
                 <target>Quittierung aufgehoben.</target>
             </trans-unit>
-            <trans-unit id="message.evaluated" approved="yes">
-                <source>Evaluation done: %s new, %s unchanged, %s resolved.</source>
-                <target>Auswertung fertig: %s neu, %s unverändert, %s erledigt.</target>
-            </trans-unit>
             <trans-unit id="message.unknownUser" approved="yes">
                 <source>unknown</source>
                 <target>unbekannt</target>
@@ -526,10 +486,6 @@
             <trans-unit id="finding.type.report" approved="yes">
                 <source>TYPO3 check</source>
                 <target>TYPO3-Prüfung</target>
-            </trans-unit>
-            <trans-unit id="list.findings.report" approved="yes">
-                <source>Findings from TYPO3's own checks</source>
-                <target>Befunde aus TYPO3s eigenen Prüfungen</target>
             </trans-unit>
             <trans-unit id="scheduler.title" approved="yes">
                 <source>Scheduled evaluation</source>
@@ -566,10 +522,6 @@
             <trans-unit id="detail.pending.never" approved="yes">
                 <source>This instance has not been evaluated yet. The scheduler gets to it within a few minutes.</source>
                 <target>Diese Instanz wurde noch nicht ausgewertet. Der Scheduler kommt binnen weniger Minuten dazu.</target>
-            </trans-unit>
-            <trans-unit id="detail.findings.count.report" approved="yes">
-                <source>%s from TYPO3's own checks</source>
-                <target>%s aus TYPO3s Prüfungen</target>
             </trans-unit>
             <trans-unit id="js.cancel" approved="yes">
                 <source>Cancel</source>
