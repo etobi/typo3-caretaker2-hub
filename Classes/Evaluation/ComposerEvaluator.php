@@ -15,6 +15,25 @@ final class ComposerEvaluator
 {
     private const TIMEOUT_SECONDS = 300;
 
+    /**
+     * Repository types that need the instance's file system or a checkout.
+     * Composer repositories and inline package definitions stay.
+     */
+    private const UNRESOLVABLE_REPOSITORY_TYPES = [
+        'path',
+        'artifact',
+        'vcs',
+        'git',
+        'github',
+        'gitlab',
+        'bitbucket',
+        'git-bitbucket',
+        'hg',
+        'fossil',
+        'svn',
+        'perforce',
+    ];
+
     public function __construct(
         private readonly string $composerBinary = 'composer',
     ) {}
@@ -59,10 +78,12 @@ final class ComposerEvaluator
      * it composer would judge against the hub's PHP version and report updates
      * that cannot be installed on the instance at all.
      *
-     * Path repositories are dropped. They point at directories that exist on
-     * the instance and not here, and composer aborts on the first one it
-     * cannot resolve. The packages they provide are reported as unassessable
-     * rather than silently treated as fine.
+     * Path and VCS repositories are dropped. Path repositories point at
+     * directories that exist on the instance and not here, VCS repositories
+     * need a git clone with whatever credentials the instance holds, and
+     * composer aborts on the first one it cannot resolve. The packages they
+     * provide are reported as unassessable rather than silently treated as
+     * fine; composer lists them as up to date with no newer version matched.
      *
      * @param array<string, mixed> $inventory
      * @return array{json: string, removed: list<string>, platform: array<string, string>}
@@ -79,7 +100,7 @@ final class ComposerEvaluator
         if (is_array($repositories)) {
             $wasList = array_is_list($repositories);
             foreach ($repositories as $key => $repository) {
-                if (is_array($repository) && ($repository['type'] ?? '') === 'path') {
+                if (is_array($repository) && in_array($repository['type'] ?? '', self::UNRESOLVABLE_REPOSITORY_TYPES, true)) {
                     $removed[] = (string)($repository['url'] ?? $key);
                     unset($repositories[$key]);
                 }
