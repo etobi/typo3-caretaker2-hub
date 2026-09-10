@@ -264,6 +264,7 @@ final class InstanceListController
 
         $this->pageRenderer->addInlineLanguageLabelFile(self::LANGUAGE_FILE);
         $this->pageRenderer->loadJavaScriptModule('@caretaker2/hub/acknowledge.js');
+        $this->pageRenderer->loadJavaScriptModule('@caretaker2/hub/busy.js');
 
         $view = $this->moduleTemplateFactory->create($request);
         $view->setTitle('Caretaker2', $instance->title);
