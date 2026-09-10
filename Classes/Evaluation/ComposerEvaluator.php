@@ -16,12 +16,15 @@ final class ComposerEvaluator
     private const TIMEOUT_SECONDS = 300;
 
     /**
-     * Repository types that need the instance's file system or a checkout.
-     * Composer repositories and inline package definitions stay.
+     * Repository types that need the instance's file system.
      */
-    private const UNRESOLVABLE_REPOSITORY_TYPES = [
-        'path',
-        'artifact',
+    private const LOCAL_REPOSITORY_TYPES = ['path', 'artifact'];
+
+    /**
+     * Repository types that need a checkout. They stay when their URL is
+     * https, which the hub can clone without the instance's credentials.
+     */
+    private const VCS_REPOSITORY_TYPES = [
         'vcs',
         'git',
         'github',
@@ -78,10 +81,10 @@ final class ComposerEvaluator
      * it composer would judge against the hub's PHP version and report updates
      * that cannot be installed on the instance at all.
      *
-     * Path and VCS repositories are dropped. Path repositories point at
-     * directories that exist on the instance and not here, VCS repositories
-     * need a git clone with whatever credentials the instance holds, and
-     * composer aborts on the first one it cannot resolve. The packages they
+     * Path repositories and VCS repositories without an https URL are
+     * dropped. Path repositories point at directories that exist on the
+     * instance and not here, ssh URLs need the instance's keys, and composer
+     * aborts on the first repository it cannot resolve. The packages they
      * provide are reported as unassessable rather than silently treated as
      * fine; composer lists them as up to date with no newer version matched.
      *
@@ -100,7 +103,7 @@ final class ComposerEvaluator
         if (is_array($repositories)) {
             $wasList = array_is_list($repositories);
             foreach ($repositories as $key => $repository) {
-                if (is_array($repository) && in_array($repository['type'] ?? '', self::UNRESOLVABLE_REPOSITORY_TYPES, true)) {
+                if (is_array($repository) && $this->isUnresolvable($repository)) {
                     $removed[] = (string)($repository['url'] ?? $key);
                     unset($repositories[$key]);
                 }
@@ -120,6 +123,24 @@ final class ComposerEvaluator
             'removed' => $removed,
             'platform' => $platform,
         ];
+    }
+
+    /**
+     * @param array<string, mixed> $repository
+     */
+    private function isUnresolvable(array $repository): bool
+    {
+        $type = $repository['type'] ?? '';
+        if (in_array($type, self::LOCAL_REPOSITORY_TYPES, true)) {
+            return true;
+        }
+        if (in_array($type, self::VCS_REPOSITORY_TYPES, true)) {
+            $url = is_string($repository['url'] ?? null) ? $repository['url'] : '';
+
+            return !str_starts_with(strtolower($url), 'https://');
+        }
+
+        return false;
     }
 
     /**
