@@ -32,28 +32,28 @@ final class ReportFindings implements EvaluatorInterface
 
         $status = (string)($provider['status'] ?? 'unavailable');
         $data = is_array($provider['data'] ?? null) ? $provider['data'] : [];
+        $findings = [];
 
         // No checks, or only some: that is a gap in what we know, and it is
-        // stated rather than passed over in silence.
+        // stated rather than passed over in silence. What did get checked
+        // still counts, so a degraded run keeps its issues below.
         if ($status !== 'ok') {
-            return [new Finding(
+            $findings[] = new Finding(
                 type: Finding::TYPE_UNASSESSABLE,
                 severity: Severity::INFO,
-                identifier: 'reports-' . $status,
+                identifier: 'reports-' . (string)($provider['reason'] ?? $status),
                 package: 'typo3/cms-reports',
                 installedVersion: '',
                 latestVersion: '',
                 title: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.reports.incomplete',
                 link: '',
                 titleArguments: [(string)($provider['message'] ?? $provider['reason'] ?? $status)],
-            )];
-        }
-
-        // "ok" with nothing looked at is not an all-clear, it is an empty
-        // report. Older TYPO3 versions register their checks somewhere the
-        // agent may not reach, and the difference has to stay visible.
-        if ((int)($data['checked'] ?? 0) === 0) {
-            return [new Finding(
+            );
+        } elseif ((int)($data['checked'] ?? 0) === 0) {
+            // "ok" with nothing looked at is not an all-clear, it is an empty
+            // report. Older TYPO3 versions register their checks somewhere the
+            // agent may not reach, and the difference has to stay visible.
+            $findings[] = new Finding(
                 type: Finding::TYPE_UNASSESSABLE,
                 severity: Severity::INFO,
                 identifier: 'reports-none',
@@ -62,10 +62,9 @@ final class ReportFindings implements EvaluatorInterface
                 latestVersion: '',
                 title: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.reports.none',
                 link: '',
-            )];
+            );
         }
 
-        $findings = [];
         foreach ($data['issues'] ?? [] as $issue) {
             if (!is_array($issue)) {
                 continue;
