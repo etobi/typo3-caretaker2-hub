@@ -8,6 +8,7 @@ use Caretaker2\Hub\Backend\FindingPresenter;
 use Caretaker2\Hub\Backend\InstanceListFilter;
 use Caretaker2\Hub\Backend\InstancePresenter;
 use Caretaker2\Hub\Backend\InventoryPresenter;
+use Caretaker2\Hub\Backend\Labels;
 use Caretaker2\Hub\Domain\CleanupService;
 use Caretaker2\Hub\Domain\EnrollmentService;
 use Caretaker2\Hub\Domain\Instance;
@@ -16,6 +17,7 @@ use Caretaker2\Hub\Domain\InstanceState;
 use Caretaker2\Hub\Domain\SnapshotRepository;
 use Caretaker2\Hub\Domain\TriggerClient;
 use Caretaker2\Hub\Evaluation\FindingRepository;
+use Caretaker2\Hub\Http\Origin;
 use Caretaker2\Hub\Scheduler\HubTaskInstaller;
 use Caretaker2\Hub\Scheduler\SchedulerTaskException;
 use Psr\Http\Message\ResponseInterface;
@@ -42,8 +44,6 @@ final class InstanceListController
 {
     private const LANGUAGE_FILE = 'EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf';
 
-    private const LL = 'LLL:' . self::LANGUAGE_FILE . ':';
-
     private const ROUTE = 'caretaker2_instances';
 
     public function __construct(
@@ -63,6 +63,7 @@ final class InstanceListController
         private readonly FindingPresenter $findingPresenter,
         private readonly InventoryPresenter $inventoryPresenter,
         private readonly InstanceListFilter $filter,
+        private readonly Labels $labels,
     ) {}
 
     public function handleRequest(ServerRequestInterface $request): ResponseInterface
@@ -78,7 +79,7 @@ final class InstanceListController
     private function list(ServerRequestInterface $request): ResponseInterface
     {
         $view = $this->moduleTemplateFactory->create($request);
-        $view->setTitle('Caretaker2', $this->ll('list.heading'));
+        $view->setTitle('Caretaker2', $this->labels->get('list.heading'));
 
         [$enrollmentCode, $message, $messageSeverity] = $this->handleListPost($request);
 
@@ -104,7 +105,10 @@ final class InstanceListController
         parse_str($listUri->getQuery(), $listParams);
 
         $view->assignMultiple([
-            'hubUrl' => $this->publicHubUrl($request),
+            // The address the administrator is reaching the hub on: that is
+            // what has to be typed into the agent, and the only value we can
+            // be sure about without configuration.
+            'hubUrl' => Origin::fromRequest($request),
             'groups' => $groups,
             'showGroupHeadings' => count($groups) > 1 || ($groups[0]['uid'] ?? 0) !== 0,
             'summary' => $this->summarize($rows),
@@ -156,8 +160,8 @@ final class InstanceListController
             return [
                 null,
                 $created === 1
-                    ? $this->ll('scheduler.created', $created)
-                    : $this->ll('scheduler.createdMany', $created),
+                    ? $this->labels->get('scheduler.created', $created)
+                    : $this->labels->get('scheduler.createdMany', $created),
                 'success',
             ];
         }
@@ -170,8 +174,8 @@ final class InstanceListController
         $view->addButtonToButtonBar(
             $this->components->createGenericButton()
                 ->setTag('button')
-                ->setLabel($this->ll('list.button.addInstance'))
-                ->setTitle($this->ll('list.button.addInstance'))
+                ->setLabel($this->labels->get('list.button.addInstance'))
+                ->setTitle($this->labels->get('list.button.addInstance'))
                 ->setShowLabelText(true)
                 ->setIcon($this->icons->getIcon('actions-plus', IconSize::SMALL))
                 ->setClasses('btn btn-default')
@@ -190,7 +194,7 @@ final class InstanceListController
                     'edit' => ['tx_caretaker2_group' => [0 => 'new']],
                     'returnUrl' => (string)$this->uriBuilder->buildUriFromRoute(self::ROUTE),
                 ]))
-                ->setTitle($this->ll('list.button.addGroup'))
+                ->setTitle($this->labels->get('list.button.addGroup'))
                 ->setShowLabelText(true)
                 ->setIcon($this->icons->getIcon('actions-plus', IconSize::SMALL))
         );
@@ -250,7 +254,7 @@ final class InstanceListController
         $view->setTitle('Caretaker2', $instance->title);
 
         if (!$readOnly) {
-            $this->addSubmitButton($view, 'caretaker2-actions', 'trigger', $this->ll('detail.button.refresh'), 'actions-refresh');
+            $this->addSubmitButton($view, 'caretaker2-actions', 'trigger', $this->labels->get('detail.button.refresh'), 'actions-refresh');
         }
 
         $view->getDocHeaderComponent()->setBreadcrumbContext(
@@ -323,13 +327,13 @@ final class InstanceListController
             );
 
             if ($count === 0) {
-                return [$this->ll('message.nothingSelected'), 'warning', $instance];
+                return [$this->labels->get('message.nothingSelected'), 'warning', $instance];
             }
 
             return [
                 $count === 1
-                    ? $this->ll('message.acknowledged.one')
-                    : $this->ll('message.acknowledged.many', $count),
+                    ? $this->labels->get('message.acknowledged.one')
+                    : $this->labels->get('message.acknowledged.many', $count),
                 'success',
                 $instance,
             ];
@@ -339,15 +343,15 @@ final class InstanceListController
             $taken = $this->findings->unacknowledge((int)$body['unacknowledge'], $instance->uid, $instance->tenant);
 
             return $taken === 1
-                ? [$this->ll('message.unacknowledged'), 'info', $instance]
-                : [$this->ll('message.unacknowledgeMissed'), 'warning', $instance];
+                ? [$this->labels->get('message.unacknowledged'), 'info', $instance]
+                : [$this->labels->get('message.unacknowledgeMissed'), 'warning', $instance];
         }
 
         if (isset($body['reset'])) {
             $counts = $this->cleanup->resetInstance($instance->uid);
 
             return [
-                $this->ll('message.reset', $counts['snapshots'], $counts['findings']),
+                $this->labels->get('message.reset', $counts['snapshots'], $counts['findings']),
                 'success',
                 $this->reload($instance),
             ];
@@ -369,23 +373,6 @@ final class InstanceListController
     private function reload(Instance $instance): Instance
     {
         return $this->instances->findByUid($instance->uid) ?? $instance;
-    }
-
-    /**
-     * The address the administrator is currently reaching the hub on. That is
-     * what has to be typed into the agent, so it is also the only value we can
-     * be sure about without configuration.
-     */
-    private function publicHubUrl(ServerRequestInterface $request): string
-    {
-        $uri = $request->getUri();
-        $url = $uri->getScheme() . '://' . $uri->getHost();
-
-        if ($uri->getPort() !== null && !in_array($uri->getPort(), [80, 443], true)) {
-            $url .= ':' . $uri->getPort();
-        }
-
-        return $url;
     }
 
     /**
@@ -471,16 +458,6 @@ final class InstanceListController
             return (string)$user->user['username'];
         }
 
-        return (string)($GLOBALS['BE_USER']->user['username'] ?? $this->ll('message.unknownUser'));
-    }
-
-    /**
-     * @param string|int ...$args
-     */
-    private function ll(string $key, ...$args): string
-    {
-        $text = (string)$GLOBALS['LANG']->sL(self::LL . $key);
-
-        return $args === [] ? $text : vsprintf($text, $args);
+        return (string)($GLOBALS['BE_USER']->user['username'] ?? $this->labels->get('message.unknownUser'));
     }
 }

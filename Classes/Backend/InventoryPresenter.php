@@ -10,9 +10,11 @@ namespace Caretaker2\Hub\Backend;
  */
 final class InventoryPresenter
 {
-    private const LL = 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:';
-
     private const MAX_RENDERED_VALUE_BYTES = 8192;
+
+    public function __construct(
+        private readonly Labels $labels,
+    ) {}
 
     /**
      * @param array<string, mixed>|null $inventory
@@ -144,8 +146,8 @@ final class InventoryPresenter
                 $size = strlen((string)json_encode($value));
                 if ($size > self::MAX_RENDERED_VALUE_BYTES) {
                     $omitted[] = ['key' => (string)$key, 'bytes' => $size];
-                    $data[$key] = sprintf(
-                        (string)$GLOBALS['LANG']->sL(self::LL . 'detail.providers.omittedValue'),
+                    $data[$key] = $this->labels->get(
+                        'detail.providers.omittedValue',
                         number_format($size, 0, ',', '.')
                     );
                 }

@@ -13,6 +13,10 @@ final class FindingPresenter
 {
     private const LL = 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:';
 
+    public function __construct(
+        private readonly Labels $labels,
+    ) {}
+
     /**
      * @param list<array<string, mixed>> $rows
      * @return list<array<string, mixed>>
@@ -46,17 +50,13 @@ final class FindingPresenter
             return $title;
         }
 
-        $text = (string)$GLOBALS['LANG']->sL($title);
         $args = $arguments === '' ? [] : json_decode($arguments, true);
-
-        if (!is_array($args) || $args === []) {
-            return $text;
-        }
+        $args = is_array($args) ? array_map('strval', $args) : [];
 
         try {
-            return vsprintf($text, $args);
+            return $this->labels->translate($title, ...$args);
         } catch (\Throwable $e) {
-            return $text;
+            return $this->labels->translate($title);
         }
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Caretaker2\Hub\Controller;
 
 use Caretaker2\Hub\Domain\EnrollmentService;
+use Caretaker2\Hub\Http\Origin;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Attribute\AsController;
@@ -22,15 +23,9 @@ final class EnrollmentAjaxController
 
     public function create(ServerRequestInterface $request): ResponseInterface
     {
-        $uri = $request->getUri();
-        $hubUrl = $uri->getScheme() . '://' . $uri->getHost();
-        if ($uri->getPort() !== null && !in_array($uri->getPort(), [80, 443], true)) {
-            $hubUrl .= ':' . $uri->getPort();
-        }
-
         return new JsonResponse([
             'code' => $this->enrollment->createCode(),
-            'hubUrl' => $hubUrl,
+            'hubUrl' => Origin::fromRequest($request),
             'validMinutes' => 15,
         ]);
     }

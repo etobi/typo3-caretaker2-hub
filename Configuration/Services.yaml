@@ -24,6 +24,7 @@ services:
       - '../Classes/Evaluation/EvaluationException.php'
       - '../Classes/Evaluation/EvaluatorInterface.php'
       - '../Classes/Scheduler/SchedulerTaskException.php'
+      - '../Classes/Http/Origin.php'
 
   cache.caretaker2:
     class: TYPO3\CMS\Core\Cache\Frontend\FrontendInterface
