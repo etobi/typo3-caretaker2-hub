@@ -755,6 +755,14 @@
                 <source>%s acknowledged findings</source>
                 <target>%s quittierte Befunde</target>
             </trans-unit>
+            <trans-unit id="list.findings.pending" approved="yes">
+                <source>evaluation pending</source>
+                <target>Auswertung steht aus</target>
+            </trans-unit>
+            <trans-unit id="list.findings.pendingTitle" approved="yes">
+                <source>New data has arrived that has not been judged yet; the counts are from the last evaluation.</source>
+                <target>Neue Daten sind angekommen und noch nicht bewertet; die Zahlen stammen aus der letzten Auswertung.</target>
+            </trans-unit>
             <trans-unit id="tca.group.title" approved="yes">
                 <source>Caretaker2 group</source>
                 <target>Caretaker2-Gruppe</target>

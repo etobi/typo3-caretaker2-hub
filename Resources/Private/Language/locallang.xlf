@@ -567,6 +567,12 @@
             <trans-unit id="list.findings.acknowledged">
                 <source>%s acknowledged findings</source>
             </trans-unit>
+            <trans-unit id="list.findings.pending">
+                <source>evaluation pending</source>
+            </trans-unit>
+            <trans-unit id="list.findings.pendingTitle">
+                <source>New data has arrived that has not been judged yet; the counts are from the last evaluation.</source>
+            </trans-unit>
             <trans-unit id="tca.group.title">
                 <source>Caretaker2 group</source>
             </trans-unit>

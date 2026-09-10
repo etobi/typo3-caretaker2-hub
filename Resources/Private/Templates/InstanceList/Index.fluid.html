@@ -179,6 +179,10 @@
                                                   title="{f:translate(key: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.findings.acknowledged', arguments: {0: instance.findings.acknowledged})}"
                                                   style="opacity:.6">&#10003; {instance.findings.acknowledged}</span>
                                         </f:if>
+                                        <f:if condition="{instance.evaluationPending}">
+                                            <span class="text-body-secondary"
+                                                  title="{f:translate(key: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.findings.pendingTitle')}"><core:icon identifier="spinner-circle" size="small"/> <f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.findings.pending"/></span>
+                                        </f:if>
                                     </td>
                                     <td class="col-nowrap">
                                         <f:if condition="{instance.lastSeen}">

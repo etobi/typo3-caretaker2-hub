@@ -65,6 +65,9 @@ final class InstancePresenter
             'phpSupport' => $php,
             'findings' => $findingCounts,
             'findingsBySeverity' => $this->severityBadges($findingCounts['severities'] ?? []),
+            // The counts are only as current as the last evaluation; new data
+            // that has not been judged yet says so next to them.
+            'evaluationPending' => $instance->needsEvaluation || $instance->evaluatedAt === 0,
         ];
     }
 
