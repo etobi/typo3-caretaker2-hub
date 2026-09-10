@@ -675,6 +675,30 @@
             <trans-unit id="finding.title.domainContested">
                 <source>This domain is also claimed by %s.</source>
             </trans-unit>
+            <trans-unit id="finding.type.scheduler_stale">
+                <source>Scheduler not running</source>
+            </trans-unit>
+            <trans-unit id="finding.type.scheduler_task_failed">
+                <source>Task failed</source>
+            </trans-unit>
+            <trans-unit id="finding.type.scheduler_task_overdue">
+                <source>Task overdue</source>
+            </trans-unit>
+            <trans-unit id="finding.title.scheduler.incomplete">
+                <source>The scheduler could not be looked at: %s</source>
+            </trans-unit>
+            <trans-unit id="finding.title.scheduler.neverRan">
+                <source>The scheduler has never run, so none of its %s enabled tasks has run either. The cron job is missing.</source>
+            </trans-unit>
+            <trans-unit id="finding.title.scheduler.stale">
+                <source>The scheduler last ran on %s. Since then no scheduled task has run — the cron job has probably stopped.</source>
+            </trans-unit>
+            <trans-unit id="finding.title.scheduler.taskFailed">
+                <source>The task "%s" failed the last time it ran: %s</source>
+            </trans-unit>
+            <trans-unit id="finding.title.scheduler.taskOverdue">
+                <source>The task "%s" was due on %s and has not run since, although the scheduler itself is running.</source>
+            </trans-unit>
             <trans-unit id="tca.instance.tab.trigger">
                 <source>Trigger</source>
             </trans-unit>

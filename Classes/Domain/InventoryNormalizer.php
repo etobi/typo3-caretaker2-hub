@@ -35,6 +35,7 @@ final class InventoryNormalizer
             'php.extensions.ext-litespeed',
         ],
         'reports' => ['*'],
+        'scheduler' => ['runs'],
     ];
 
     /**

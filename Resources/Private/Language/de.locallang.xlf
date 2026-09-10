@@ -899,6 +899,38 @@
                 <source>This domain is also claimed by %s.</source>
                 <target>Diese Domain beansprucht auch %s.</target>
             </trans-unit>
+            <trans-unit id="finding.type.scheduler_stale" approved="yes">
+                <source>Scheduler not running</source>
+                <target>Scheduler läuft nicht</target>
+            </trans-unit>
+            <trans-unit id="finding.type.scheduler_task_failed" approved="yes">
+                <source>Task failed</source>
+                <target>Task fehlgeschlagen</target>
+            </trans-unit>
+            <trans-unit id="finding.type.scheduler_task_overdue" approved="yes">
+                <source>Task overdue</source>
+                <target>Task überfällig</target>
+            </trans-unit>
+            <trans-unit id="finding.title.scheduler.incomplete" approved="yes">
+                <source>The scheduler could not be looked at: %s</source>
+                <target>Der Scheduler konnte nicht geprüft werden: %s</target>
+            </trans-unit>
+            <trans-unit id="finding.title.scheduler.neverRan" approved="yes">
+                <source>The scheduler has never run, so none of its %s enabled tasks has run either. The cron job is missing.</source>
+                <target>Der Scheduler ist noch nie gelaufen, also auch keiner seiner %s aktiven Tasks. Der Cronjob fehlt.</target>
+            </trans-unit>
+            <trans-unit id="finding.title.scheduler.stale" approved="yes">
+                <source>The scheduler last ran on %s. Since then no scheduled task has run — the cron job has probably stopped.</source>
+                <target>Der Scheduler ist zuletzt am %s gelaufen. Seitdem ist kein geplanter Task mehr gelaufen — der Cronjob ist vermutlich stehengeblieben.</target>
+            </trans-unit>
+            <trans-unit id="finding.title.scheduler.taskFailed" approved="yes">
+                <source>The task "%s" failed the last time it ran: %s</source>
+                <target>Der Task "%s" ist beim letzten Lauf fehlgeschlagen: %s</target>
+            </trans-unit>
+            <trans-unit id="finding.title.scheduler.taskOverdue" approved="yes">
+                <source>The task "%s" was due on %s and has not run since, although the scheduler itself is running.</source>
+                <target>Der Task "%s" war am %s fällig und ist seitdem nicht gelaufen, obwohl der Scheduler selbst läuft.</target>
+            </trans-unit>
             <trans-unit id="tca.instance.tab.trigger" approved="yes">
                 <source>Trigger</source>
                 <target>Trigger</target>

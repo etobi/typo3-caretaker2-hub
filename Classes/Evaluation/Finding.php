@@ -21,6 +21,9 @@ final readonly class Finding
     public const TYPE_PHP_EOL = 'php_eol';
     public const TYPE_REPORT = 'report';
     public const TYPE_DOMAIN_CONTESTED = 'domain_contested';
+    public const TYPE_SCHEDULER_STALE = 'scheduler_stale';
+    public const TYPE_SCHEDULER_TASK_FAILED = 'scheduler_task_failed';
+    public const TYPE_SCHEDULER_TASK_OVERDUE = 'scheduler_task_overdue';
 
     public function __construct(
         public string $type,
