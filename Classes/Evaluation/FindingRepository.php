@@ -32,9 +32,19 @@ final class FindingRepository
 
         $added = 0;
         $kept = 0;
+        $written = [];
 
         foreach ($findings as $finding) {
             $key = $finding->type . "\0" . $finding->identifier;
+
+            // Type and identifier are unique per instance. An evaluator that
+            // hands in the same identity twice must not take the whole run
+            // down with it; the first finding stands.
+            if (isset($written[$key])) {
+                continue;
+            }
+            $written[$key] = true;
+
             $row = $finding->toRow();
             $row['last_seen'] = $now;
             $row['tstamp'] = $now;

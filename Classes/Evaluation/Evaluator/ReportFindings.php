@@ -65,6 +65,8 @@ final class ReportFindings implements EvaluatorInterface
             );
         }
 
+        $seen = [];
+
         foreach ($data['issues'] ?? [] as $issue) {
             if (!is_array($issue)) {
                 continue;
@@ -84,10 +86,23 @@ final class ReportFindings implements EvaluatorInterface
                 continue;
             }
 
+            // Group and title make the identity, so a finding keeps its
+            // acknowledgement while the message changes. Two checks under the
+            // same title still need two rows: the second one takes its value
+            // and message into the identity as well.
+            $identifier = $this->identifier($group . "\0" . $distinct);
+            if (isset($seen[$identifier])) {
+                $identifier = $this->identifier($group . "\0" . $distinct . "\0" . ($issue['value'] ?? '') . "\0" . $message);
+            }
+            if (isset($seen[$identifier])) {
+                continue;
+            }
+            $seen[$identifier] = true;
+
             $findings[] = new Finding(
                 type: Finding::TYPE_REPORT,
                 severity: $severity,
-                identifier: 'report-' . substr(hash('sha256', $group . "\0" . $distinct), 0, 24),
+                identifier: $identifier,
                 package: $group,
                 installedVersion: (string)($issue['value'] ?? ''),
                 latestVersion: '',
@@ -97,6 +112,11 @@ final class ReportFindings implements EvaluatorInterface
         }
 
         return $findings;
+    }
+
+    private function identifier(string $identity): string
+    {
+        return 'report-' . substr(hash('sha256', $identity), 0, 24);
     }
 
     /**
