@@ -12,6 +12,8 @@ final readonly class EvaluationResult
      * @param list<array<string, mixed>> $packages
      * @param list<string> $unresolvableRepositories
      * @param array<string, string> $platform
+     * @param array<string, string> $lockedVersions installed versions by package name, from the lock file
+     * @param string|null $updateCheckError why "composer outdated" contributed nothing, if it broke off
      */
     public function __construct(
         public array $advisories,
@@ -19,5 +21,7 @@ final readonly class EvaluationResult
         public array $packages,
         public array $unresolvableRepositories,
         public array $platform,
+        public array $lockedVersions = [],
+        public ?string $updateCheckError = null,
     ) {}
 }

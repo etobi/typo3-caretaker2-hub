@@ -62,8 +62,18 @@ final class ComposerEvaluator
         );
         file_put_contents($workspace . '/composer.json', $stripped['json']);
 
+        // The audit reads only the lock file and needs no repository. It is
+        // kept even when the update check below breaks off, so an
+        // unreachable repository never hides a security advisory.
         $audit = $this->run(['audit', '--locked', '--format=json'], $workspace, $home);
-        $outdated = $this->run(['outdated', '--locked', '--direct', '--format=json'], $workspace, $home);
+
+        $outdated = [];
+        $updateCheckError = null;
+        try {
+            $outdated = $this->run(['outdated', '--locked', '--direct', '--format=json'], $workspace, $home);
+        } catch (EvaluationException $e) {
+            $updateCheckError = $e->getMessage();
+        }
 
         return new EvaluationResult(
             advisories: $audit['advisories'] ?? [],
@@ -71,11 +81,38 @@ final class ComposerEvaluator
             packages: $outdated['locked'] ?? [],
             unresolvableRepositories: $stripped['removed'],
             platform: $stripped['platform'],
+            lockedVersions: $this->lockedVersions($composer['lock']),
+            updateCheckError: $updateCheckError,
         );
     }
 
     /**
-     * Two changes to the manifest before composer sees it.
+     * Installed versions straight from the lock file, for findings that
+     * have to name a version when the update check contributed nothing.
+     *
+     * @return array<string, string>
+     */
+    private function lockedVersions(string $lock): array
+    {
+        $decoded = json_decode($lock, true);
+        if (!is_array($decoded)) {
+            return [];
+        }
+
+        $versions = [];
+        foreach (['packages', 'packages-dev'] as $section) {
+            foreach (($decoded[$section] ?? []) as $package) {
+                if (is_array($package) && is_string($package['name'] ?? null) && is_string($package['version'] ?? null)) {
+                    $versions[$package['name']] = $package['version'];
+                }
+            }
+        }
+
+        return $versions;
+    }
+
+    /**
+     * Three changes to the manifest before composer sees it.
      *
      * config.platform is filled from what the instance actually runs. Without
      * it composer would judge against the hub's PHP version and report updates
@@ -241,11 +278,14 @@ final class ComposerEvaluator
         $decoded = json_decode($output, true);
 
         if (!is_array($decoded)) {
+            // Composer boxes its errors with padding and line breaks; a
+            // finding title wants one line.
+            $error = trim((string)preg_replace('/\s+/', ' ', $process->getErrorOutput() ?: $output));
             throw new EvaluationException(sprintf(
                 'composer %s returned no JSON (exit code %d): %s',
                 $arguments[0],
                 (int)$process->getExitCode(),
-                substr($process->getErrorOutput() ?: $output, 0, 400)
+                substr($error, 0, 400)
             ));
         }
 

@@ -501,6 +501,9 @@
             <trans-unit id="finding.title.evaluatorFailed">
                 <source>The "%s" evaluation broke off and contributed nothing: %s</source>
             </trans-unit>
+            <trans-unit id="finding.title.updateCheckFailed">
+                <source>The check for available updates broke off, security advisories were still assessed: %s</source>
+            </trans-unit>
             <trans-unit id="detail.reset.button">
                 <source>Reset collected data</source>
             </trans-unit>

@@ -136,6 +136,20 @@ final class FindingFactory
             );
         }
 
+        if ($result->updateCheckError !== null) {
+            $findings[] = new Finding(
+                type: Finding::TYPE_UNASSESSABLE,
+                severity: Severity::INFO,
+                identifier: 'composer-outdated',
+                package: '',
+                installedVersion: '',
+                latestVersion: '',
+                title: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.updateCheckFailed',
+                link: '',
+                titleArguments: [$result->updateCheckError],
+            );
+        }
+
         return $findings;
     }
 
@@ -144,7 +158,7 @@ final class FindingFactory
      */
     private function installedVersions(EvaluationResult $result): array
     {
-        $versions = [];
+        $versions = $result->lockedVersions;
         foreach ($result->packages as $package) {
             if (is_string($package['name'] ?? null)) {
                 $versions[$package['name']] = (string)($package['version'] ?? '');

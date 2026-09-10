@@ -667,6 +667,10 @@
                 <source>The "%s" evaluation broke off and contributed nothing: %s</source>
                 <target>Die Auswertung "%s" ist abgebrochen und hat nichts beigetragen: %s</target>
             </trans-unit>
+            <trans-unit id="finding.title.updateCheckFailed" approved="yes">
+                <source>The check for available updates broke off, security advisories were still assessed: %s</source>
+                <target>Die Prüfung auf verfügbare Updates ist abgebrochen, Sicherheitshinweise wurden trotzdem bewertet: %s</target>
+            </trans-unit>
             <trans-unit id="detail.reset.button" approved="yes">
                 <source>Reset collected data</source>
                 <target>Erfasste Daten zurücksetzen</target>
