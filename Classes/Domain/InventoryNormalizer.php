@@ -10,29 +10,31 @@ namespace Caretaker2\Hub\Domain;
  * hub-triggered pull under FPM, and they disagree about all of these. Left
  * in, every alternation between the two would look like a change.
  *
+ * Which values those are, each provider says itself in its "volatile" list.
+ * Agents from before that field get the list the hub keeps for them.
+ *
  * The data still reaches the hub and is shown. It just does not decide
  * whether a snapshot is stored, and it does not show up when two snapshots
  * are compared.
  */
 final class InventoryNormalizer
 {
-    private const VOLATILE_PATHS = [
-        ['generatedAt'],
-        ['providers', 'platform', 'data', 'php', 'sapi'],
-        ['providers', 'platform', 'data', 'php', 'settings'],
-        // TYPO3's own checks judge the runtime they happen to run in, so a
-        // scheduler push and a hub-triggered pull disagree about two of them.
-        // They describe the current state, not a change to the installation,
-        // and are always available in full from last_inventory.
-        ['providers', 'reports'],
-    ];
-
-    private const SAPI_BOUND_EXTENSIONS = [
-        'ext-pcntl',
-        'ext-posix',
-        'ext-readline',
-        'ext-cgi-fcgi',
-        'ext-litespeed',
+    /**
+     * Per provider key, dotted paths under its data; "*" for the whole
+     * provider. Mirrors what the agent's providers declare today.
+     */
+    private const VOLATILE_BY_DEFAULT = [
+        'platform' => [
+            'php.sapi',
+            'php.settings',
+            'php.extensions.ext-pcntl',
+            'php.extensions.ext-posix',
+            'php.extensions.ext-readline',
+            'php.extensions.ext-cgi-fcgi',
+            'php.extensions.ext-apache2handler',
+            'php.extensions.ext-litespeed',
+        ],
+        'reports' => ['*'],
     ];
 
     /**
@@ -49,17 +51,38 @@ final class InventoryNormalizer
      */
     public function normalize(array $inventory): array
     {
-        foreach (self::VOLATILE_PATHS as $path) {
-            $inventory = $this->forget($inventory, $path);
+        unset($inventory['generatedAt']);
+
+        $providers = $inventory['providers'] ?? null;
+        if (!is_array($providers)) {
+            return $inventory;
         }
 
-        $extensions = &$inventory['providers']['platform']['data']['php']['extensions'];
-        if (is_array($extensions)) {
-            foreach (self::SAPI_BOUND_EXTENSIONS as $name) {
-                unset($extensions[$name]);
+        foreach ($providers as $key => $provider) {
+            if (!is_array($provider)) {
+                continue;
+            }
+
+            $paths = is_array($provider['volatile'] ?? null)
+                ? $provider['volatile']
+                : (self::VOLATILE_BY_DEFAULT[$key] ?? []);
+
+            if (in_array('*', $paths, true)) {
+                unset($providers[$key]);
+                continue;
+            }
+
+            // The declaration itself is not a property of the instance.
+            unset($providers[$key]['volatile']);
+
+            foreach ($paths as $path) {
+                if (is_array($providers[$key]['data'] ?? null)) {
+                    $providers[$key]['data'] = $this->forget($providers[$key]['data'], explode('.', (string)$path));
+                }
             }
         }
-        unset($extensions);
+
+        $inventory['providers'] = $providers;
 
         return $inventory;
     }
