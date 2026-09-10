@@ -121,7 +121,7 @@
                 <source>latest</source>
             </trans-unit>
             <trans-unit id="typo3.status.oldstable">
-                <source>maintained</source>
+                <source>old stable</source>
             </trans-unit>
             <trans-unit id="typo3.status.elts">
                 <source>ELTS</source>

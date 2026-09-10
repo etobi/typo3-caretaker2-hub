@@ -160,8 +160,8 @@
                 <target>aktuell</target>
             </trans-unit>
             <trans-unit id="typo3.status.oldstable" approved="yes">
-                <source>maintained</source>
-                <target>gepflegt</target>
+                <source>old stable</source>
+                <target>old stable</target>
             </trans-unit>
             <trans-unit id="typo3.status.elts" approved="yes">
                 <source>ELTS</source>
