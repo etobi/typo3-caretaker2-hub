@@ -16,7 +16,11 @@
     },
     "extra": {
         "typo3/cms": {
-            "extension-key": "caretaker2_hub"
+            "extension-key": "caretaker2_hub",
+            "version": "0.2.0",
+            "Package": {
+                "providesPackages": {}
+            }
         }
     }
 }
