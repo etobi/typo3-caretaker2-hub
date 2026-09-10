@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Caretaker2\Hub\Domain;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 
@@ -50,6 +51,37 @@ final class InstanceRepository
             ->fetchAssociative();
 
         return $row === false ? null : Instance::fromRow($row);
+    }
+
+    /**
+     * The other instances that name at least one of these hosts as theirs.
+     *
+     * @param list<string> $hosts
+     * @return list<Instance>
+     */
+    public function findClaiming(array $hosts, int $exceptUid, int $tenant = 1): array
+    {
+        return array_values(array_filter(
+            $this->findAll($tenant),
+            static fn(Instance $instance): bool => $instance->uid !== $exceptUid
+                && array_intersect($instance->siteHosts, $hosts) !== []
+        ));
+    }
+
+    /**
+     * @param list<int> $uids
+     */
+    public function markForEvaluation(array $uids): void
+    {
+        if ($uids === []) {
+            return;
+        }
+
+        $qb = $this->connectionPool->getQueryBuilderForTable(self::TABLE);
+        $qb->update(self::TABLE)
+            ->set('needs_evaluation', 1)
+            ->where($qb->expr()->in('uid', $qb->createNamedParameter($uids, ArrayParameterType::INTEGER)))
+            ->executeStatement();
     }
 
     public function findByUid(int $uid, int $tenant = 1): ?Instance

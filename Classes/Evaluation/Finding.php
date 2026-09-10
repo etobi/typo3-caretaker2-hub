@@ -20,6 +20,7 @@ final readonly class Finding
     public const TYPE_PHP_SECURITY_ONLY = 'php_security_only';
     public const TYPE_PHP_EOL = 'php_eol';
     public const TYPE_REPORT = 'report';
+    public const TYPE_DOMAIN_CONTESTED = 'domain_contested';
 
     public function __construct(
         public string $type,

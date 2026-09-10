@@ -50,6 +50,8 @@ final class IngestService
             $this->snapshots->add($instance, $fingerprint, $inventory);
         }
 
+        $sites = $this->summaryFromSites($providers['sites'] ?? null);
+
         $this->instances->update($instance->uid, array_merge(
             [
                 'last_seen' => time(),
@@ -62,10 +64,36 @@ final class IngestService
             ],
             $this->summaryFromCore($providers['core'] ?? null),
             $this->summaryFromPlatform($providers['platform'] ?? null),
-            $this->summaryFromSites($providers['sites'] ?? null),
+            $sites,
         ));
 
+        $this->reevaluateOtherClaimants($instance, $sites['site_hosts']);
+
         return ['stored' => $changed, 'fingerprint' => $fingerprint];
+    }
+
+    /**
+     * A domain claimed by two instances is a finding on both. The other
+     * side would only notice at its next scheduled evaluation, so it is
+     * queued right away whenever this instance's domains change, including
+     * the instances that shared a host it just gave up.
+     */
+    private function reevaluateOtherClaimants(Instance $instance, string $hostsNow): void
+    {
+        $hostsNow = array_values(array_filter(explode("\n", $hostsNow)));
+        if ($hostsNow === $instance->siteHosts) {
+            return;
+        }
+
+        $affected = $this->instances->findClaiming(
+            array_values(array_unique(array_merge($hostsNow, $instance->siteHosts))),
+            $instance->uid,
+            $instance->tenant
+        );
+
+        $this->instances->markForEvaluation(
+            array_map(static fn(Instance $other): int => $other->uid, $affected)
+        );
     }
 
     /**

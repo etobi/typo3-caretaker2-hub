@@ -663,6 +663,12 @@
             <trans-unit id="diff.none">
                 <source>Nothing changed, apart from the values that only depend on the collecting runtime.</source>
             </trans-unit>
+            <trans-unit id="finding.type.domain_contested">
+                <source>Domain claimed twice</source>
+            </trans-unit>
+            <trans-unit id="finding.title.domainContested">
+                <source>This domain is also claimed by %s.</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>

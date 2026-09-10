@@ -219,6 +219,7 @@ final class FindingRepository
         return [
             'security' => 0, 'securityHigh' => 0, 'typo3Unsupported' => 0, 'phpUnsupported' => 0,
             'update_safe' => 0, 'update_major' => 0, 'abandoned' => 0, 'unassessable' => 0, 'report' => 0,
+            'domain_contested' => 0,
             'severities' => $severities, 'total' => 0, 'acknowledged' => 0,
         ];
     }
