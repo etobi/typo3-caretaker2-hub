@@ -27,6 +27,7 @@ final readonly class Finding
     public const TYPE_DATABASE_CHARSET = 'database_charset';
     public const TYPE_DATABASE_ENGINE = 'database_engine';
     public const TYPE_DATABASE_HOUSEKEEPING = 'database_housekeeping';
+    public const TYPE_AGENT_OUTDATED = 'agent_outdated';
 
     public function __construct(
         public string $type,

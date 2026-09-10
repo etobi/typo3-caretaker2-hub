@@ -726,6 +726,12 @@
             <trans-unit id="finding.title.database.housekeeping">
                 <source>The table %s holds about %s rows in %s. TYPO3 can clean it up on a schedule.</source>
             </trans-unit>
+            <trans-unit id="finding.type.agent_outdated">
+                <source>Agent outdated</source>
+            </trans-unit>
+            <trans-unit id="finding.title.agent.outdated">
+                <source>The agent on this instance is version %s, the hub is %s. An older agent does not collect everything this hub judges, so its findings are incomplete. Update the agent.</source>
+            </trans-unit>
             <trans-unit id="tca.instance.tab.trigger">
                 <source>Trigger</source>
             </trans-unit>
