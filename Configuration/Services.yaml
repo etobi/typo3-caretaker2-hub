@@ -18,6 +18,8 @@ services:
       - '../Classes/Domain/EnrollmentException.php'
       - '../Classes/Domain/IngestException.php'
       - '../Classes/Domain/TriggerException.php'
+      - '../Classes/Domain/ChangeKind.php'
+      - '../Classes/Domain/InventoryChange.php'
       - '../Classes/Domain/TokenGenerator.php'
       - '../Classes/Evaluation/Finding.php'
       - '../Classes/Evaluation/Severity.php'

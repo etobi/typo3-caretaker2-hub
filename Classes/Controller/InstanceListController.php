@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Caretaker2\Hub\Controller;
 
+use Caretaker2\Hub\Backend\DiffPresenter;
 use Caretaker2\Hub\Backend\FindingPresenter;
 use Caretaker2\Hub\Backend\InstanceListFilter;
 use Caretaker2\Hub\Backend\InstancePresenter;
@@ -14,6 +15,8 @@ use Caretaker2\Hub\Domain\EnrollmentService;
 use Caretaker2\Hub\Domain\Instance;
 use Caretaker2\Hub\Domain\InstanceRepository;
 use Caretaker2\Hub\Domain\InstanceState;
+use Caretaker2\Hub\Domain\InventoryDiff;
+use Caretaker2\Hub\Domain\InventoryNormalizer;
 use Caretaker2\Hub\Domain\SnapshotRepository;
 use Caretaker2\Hub\Domain\TriggerClient;
 use Caretaker2\Hub\Domain\TriggerException;
@@ -65,11 +68,21 @@ final class InstanceListController
         private readonly InventoryPresenter $inventoryPresenter,
         private readonly InstanceListFilter $filter,
         private readonly Labels $labels,
+        private readonly InventoryNormalizer $normalizer,
+        private readonly InventoryDiff $diff,
+        private readonly DiffPresenter $diffPresenter,
     ) {}
 
     public function handleRequest(ServerRequestInterface $request): ResponseInterface
     {
-        $instanceId = (int)($request->getQueryParams()['instance'] ?? 0);
+        $query = $request->getQueryParams();
+        $instanceId = (int)($query['instance'] ?? 0);
+        $newerSnapshot = (int)($query['diff'] ?? 0);
+
+        if ($instanceId > 0 && $newerSnapshot > 0) {
+            return $this->diff($request, $instanceId, $newerSnapshot, (int)($query['against'] ?? 0));
+        }
+
         if ($instanceId > 0) {
             return $this->detail($request, $instanceId);
         }
@@ -311,6 +324,97 @@ final class InstanceListController
     }
 
     /**
+     * What changed between two snapshots. Without an explicit older one, the
+     * snapshot right before the newer one is taken: "what changed here".
+     */
+    private function diff(ServerRequestInterface $request, int $instanceId, int $newerUid, int $olderUid): ResponseInterface
+    {
+        $instance = $this->instances->findByUid($instanceId);
+        $history = $this->snapshots->findHistory($instanceId);
+        if ($olderUid === 0) {
+            $olderUid = $this->predecessorOf($newerUid, $history);
+        }
+
+        $newer = $this->snapshots->findInventoryByUid($newerUid, $instanceId);
+        $older = $olderUid > 0 ? $this->snapshots->findInventoryByUid($olderUid, $instanceId) : null;
+
+        if ($instance === null || $newer === null || $older === null) {
+            return new RedirectResponse((string)$this->uriBuilder->buildUriFromRoute(
+                self::ROUTE,
+                $instance === null ? [] : ['instance' => $instanceId]
+            ));
+        }
+
+        // Compared as the fingerprint sees them: the values that only depend
+        // on the collecting runtime would otherwise show up as changes.
+        $changes = $this->diff->between(
+            $this->normalizer->normalize($older['inventory']),
+            $this->normalizer->normalize($newer['inventory'])
+        );
+
+        $detailUri = (string)$this->uriBuilder->buildUriFromRoute(self::ROUTE, ['instance' => $instanceId]);
+
+        $view = $this->moduleTemplateFactory->create($request);
+        $view->setTitle('Caretaker2', $instance->title . ' · ' . $this->labels->get('diff.heading'));
+        $view->addButtonToButtonBar(
+            $this->components->createLinkButton()
+                ->setHref($detailUri)
+                ->setTitle($this->labels->get('diff.back'))
+                ->setShowLabelText(true)
+                ->setIcon($this->icons->getIcon('actions-view-go-back', IconSize::SMALL))
+        );
+        $view->getDocHeaderComponent()->setBreadcrumbContext(new BreadcrumbContext(null, [
+            new BreadcrumbNode(
+                identifier: 'caretaker2-instance-' . $instance->uid,
+                label: $instance->title,
+                icon: 'caretaker2-module',
+                url: $detailUri,
+            ),
+            new BreadcrumbNode(
+                identifier: 'caretaker2-diff',
+                label: $this->labels->get('diff.heading'),
+                icon: 'actions-history',
+            ),
+        ]));
+
+        // The same token trick as the list filter: a GET form replaces the
+        // query string, so the token rides along as a hidden field.
+        $formUri = new Uri((string)$this->uriBuilder->buildUriFromRoute(self::ROUTE));
+        parse_str($formUri->getQuery(), $formParams);
+        $formParams['instance'] = $instanceId;
+
+        $view->assignMultiple([
+            'olderAt' => $older['crdate'],
+            'newerAt' => $newer['crdate'],
+            'olderUid' => $olderUid,
+            'newerUid' => $newerUid,
+            'history' => $history,
+            'groups' => $this->diffPresenter->present($changes),
+            'count' => count($changes),
+            'formUri' => $formUri->withQuery(''),
+            'formParams' => $formParams,
+            'dateTimeFormat' => $this->dateTimeFormat(),
+        ]);
+
+        return $view->renderResponse('InstanceList/Diff');
+    }
+
+    /**
+     * @param list<array{uid: int, crdate: int, fingerprint: string}> $history newest first
+     * @return int 0 when there is none
+     */
+    private function predecessorOf(int $uid, array $history): int
+    {
+        foreach ($history as $index => $entry) {
+            if ($entry['uid'] === $uid) {
+                return $history[$index + 1]['uid'] ?? 0;
+            }
+        }
+
+        return 0;
+    }
+
+    /**
      * @return array{0: string|null, 1: string, 2: Instance} message, severity, and the instance as it is afterwards
      */
     private function handleDetailPost(ServerRequestInterface $request, Instance $instance): array
@@ -447,7 +551,9 @@ final class InstanceListController
     {
         $latest = $history[0]['uid'] ?? 0;
 
-        return array_map(function (array $entry) use ($instanceId, $current, $latest): array {
+        return array_map(function (array $entry) use ($instanceId, $current, $latest, $history): array {
+            $predecessor = $this->predecessorOf($entry['uid'], $history);
+
             return [
                 'uid' => $entry['uid'],
                 'crdate' => $entry['crdate'],
@@ -457,6 +563,11 @@ final class InstanceListController
                 'uri' => (string)$this->uriBuilder->buildUriFromRoute(
                     self::ROUTE,
                     ['instance' => $instanceId, 'snapshot' => $entry['uid']]
+                ),
+                // What changed with this snapshot: the oldest one has nothing to compare with.
+                'diffUri' => $predecessor === 0 ? null : (string)$this->uriBuilder->buildUriFromRoute(
+                    self::ROUTE,
+                    ['instance' => $instanceId, 'diff' => $entry['uid'], 'against' => $predecessor]
                 ),
             ];
         }, $history);

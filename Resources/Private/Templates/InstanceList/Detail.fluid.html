@@ -251,7 +251,7 @@
                     <summary><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.history.summary" arguments="{0: '{history -> f:count()}'}"/></summary>
                     <div class="table-fit mt-2">
                     <table class="table table-striped">
-                        <thead><tr><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.history.time"/></th><th></th><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.history.fingerprint"/></th></tr></thead>
+                        <thead><tr><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.history.time"/></th><th></th><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.history.fingerprint"/></th><th></th></tr></thead>
                         <tbody>
                             <f:for each="{history}" as="entry">
                                 <tr>
@@ -269,6 +269,11 @@
                                         </f:if>
                                     </td>
                                     <td><code class="text-body-secondary">{entry.fingerprint -> f:format.crop(maxCharacters: 16, append: '…')}</code></td>
+                                    <td class="col-nowrap">
+                                        <f:if condition="{entry.diffUri}">
+                                            <a href="{entry.diffUri}" class="btn btn-default btn-sm"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.history.changes"/></a>
+                                        </f:if>
+                                    </td>
                                 </tr>
                             </f:for>
                         </tbody>

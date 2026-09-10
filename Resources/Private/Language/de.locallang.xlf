@@ -819,6 +819,70 @@
                 <source>Reported</source>
                 <target>Gemeldet</target>
             </trans-unit>
+            <trans-unit id="detail.history.changes" approved="yes">
+                <source>What changed</source>
+                <target>Was sich geändert hat</target>
+            </trans-unit>
+            <trans-unit id="diff.heading" approved="yes">
+                <source>Changes</source>
+                <target>Änderungen</target>
+            </trans-unit>
+            <trans-unit id="diff.between" approved="yes">
+                <source>Between %s and %s.</source>
+                <target>Zwischen %s und %s.</target>
+            </trans-unit>
+            <trans-unit id="diff.count" approved="yes">
+                <source>%s changes</source>
+                <target>%s Änderungen</target>
+            </trans-unit>
+            <trans-unit id="diff.older" approved="yes">
+                <source>Older snapshot</source>
+                <target>Älterer Stand</target>
+            </trans-unit>
+            <trans-unit id="diff.newer" approved="yes">
+                <source>Newer snapshot</source>
+                <target>Neuerer Stand</target>
+            </trans-unit>
+            <trans-unit id="diff.compare" approved="yes">
+                <source>Compare</source>
+                <target>Vergleichen</target>
+            </trans-unit>
+            <trans-unit id="diff.back" approved="yes">
+                <source>Back to the instance</source>
+                <target>Zurück zur Instanz</target>
+            </trans-unit>
+            <trans-unit id="diff.column.path" approved="yes">
+                <source>Value</source>
+                <target>Wert</target>
+            </trans-unit>
+            <trans-unit id="diff.column.before" approved="yes">
+                <source>Before</source>
+                <target>Vorher</target>
+            </trans-unit>
+            <trans-unit id="diff.column.after" approved="yes">
+                <source>After</source>
+                <target>Nachher</target>
+            </trans-unit>
+            <trans-unit id="diff.kind.added" approved="yes">
+                <source>added</source>
+                <target>neu</target>
+            </trans-unit>
+            <trans-unit id="diff.kind.removed" approved="yes">
+                <source>removed</source>
+                <target>entfernt</target>
+            </trans-unit>
+            <trans-unit id="diff.kind.changed" approved="yes">
+                <source>changed</source>
+                <target>geändert</target>
+            </trans-unit>
+            <trans-unit id="diff.outsideProviders" approved="yes">
+                <source>Outside the providers</source>
+                <target>Außerhalb der Provider</target>
+            </trans-unit>
+            <trans-unit id="diff.none" approved="yes">
+                <source>Nothing changed, apart from the values that only depend on the collecting runtime.</source>
+                <target>Nichts geändert, abgesehen von den Werten, die nur von der sammelnden Laufzeit abhängen.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

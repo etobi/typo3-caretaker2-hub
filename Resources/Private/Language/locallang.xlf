@@ -615,6 +615,54 @@
             <trans-unit id="tca.instance.tab.reported">
                 <source>Reported</source>
             </trans-unit>
+            <trans-unit id="detail.history.changes">
+                <source>What changed</source>
+            </trans-unit>
+            <trans-unit id="diff.heading">
+                <source>Changes</source>
+            </trans-unit>
+            <trans-unit id="diff.between">
+                <source>Between %s and %s.</source>
+            </trans-unit>
+            <trans-unit id="diff.count">
+                <source>%s changes</source>
+            </trans-unit>
+            <trans-unit id="diff.older">
+                <source>Older snapshot</source>
+            </trans-unit>
+            <trans-unit id="diff.newer">
+                <source>Newer snapshot</source>
+            </trans-unit>
+            <trans-unit id="diff.compare">
+                <source>Compare</source>
+            </trans-unit>
+            <trans-unit id="diff.back">
+                <source>Back to the instance</source>
+            </trans-unit>
+            <trans-unit id="diff.column.path">
+                <source>Value</source>
+            </trans-unit>
+            <trans-unit id="diff.column.before">
+                <source>Before</source>
+            </trans-unit>
+            <trans-unit id="diff.column.after">
+                <source>After</source>
+            </trans-unit>
+            <trans-unit id="diff.kind.added">
+                <source>added</source>
+            </trans-unit>
+            <trans-unit id="diff.kind.removed">
+                <source>removed</source>
+            </trans-unit>
+            <trans-unit id="diff.kind.changed">
+                <source>changed</source>
+            </trans-unit>
+            <trans-unit id="diff.outsideProviders">
+                <source>Outside the providers</source>
+            </trans-unit>
+            <trans-unit id="diff.none">
+                <source>Nothing changed, apart from the values that only depend on the collecting runtime.</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>

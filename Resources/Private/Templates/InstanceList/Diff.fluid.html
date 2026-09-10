@@ -1,0 +1,88 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      data-namespace-typo3-fluid="true">
+
+<f:layout name="Module" />
+
+<f:section name="Content">
+
+    <h1><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:diff.heading"/></h1>
+
+    <p>
+        <f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:diff.between"
+                     arguments="{0: '{f:format.date(format: dateTimeFormat, date: olderAt)}', 1: '{f:format.date(format: dateTimeFormat, date: newerAt)}'}"/>
+        <span class="badge badge-{f:if(condition: count, then: 'warning', else: 'success')} ms-2">
+            <f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:diff.count" arguments="{0: count}"/>
+        </span>
+    </p>
+
+    <form method="get" action="{formUri}" class="mb-4">
+        <f:for each="{formParams}" as="value" key="name">
+            <input type="hidden" name="{name}" value="{value}">
+        </f:for>
+        <div class="row g-2 align-items-end">
+            <div class="col-auto">
+                <label class="form-label" for="c2-diff-older"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:diff.older"/></label>
+                <select class="form-select" id="c2-diff-older" name="against">
+                    <f:for each="{history}" as="entry">
+                        <option value="{entry.uid}"{f:if(condition: '{entry.uid} == {olderUid}', then: ' selected="selected"')}><f:format.date format="{dateTimeFormat}">@{entry.crdate}</f:format.date></option>
+                    </f:for>
+                </select>
+            </div>
+            <div class="col-auto">
+                <label class="form-label" for="c2-diff-newer"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:diff.newer"/></label>
+                <select class="form-select" id="c2-diff-newer" name="diff">
+                    <f:for each="{history}" as="entry">
+                        <option value="{entry.uid}"{f:if(condition: '{entry.uid} == {newerUid}', then: ' selected="selected"')}><f:format.date format="{dateTimeFormat}">@{entry.crdate}</f:format.date></option>
+                    </f:for>
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-default"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:diff.compare"/></button>
+            </div>
+        </div>
+    </form>
+
+    <f:if condition="{groups}">
+        <f:then>
+            <f:for each="{groups}" as="group">
+                <h2>
+                    <f:if condition="{group.provider}">
+                        <f:then><code>{group.provider}</code></f:then>
+                        <f:else><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:diff.outsideProviders"/></f:else>
+                    </f:if>
+                </h2>
+                <div class="table-fit mb-4">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:diff.column.path"/></th>
+                                <th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:diff.column.before"/></th>
+                                <th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:diff.column.after"/></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <f:for each="{group.changes}" as="change">
+                                <tr>
+                                    <td class="col-nowrap"><span class="badge badge-{change.kind.colour}"><f:translate key="{change.kind.labelKey}"/></span></td>
+                                    <td><code>{change.path}</code></td>
+                                    <td><pre class="mb-0" style="white-space:pre-wrap;word-break:break-all">{change.before}</pre></td>
+                                    <td><pre class="mb-0" style="white-space:pre-wrap;word-break:break-all">{change.after}</pre></td>
+                                </tr>
+                            </f:for>
+                        </tbody>
+                    </table>
+                </div>
+            </f:for>
+        </f:then>
+        <f:else>
+            <div class="callout callout-success">
+                <div class="callout-content">
+                    <div class="callout-body"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:diff.none"/></div>
+                </div>
+            </div>
+        </f:else>
+    </f:if>
+
+</f:section>
+</html>
