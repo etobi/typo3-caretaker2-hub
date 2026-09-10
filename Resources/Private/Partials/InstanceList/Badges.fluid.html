@@ -1,0 +1,42 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      data-namespace-typo3-fluid="true">
+
+<!--
+    The badges both views share. Colours and label keys come from the enums,
+    the hint is translated here.
+-->
+
+<f:section name="State">
+    <f:spaceless>
+        <f:variable name="hint" value=""/>
+        <f:if condition="{instance.stateHintKey}">
+            <f:if condition="{instance.state.value} == 'attention'">
+                <f:then><f:variable name="worst"><f:translate key="{instance.worstSeverity.labelKey}"/></f:variable><f:variable name="hint"><f:translate key="{instance.stateHintKey}" arguments="{0: worst}"/></f:variable></f:then>
+                <f:else><f:variable name="hint"><f:translate key="{instance.stateHintKey}" arguments="{instance.stateHintArguments}"/></f:variable></f:else>
+            </f:if>
+        </f:if>
+        <span class="badge badge-{instance.stateColour}" title="{hint}"><f:translate key="{instance.state.labelKey}"/></span>
+    </f:spaceless>
+</f:section>
+
+<f:section name="Support">
+    <f:spaceless>
+        <f:variable name="hint" value=""/>
+        <f:if condition="{support.hintKey}">
+            <f:variable name="hint"><f:translate key="{support.hintKey}" arguments="{support.hintArguments}"/></f:variable>
+        </f:if>
+        <span class="badge badge-{support.status.colour}" title="{hint}">{text}<f:if condition="{showLabel} && {support.status.labelKey}"> · <f:translate key="{support.status.labelKey}"/></f:if></span>
+    </f:spaceless>
+</f:section>
+
+<f:section name="Severity">
+    <f:spaceless>
+        <f:variable name="hint" value=""/>
+        <f:if condition="{severity.hintKey}">
+            <f:variable name="hint"><f:translate key="{severity.hintKey}"/></f:variable>
+        </f:if>
+        <span class="badge badge-{severity.colour}" title="{hint}"><f:translate key="{severity.labelKey}"/></span>
+    </f:spaceless>
+</f:section>
+
+</html>

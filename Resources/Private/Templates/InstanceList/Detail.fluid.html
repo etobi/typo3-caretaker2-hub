@@ -48,7 +48,7 @@
         <h2><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.findings.heading"/></h2>
         <div class="mb-2">
             <f:for each="{findingsBySeverity}" as="badge">
-                <span class="badge badge-{badge.colour}">{badge.count} {badge.label}</span>
+                <span class="badge badge-{badge.severity.colour}">{badge.count} <f:translate key="{badge.severity.labelKey}"/></span>
             </f:for>
         </div>
 
@@ -81,10 +81,9 @@
                                     </div>
                                 </td>
                                 <td class="col-nowrap">
-                                    <span class="badge badge-{finding.severityColour}"
-                                          title="{finding.severityHint}">{finding.severity}</span>
+                                    <f:render partial="InstanceList/Badges" section="Severity" arguments="{severity: finding.severity}"/>
                                 </td>
-                                <td class="col-nowrap">{finding.typeLabel}</td>
+                                <td class="col-nowrap"><f:translate key="{finding.typeLabelKey}" default="{finding.type}"/></td>
                                 <td class="col-nowrap"><code>{finding.package}</code></td>
                                 <td class="col-nowrap">{finding.installedVersion}</td>
                                 <td class="col-nowrap">{finding.latestVersion}</td>
@@ -108,9 +107,8 @@
     </f:if>
 
     <div class="mb-3">
-        <span class="badge badge-{instance.stateSeverity}">{instance.stateLabel}</span>
-        <span class="badge badge-{instance.typo3Support.colour}"
-              title="{instance.typo3Support.hint}">TYPO3 {shown.typo3Version}<f:if condition="{instance.typo3Support.label}"> · {instance.typo3Support.label}</f:if></span>
+        <f:render partial="InstanceList/Badges" section="State" arguments="{instance: instance}"/>
+        <f:render partial="InstanceList/Badges" section="Support" arguments="{support: instance.typo3Support, text: 'TYPO3 {shown.typo3Version}', showLabel: 1}"/>
         <span class="badge badge-secondary">PHP {shown.phpVersion}</span>
         <span class="badge badge-secondary">{shown.database}</span>
         <span class="badge badge-secondary">{shown.context}</span>
@@ -175,7 +173,7 @@
                     <tbody>
                         <f:for each="{acknowledgedFindings}" as="finding">
                             <tr>
-                                <td class="col-nowrap"><span class="badge badge-{finding.severityColour}">{finding.severity}</span></td>
+                                <td class="col-nowrap"><f:render partial="InstanceList/Badges" section="Severity" arguments="{severity: finding.severity}"/></td>
                                 <td class="col-nowrap"><code>{finding.package}</code></td>
                                 <td>{finding.title}</td>
                                 <td>

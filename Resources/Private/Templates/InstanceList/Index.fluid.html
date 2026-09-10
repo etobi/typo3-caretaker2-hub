@@ -1,5 +1,6 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
       xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+      xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
       data-namespace-typo3-fluid="true">
 
 <f:layout name="Module" />
@@ -69,24 +70,9 @@
         <f:then>
             <div class="mb-3">
                 <span class="badge badge-secondary"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.summary.total" arguments="{0: summary.total}"/></span>
-                <f:if condition="{summary.ok}">
-                    <span class="badge badge-success"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.summary.ok" arguments="{0: summary.ok}"/></span>
-                </f:if>
-                <f:if condition="{summary.attention}">
-                    <span class="badge badge-secondary"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.summary.attention" arguments="{0: summary.attention}"/></span>
-                </f:if>
-                <f:if condition="{summary.incomplete}">
-                    <span class="badge badge-warning"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.summary.incomplete" arguments="{0: summary.incomplete}"/></span>
-                </f:if>
-                <f:if condition="{summary.vulnerable}">
-                    <span class="badge badge-danger"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.summary.vulnerable" arguments="{0: summary.vulnerable}"/></span>
-                </f:if>
-                <f:if condition="{summary.unsupported}">
-                    <span class="badge badge-danger"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.summary.unsupported" arguments="{0: summary.unsupported}"/></span>
-                </f:if>
-                <f:if condition="{summary.stale}">
-                    <span class="badge badge-danger"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.summary.stale" arguments="{0: summary.stale}"/></span>
-                </f:if>
+                <f:for each="{summary.states}" as="entry">
+                    <span class="badge badge-{entry.state.colour}"><f:translate key="{entry.state.summaryKey}" arguments="{0: entry.count}"/></span>
+                </f:for>
             </div>
 
             <form method="get" action="{listUri}" class="mb-3">
@@ -94,42 +80,22 @@
                     <input type="hidden" name="{name}" value="{value}">
                 </f:for>
                 <div class="row g-2 align-items-end">
-                    <div class="col-auto">
-                        <label class="form-label" for="c2-filter-state"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.filter.state"/></label>
-                        <select class="form-select" id="c2-filter-state" name="filter_state">
-                            <option value=""><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.filter.any"/></option>
-                            <f:for each="{filterOptions.state}" as="option">
-                                <option value="{option.value}"{f:if(condition: '{filters.state} == {option.value}', then: ' selected="selected"')}>{option.label}</option>
-                            </f:for>
-                        </select>
-                    </div>
-                    <div class="col-auto">
-                        <label class="form-label" for="c2-filter-typo3"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.filter.typo3"/></label>
-                        <select class="form-select" id="c2-filter-typo3" name="filter_typo3">
-                            <option value=""><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.filter.any"/></option>
-                            <f:for each="{filterOptions.typo3}" as="option">
-                                <option value="{option.value}"{f:if(condition: '{filters.typo3} == {option.value}', then: ' selected="selected"')}>{option.label}</option>
-                            </f:for>
-                        </select>
-                    </div>
-                    <div class="col-auto">
-                        <label class="form-label" for="c2-filter-php"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.filter.php"/></label>
-                        <select class="form-select" id="c2-filter-php" name="filter_php">
-                            <option value=""><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.filter.any"/></option>
-                            <f:for each="{filterOptions.php}" as="option">
-                                <option value="{option.value}"{f:if(condition: '{filters.php} == {option.value}', then: ' selected="selected"')}>{option.label}</option>
-                            </f:for>
-                        </select>
-                    </div>
-                    <div class="col-auto">
-                        <label class="form-label" for="c2-filter-group"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.filter.group"/></label>
-                        <select class="form-select" id="c2-filter-group" name="filter_group">
-                            <option value=""><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.filter.any"/></option>
-                            <f:for each="{filterOptions.group}" as="option">
-                                <option value="{option.value}"{f:if(condition: '{filters.group} == {option.value}', then: ' selected="selected"')}>{option.label}</option>
-                            </f:for>
-                        </select>
-                    </div>
+                    <f:for each="{filterOptions}" as="options" key="name">
+                        <div class="col-auto">
+                            <label class="form-label" for="c2-filter-{name}"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.filter.{name}"/></label>
+                            <select class="form-select" id="c2-filter-{name}" name="filter_{name}">
+                                <option value=""><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.filter.any"/></option>
+                                <f:for each="{options}" as="option">
+                                    <option value="{option.value}"{f:if(condition: '{filters.{name}} == {option.value}', then: ' selected="selected"')}>
+                                        <f:if condition="{option.labelKey}">
+                                            <f:then><f:translate key="{option.labelKey}"/></f:then>
+                                            <f:else>{option.label}</f:else>
+                                        </f:if>
+                                    </option>
+                                </f:for>
+                            </select>
+                        </div>
+                    </f:for>
                     <div class="col-auto">
                         <button type="submit" class="btn btn-default"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.filter.apply"/></button>
                         <f:if condition="{filterActive}">
@@ -161,14 +127,17 @@
                                     <th colspan="8" scope="colgroup">
                                         <div class="d-flex align-items-center justify-content-between gap-2">
                                             <span>
-                                                {group.title}
+                                                <f:if condition="{group.uid}">
+                                                    <f:then>{group.title}</f:then>
+                                                    <f:else><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.group.ungrouped"/></f:else>
+                                                </f:if>
                                                 <span class="badge badge-secondary">{group.instances -> f:count()}</span>
                                                 <f:if condition="{group.description}">
                                                     <span class="fw-normal text-body-secondary ms-2">{group.description}</span>
                                                 </f:if>
                                             </span>
-                                            <f:if condition="{group.editUri}">
-                                                <a href="{group.editUri}" class="btn btn-default btn-sm"
+                                            <f:if condition="{group.uid}">
+                                                <a href="{be:uri.editRecord(uid: group.uid, table: 'tx_caretaker2_group', returnUrl: resetUri)}" class="btn btn-default btn-sm"
                                                    title="{f:translate(key: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.group.edit')}">
                                                     <core:icon identifier="actions-open" size="small"/>
                                                 </a>
@@ -179,12 +148,12 @@
                             </f:if>
                             <f:for each="{group.instances}" as="instance">
                                 <tr>
+                                    <f:variable name="detailUri">{be:moduleLink(route: 'caretaker2_instances', arguments: {instance: instance.uid})}</f:variable>
                                     <td class="col-nowrap">
-                                        <span class="badge badge-{instance.stateSeverity}"
-                                              title="{instance.stateHint}">{instance.stateLabel}</span>
+                                        <f:render partial="InstanceList/Badges" section="State" arguments="{instance: instance}"/>
                                     </td>
                                     <td>
-                                        <a href="{instance.detailUri}"><strong>{instance.title}</strong></a>
+                                        <a href="{detailUri}"><strong>{instance.title}</strong></a>
                                         <f:if condition="{instance.siteHosts}">
                                             <div class="text-body-secondary">
                                                 <f:for each="{instance.siteHosts}" as="host"><div>{host}</div></f:for>
@@ -192,18 +161,18 @@
                                         </f:if>
                                     </td>
                                     <td class="col-nowrap">
-                                        <span class="badge badge-{instance.typo3Support.colour}"
-                                              title="{instance.typo3Support.hint}">v{instance.typo3Major}</span>
+                                        <f:render partial="InstanceList/Badges" section="Support" arguments="{support: instance.typo3Support, text: 'v{instance.typo3Major}'}"/>
                                         {instance.typo3Version}
                                     </td>
                                     <td class="col-nowrap">
-                                        <span class="badge badge-{instance.phpSupport.colour}"
-                                              title="{instance.phpSupport.hint}">{instance.phpVersion}</span>
+                                        <f:render partial="InstanceList/Badges" section="Support" arguments="{support: instance.phpSupport, text: instance.phpVersion}"/>
                                     </td>
                                     <td class="col-nowrap">{instance.context}</td>
                                     <td class="col-nowrap">
                                         <f:for each="{instance.findingsBySeverity}" as="badge">
-                                            <span class="badge badge-{badge.colour}" title="{badge.hint}">{badge.count}</span>
+                                            <f:variable name="severityLabel"><f:translate key="{badge.severity.labelKey}"/></f:variable>
+                                            <span class="badge badge-{badge.severity.colour}"
+                                                  title="{f:translate(key: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.findings.bySeverity', arguments: {0: badge.count, 1: severityLabel})}">{badge.count}</span>
                                         </f:for>
                                         <f:if condition="{instance.findings.acknowledged}">
                                             <span class="badge badge-secondary"
@@ -219,11 +188,11 @@
                                     </td>
                                     <td class="col-control">
                                         <div class="btn-group">
-                                            <a href="{instance.detailUri}" class="btn btn-default"
+                                            <a href="{detailUri}" class="btn btn-default"
                                                title="{f:translate(key: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.action.detail')}">
                                                 <core:icon identifier="actions-eye" size="small"/>
                                             </a>
-                                            <a href="{instance.editUri}" class="btn btn-default"
+                                            <a href="{be:uri.editRecord(uid: instance.uid, table: 'tx_caretaker2_instance', returnUrl: resetUri)}" class="btn btn-default"
                                                title="{f:translate(key: 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.action.edit')}">
                                                 <core:icon identifier="actions-open" size="small"/>
                                             </a>
