@@ -75,11 +75,18 @@ final class ComposerEvaluator
         }
 
         $removed = [];
-        foreach (($manifest['repositories'] ?? []) as $key => $repository) {
-            if (is_array($repository) && ($repository['type'] ?? '') === 'path') {
-                $removed[] = (string)($repository['url'] ?? $key);
-                unset($manifest['repositories'][$key]);
+        $repositories = $manifest['repositories'] ?? [];
+        if (is_array($repositories)) {
+            $wasList = array_is_list($repositories);
+            foreach ($repositories as $key => $repository) {
+                if (is_array($repository) && ($repository['type'] ?? '') === 'path') {
+                    $removed[] = (string)($repository['url'] ?? $key);
+                    unset($repositories[$key]);
+                }
             }
+            // A list with a gap encodes as an object, which composer's schema
+            // treats as named repositories and rejects.
+            $manifest['repositories'] = $wasList ? array_values($repositories) : $repositories;
         }
 
         $platform = $this->platformFrom($inventory);
