@@ -272,6 +272,16 @@ final class InstanceListController
         if (!$readOnly) {
             $this->addSubmitButton($view, 'caretaker2-actions', 'trigger', $this->labels->get('detail.button.refresh'), 'actions-refresh');
         }
+        $view->addButtonToButtonBar(
+            $this->components->createLinkButton()
+                ->setHref((string)$this->uriBuilder->buildUriFromRoute('record_edit', [
+                    'edit' => ['tx_caretaker2_instance' => [$instanceId => 'edit']],
+                    'returnUrl' => (string)$this->uriBuilder->buildUriFromRoute(self::ROUTE, ['instance' => $instanceId]),
+                ]))
+                ->setTitle($this->labels->get('list.action.edit'))
+                ->setShowLabelText(true)
+                ->setIcon($this->icons->getIcon('actions-open', IconSize::SMALL))
+        );
 
         $view->getDocHeaderComponent()->setBreadcrumbContext(
             new BreadcrumbContext(null, $this->breadcrumb($instance, $historic))
