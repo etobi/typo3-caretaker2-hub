@@ -88,6 +88,12 @@ final class ComposerEvaluator
      * provide are reported as unassessable rather than silently treated as
      * fine; composer lists them as up to date with no newer version matched.
      *
+     * GitHub repositories are marked "no-api". Composer would otherwise ask
+     * the GitHub API, which allows sixty anonymous requests an hour per
+     * address, and on the first 403 or 404 it silently switches to cloning
+     * git@github.com over ssh — which the hub has no key for. A plain https
+     * clone needs no token for a public repository and no API quota at all.
+     *
      * @param array<string, mixed> $inventory
      * @return array{json: string, removed: list<string>, platform: array<string, string>}
      */
@@ -103,9 +109,14 @@ final class ComposerEvaluator
         if (is_array($repositories)) {
             $wasList = array_is_list($repositories);
             foreach ($repositories as $key => $repository) {
-                if (is_array($repository) && $this->isUnresolvable($repository)) {
+                if (!is_array($repository)) {
+                    continue;
+                }
+                if ($this->isUnresolvable($repository)) {
                     $removed[] = (string)($repository['url'] ?? $key);
                     unset($repositories[$key]);
+                } elseif ($this->isGitHub($repository)) {
+                    $repositories[$key]['no-api'] = true;
                 }
             }
             // A list with a gap encodes as an object, which composer's schema
@@ -141,6 +152,19 @@ final class ComposerEvaluator
         }
 
         return false;
+    }
+
+    /**
+     * @param array<string, mixed> $repository
+     */
+    private function isGitHub(array $repository): bool
+    {
+        if (!in_array($repository['type'] ?? '', self::VCS_REPOSITORY_TYPES, true)) {
+            return false;
+        }
+        $host = parse_url(is_string($repository['url'] ?? null) ? $repository['url'] : '', PHP_URL_HOST);
+
+        return is_string($host) && in_array(strtolower($host), ['github.com', 'www.github.com'], true);
     }
 
     /**
