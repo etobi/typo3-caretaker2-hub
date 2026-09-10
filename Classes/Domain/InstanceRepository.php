@@ -97,8 +97,13 @@ final class InstanceRepository
         return array_map(static fn(array $row): Instance => Instance::fromRow($row), $rows);
     }
 
-    public function create(int $tenant, string $title, string $instanceUrl, string $tokenHash): int
-    {
+    public function create(
+        int $tenant,
+        string $title,
+        string $instanceUrl,
+        string $tokenHash,
+        string $agentVersion
+    ): int {
         $connection = $this->connectionPool->getConnectionForTable(self::TABLE);
         $connection->insert(self::TABLE, [
             'pid' => 0,
@@ -108,6 +113,7 @@ final class InstanceRepository
             'title' => $title,
             'instance_url' => $instanceUrl,
             'token_hash' => $tokenHash,
+            'agent_version' => $agentVersion,
         ]);
 
         return (int)$connection->lastInsertId();

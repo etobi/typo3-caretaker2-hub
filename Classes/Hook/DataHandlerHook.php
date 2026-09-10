@@ -8,10 +8,13 @@ use Caretaker2\Hub\Domain\CleanupService;
 use Caretaker2\Hub\Domain\InstanceRepository;
 use Caretaker2\Hub\Domain\GroupRepository;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 final class DataHandlerHook
 {
+    public function __construct(
+        private readonly CleanupService $cleanup,
+    ) {}
+
     /**
      * @param array<string, mixed> $recordToDelete
      */
@@ -22,14 +25,12 @@ final class DataHandlerHook
         bool &$recordWasDeleted,
         DataHandler $dataHandler
     ): void {
-        $cleanup = GeneralUtility::makeInstance(CleanupService::class);
-
         if ($table === InstanceRepository::TABLE) {
-            $cleanup->forgetInstance((int)$uid);
+            $this->cleanup->forgetInstance((int)$uid);
         }
 
         if ($table === GroupRepository::TABLE) {
-            $cleanup->detachGroup((int)$uid);
+            $this->cleanup->detachGroup((int)$uid);
         }
     }
 }

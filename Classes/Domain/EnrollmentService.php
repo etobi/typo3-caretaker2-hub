@@ -71,9 +71,8 @@ final class EnrollmentService
             $this->deriveTitle($instanceUrl),
             $instanceUrl,
             TokenGenerator::hash($token),
+            $agentVersion,
         );
-
-        $this->instances->update($instanceId, ['agent_version' => $agentVersion]);
 
         $this->connectionPool->getConnectionForTable(self::TABLE)->update(
             self::TABLE,

@@ -35,7 +35,7 @@ services:
   # The DataHandler builds its hooks through GeneralUtility::makeInstance(),
   # and that only resolves public services. Without this the hook throws
   # whenever any record is deleted, not only one of ours.
-  Caretaker2\Hub\Domain\CleanupService:
+  Caretaker2\Hub\Hook\DataHandlerHook:
     public: true
 
   Caretaker2\Hub\Evaluation\EvaluationService:

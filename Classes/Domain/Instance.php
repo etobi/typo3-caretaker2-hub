@@ -9,6 +9,12 @@ namespace Caretaker2\Hub\Domain;
  */
 final readonly class Instance
 {
+    /**
+     * The agent pushes daily. Two days leave room for one missed night
+     * before the instance counts as silent.
+     */
+    private const STALE_AFTER_SECONDS = 2 * 86400;
+
     public function __construct(
         public int $uid,
         public int $tenant,
@@ -82,9 +88,9 @@ final readonly class Instance
         return is_array($decoded) ? $decoded : null;
     }
 
-    public function isStale(int $now, int $toleranceSeconds = 172800): bool
+    public function isStale(int $now): bool
     {
-        return $this->lastSeen === 0 || ($now - $this->lastSeen) > $toleranceSeconds;
+        return $this->lastSeen === 0 || ($now - $this->lastSeen) > self::STALE_AFTER_SECONDS;
     }
 
     /**
