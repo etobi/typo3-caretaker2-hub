@@ -15,6 +15,13 @@ composer require caretaker2/hub
 Then create the scheduler tasks the *Caretaker2 → Instances* module asks
 for, and connect the first instance with the code the module hands out.
 
+## Behind Apache
+
+The agent sends its token as `Authorization: Bearer <token>`. Apache does
+not pass that header on to PHP-FPM or CGI by default, so an instance
+connects but never reports, and its first push fails with HTTP 401. Put
+`CGIPassAuth On` into the vhost or the `.htaccess` in the web root.
+
 ## Read-only mirror
 
 This repository is a read-only release mirror. Development happens in a
