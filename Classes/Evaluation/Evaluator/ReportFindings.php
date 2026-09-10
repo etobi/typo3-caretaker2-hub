@@ -16,7 +16,7 @@ final class ReportFindings implements EvaluatorInterface
         'warning' => Severity::MEDIUM,
     ];
 
-    private const MAX_TITLE_LENGTH = 400;
+    private const MAX_TITLE_LENGTH = 2000;
 
     public function key(): string
     {
@@ -100,13 +100,16 @@ final class ReportFindings implements EvaluatorInterface
     }
 
     /**
-     * Title and message as one line. The message carries the detail and is
-     * often the only part that says what to do.
+     * Title and message as one text. The message carries the detail and is
+     * often the only part that says what to do; when it has lines of its
+     * own, they start under the title.
      */
     private function sentence(string $title, string $message): string
     {
         if ($title === '' || $message === '') {
             $text = $title . $message;
+        } elseif (str_contains($message, "\n")) {
+            $text = $title . ":\n" . $message;
         } else {
             $text = $title . ': ' . $message;
         }

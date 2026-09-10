@@ -87,7 +87,7 @@
                                 <td class="col-nowrap"><code>{finding.package}</code></td>
                                 <td class="col-nowrap">{finding.installedVersion}</td>
                                 <td class="col-nowrap">{finding.latestVersion}</td>
-                                <td>
+                                <td style="white-space:pre-line">
                                     <f:if condition="{finding.link}">
                                         <f:then><a href="{finding.link}" target="_blank" rel="noreferrer">{finding.title}</a></f:then>
                                         <f:else>{finding.title}</f:else>
@@ -175,7 +175,7 @@
                             <tr>
                                 <td class="col-nowrap"><f:render partial="InstanceList/Badges" section="Severity" arguments="{severity: finding.severity}"/></td>
                                 <td class="col-nowrap"><code>{finding.package}</code></td>
-                                <td>{finding.title}</td>
+                                <td style="white-space:pre-line">{finding.title}</td>
                                 <td>
                                     <f:if condition="{finding.ackNote}">
                                         <f:then>{finding.ackNote}</f:then>
