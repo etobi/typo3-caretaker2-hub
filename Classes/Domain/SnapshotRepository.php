@@ -10,10 +10,18 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 /**
  * Snapshots are only written on change, so their order already is the
  * instance's history of changes, without it being kept separately.
+ *
+ * The payload is stored zlib-compressed. Almost all of it is composer.lock,
+ * which shrinks to roughly a sixth; that is the difference between a few
+ * hundred megabytes and a few gigabytes a year at a hundred instances.
+ * Rows written before compression are still read, and caretaker2:cleanup
+ * compresses them along the way.
  */
 final class SnapshotRepository
 {
     public const TABLE = 'tx_caretaker2_snapshot';
+
+    private const COMPRESSION_LEVEL = 9;
 
     public function __construct(
         private readonly ConnectionPool $connectionPool,
@@ -30,8 +38,35 @@ final class SnapshotRepository
             'instance' => $instance->uid,
             'tenant' => $instance->tenant,
             'fingerprint' => $fingerprint,
-            'payload' => (string)json_encode($inventory, JSON_UNESCAPED_SLASHES),
+            'payload' => $this->encode((string)json_encode($inventory, JSON_UNESCAPED_SLASHES)),
         ]);
+    }
+
+    /**
+     * Compresses the snapshots that were written before compression.
+     *
+     * @return int how many
+     */
+    public function compressStoredPlain(): int
+    {
+        $connection = $this->connectionPool->getConnectionForTable(self::TABLE);
+        $qb = $this->connectionPool->getQueryBuilderForTable(self::TABLE);
+        $rows = $qb
+            ->select('uid', 'payload')
+            ->from(self::TABLE)
+            ->where($qb->expr()->comparison('LEFT(' . $qb->quoteIdentifier('payload') . ', 1)', '=', $qb->createNamedParameter('{')))
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        foreach ($rows as $row) {
+            $connection->update(
+                self::TABLE,
+                ['payload' => $this->encode((string)$row['payload'])],
+                ['uid' => (int)$row['uid']]
+            );
+        }
+
+        return count($rows);
     }
 
     /**
@@ -55,7 +90,7 @@ final class SnapshotRepository
             return null;
         }
 
-        $decoded = json_decode((string)$row['payload'], true);
+        $decoded = json_decode($this->decode((string)$row['payload']), true);
 
         return is_array($decoded)
             ? ['crdate' => (int)$row['crdate'], 'inventory' => $decoded]
@@ -89,6 +124,26 @@ final class SnapshotRepository
             ->count('uid')
             ->executeQuery()
             ->fetchOne();
+    }
+
+    private function encode(string $json): string
+    {
+        return (string)gzcompress($json, self::COMPRESSION_LEVEL);
+    }
+
+    /**
+     * A zlib stream starts with 0x78, JSON with a brace. That tells the two
+     * generations of rows apart.
+     */
+    private function decode(string $payload): string
+    {
+        if ($payload === '' || $payload[0] !== "\x78") {
+            return $payload;
+        }
+
+        $json = @gzuncompress($payload);
+
+        return $json === false ? '' : $json;
     }
 
     private function query(int $instanceId): \TYPO3\CMS\Core\Database\Query\QueryBuilder

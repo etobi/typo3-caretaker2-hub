@@ -41,7 +41,7 @@ CREATE TABLE tx_caretaker2_snapshot (
     instance int(11) unsigned DEFAULT 0 NOT NULL,
     tenant int(11) unsigned DEFAULT 1 NOT NULL,
     fingerprint varchar(64) DEFAULT '' NOT NULL,
-    payload mediumtext,
+    payload mediumblob,
 
     PRIMARY KEY (uid),
     KEY instance_created (instance, crdate)

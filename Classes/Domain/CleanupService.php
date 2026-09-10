@@ -13,6 +13,7 @@ final class CleanupService
     public function __construct(
         private readonly ConnectionPool $connectionPool,
         private readonly InstanceRepository $instances,
+        private readonly SnapshotRepository $snapshots,
     ) {}
 
     /**
@@ -52,7 +53,7 @@ final class CleanupService
     }
 
     /**
-     * @return array{snapshots: int, findings: int, groups: int}
+     * @return array{snapshots: int, findings: int, groups: int, compressed: int}
      */
     public function removeOrphans(): array
     {
@@ -63,6 +64,7 @@ final class CleanupService
             'snapshots' => $this->deleteNotIn(SnapshotRepository::TABLE, 'instance', $instanceUids),
             'findings' => $this->deleteNotIn(FindingRepository::TABLE, 'instance', $instanceUids),
             'groups' => $this->detachMissingGroups($groupUids),
+            'compressed' => $this->snapshots->compressStoredPlain(),
         ];
     }
 

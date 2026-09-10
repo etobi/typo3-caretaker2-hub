@@ -19,7 +19,7 @@ final class CleanupCommand extends Command
 
     protected function configure(): void
     {
-        $this->setDescription('Removes snapshots and findings without an instance and detaches references to deleted groups');
+        $this->setDescription('Removes snapshots and findings without an instance, detaches references to deleted groups, and compresses snapshots stored uncompressed');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -34,10 +34,11 @@ final class CleanupCommand extends Command
         }
 
         $io->success(sprintf(
-            '%d snapshots and %d findings without an instance removed, %d instances detached from deleted groups.',
+            '%d snapshots and %d findings without an instance removed, %d instances detached from deleted groups, %d snapshots compressed.',
             $removed['snapshots'],
             $removed['findings'],
-            $removed['groups']
+            $removed['groups'],
+            $removed['compressed']
         ));
 
         return Command::SUCCESS;
