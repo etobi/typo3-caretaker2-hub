@@ -36,7 +36,7 @@ final class FindingFactory
 
                 $findings[] = new Finding(
                     type: Finding::TYPE_SECURITY,
-                    severity: $this->normalizeSeverity($advisory['severity'] ?? null),
+                    severity: Severity::fromAdvisory($advisory['severity'] ?? null),
                     identifier: $identifier,
                     package: (string)$package,
                     installedVersion: $installed[$package] ?? '',
@@ -73,7 +73,7 @@ final class FindingFactory
 
             $findings[] = new Finding(
                 type: $isSafe ? Finding::TYPE_UPDATE_SAFE : Finding::TYPE_UPDATE_MAJOR,
-                severity: $isSafe ? 'medium' : 'low',
+                severity: $isSafe ? Severity::MEDIUM : Severity::LOW,
                 identifier: $name,
                 package: $name,
                 installedVersion: (string)($package['version'] ?? ''),
@@ -99,7 +99,7 @@ final class FindingFactory
         foreach ($result->abandoned as $package => $replacement) {
             $findings[] = new Finding(
                 type: Finding::TYPE_ABANDONED,
-                severity: 'low',
+                severity: Severity::LOW,
                 identifier: (string)$package,
                 package: (string)$package,
                 installedVersion: $installed[$package] ?? '',
@@ -125,7 +125,7 @@ final class FindingFactory
         foreach ($result->unresolvableRepositories as $url) {
             $findings[] = new Finding(
                 type: Finding::TYPE_UNASSESSABLE,
-                severity: 'info',
+                severity: Severity::INFO,
                 identifier: $url,
                 package: '',
                 installedVersion: '',
@@ -152,16 +152,5 @@ final class FindingFactory
         }
 
         return $versions;
-    }
-
-    /**
-     * @param mixed $severity
-     */
-    private function normalizeSeverity($severity): string
-    {
-        $known = ['critical', 'high', 'medium', 'low'];
-        $value = is_string($severity) ? strtolower($severity) : '';
-
-        return in_array($value, $known, true) ? $value : 'unknown';
     }
 }

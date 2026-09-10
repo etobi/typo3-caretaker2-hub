@@ -23,7 +23,7 @@ final readonly class Finding
 
     public function __construct(
         public string $type,
-        public string $severity,
+        public Severity $severity,
         public string $identifier,
         public string $package,
         public string $installedVersion,
@@ -41,7 +41,7 @@ final readonly class Finding
     {
         return [
             'finding_type' => $this->type,
-            'severity' => $this->severity,
+            'severity' => $this->severity->value,
             'identifier' => $this->identifier,
             'package' => $this->package,
             'installed_version' => $this->installedVersion,

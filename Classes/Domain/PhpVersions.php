@@ -17,14 +17,17 @@ final class PhpVersions implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    public const STATUS_ACTIVE = 'active';
-    public const STATUS_SECURITY = 'security';
-    public const STATUS_EOL = 'eol';
-    public const STATUS_UNKNOWN = 'unknown';
-
     private const ENDPOINT = 'https://endoflife.date/api/php.json';
-    private const CACHE_KEY = 'php-versions';
+    private const CACHE_KEY = 'php-versions-v2';
     private const TIMEOUT_SECONDS = 15;
+
+    /**
+     * Asked for several times per instance in the list. Once per request is
+     * enough.
+     *
+     * @var array<string, array{status: PhpSupport, cycle: string, supportUntil: ?int, eolUntil: ?int, latest: string}>|null
+     */
+    private ?array $loaded = null;
 
     public function __construct(
         private readonly RequestFactory $requestFactory,
@@ -32,12 +35,12 @@ final class PhpVersions implements LoggerAwareInterface
     ) {}
 
     /**
-     * @return array{status: string, cycle: string, supportUntil: ?int, eolUntil: ?int, latest: string}
+     * @return array{status: PhpSupport, cycle: string, supportUntil: ?int, eolUntil: ?int, latest: string}
      */
     public function statusOf(string $version): array
     {
         $unknown = [
-            'status' => self::STATUS_UNKNOWN,
+            'status' => PhpSupport::UNKNOWN,
             'cycle' => '',
             'supportUntil' => null,
             'eolUntil' => null,
@@ -54,9 +57,17 @@ final class PhpVersions implements LoggerAwareInterface
     }
 
     /**
-     * @return array<string, array{status: string, cycle: string, supportUntil: ?int, eolUntil: ?int, latest: string}>
+     * @return array<string, array{status: PhpSupport, cycle: string, supportUntil: ?int, eolUntil: ?int, latest: string}>
      */
     public function load(): array
+    {
+        return $this->loaded ??= $this->loadFromCacheOrApi();
+    }
+
+    /**
+     * @return array<string, array{status: PhpSupport, cycle: string, supportUntil: ?int, eolUntil: ?int, latest: string}>
+     */
+    private function loadFromCacheOrApi(): array
     {
         $cached = $this->cache->get(self::CACHE_KEY);
         if (is_array($cached)) {
@@ -97,7 +108,7 @@ final class PhpVersions implements LoggerAwareInterface
 
     /**
      * @param list<array<string, mixed>> $raw
-     * @return array<string, array{status: string, cycle: string, supportUntil: ?int, eolUntil: ?int, latest: string}>
+     * @return array<string, array{status: PhpSupport, cycle: string, supportUntil: ?int, eolUntil: ?int, latest: string}>
      */
     private function classify(array $raw): array
     {
@@ -119,11 +130,11 @@ final class PhpVersions implements LoggerAwareInterface
             }
 
             if ($support !== null && $support >= $now) {
-                $status = self::STATUS_ACTIVE;
+                $status = PhpSupport::ACTIVE;
             } elseif ($eol !== null && $eol >= $now) {
-                $status = self::STATUS_SECURITY;
+                $status = PhpSupport::SECURITY;
             } else {
-                $status = self::STATUS_EOL;
+                $status = PhpSupport::EOL;
             }
 
             $cycles[$cycle] = [

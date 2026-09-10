@@ -70,7 +70,7 @@ final class EvaluationService implements LoggerAwareInterface
 
             return [new Finding(
                 type: Finding::TYPE_UNASSESSABLE,
-                severity: 'info',
+                severity: Severity::INFO,
                 identifier: 'evaluator-' . $evaluator->key(),
                 package: '',
                 installedVersion: '',

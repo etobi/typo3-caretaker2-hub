@@ -7,12 +7,13 @@ namespace Caretaker2\Hub\Evaluation\Evaluator;
 use Caretaker2\Hub\Domain\Instance;
 use Caretaker2\Hub\Evaluation\EvaluatorInterface;
 use Caretaker2\Hub\Evaluation\Finding;
+use Caretaker2\Hub\Evaluation\Severity;
 
 final class ReportFindings implements EvaluatorInterface
 {
     private const SEVERITIES = [
-        'error' => 'high',
-        'warning' => 'medium',
+        'error' => Severity::HIGH,
+        'warning' => Severity::MEDIUM,
     ];
 
     private const MAX_TITLE_LENGTH = 400;
@@ -37,7 +38,7 @@ final class ReportFindings implements EvaluatorInterface
         if ($status !== 'ok') {
             return [new Finding(
                 type: Finding::TYPE_UNASSESSABLE,
-                severity: 'info',
+                severity: Severity::INFO,
                 identifier: 'reports-' . $status,
                 package: 'typo3/cms-reports',
                 installedVersion: '',
@@ -54,7 +55,7 @@ final class ReportFindings implements EvaluatorInterface
         if ((int)($data['checked'] ?? 0) === 0) {
             return [new Finding(
                 type: Finding::TYPE_UNASSESSABLE,
-                severity: 'info',
+                severity: Severity::INFO,
                 identifier: 'reports-none',
                 package: 'typo3/cms-reports',
                 installedVersion: '',

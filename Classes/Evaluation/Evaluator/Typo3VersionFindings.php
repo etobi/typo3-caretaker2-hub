@@ -6,8 +6,10 @@ namespace Caretaker2\Hub\Evaluation\Evaluator;
 
 use Caretaker2\Hub\Domain\Instance;
 use Caretaker2\Hub\Domain\Typo3MajorVersions;
+use Caretaker2\Hub\Domain\Typo3Support;
 use Caretaker2\Hub\Evaluation\EvaluatorInterface;
 use Caretaker2\Hub\Evaluation\Finding;
+use Caretaker2\Hub\Evaluation\Severity;
 
 /**
  * The support status of the installed TYPO3 version.
@@ -34,10 +36,10 @@ final class Typo3VersionFindings implements EvaluatorInterface
         );
         // Inside the ELTS window but on the last freely published release: the
         // instance gets nothing. That weighs more than running ELTS does.
-        if ($status['status'] === Typo3MajorVersions::STATUS_ELTS_UNPATCHED) {
+        if ($status['status'] === Typo3Support::ELTS_UNPATCHED) {
             return [new Finding(
                 type: Finding::TYPE_TYPO3_ELTS_UNPATCHED,
-                severity: 'high',
+                severity: Severity::HIGH,
                 identifier: 'typo3-' . $instance->typo3Major,
                 package: 'typo3/cms-core',
                 installedVersion: $instance->typo3Version,
@@ -52,10 +54,10 @@ final class Typo3VersionFindings implements EvaluatorInterface
             )];
         }
 
-        if ($status['status'] === Typo3MajorVersions::STATUS_ELTS) {
+        if ($status['status'] === Typo3Support::ELTS) {
             return [new Finding(
                 type: Finding::TYPE_TYPO3_ELTS,
-                severity: 'medium',
+                severity: Severity::MEDIUM,
                 identifier: 'typo3-' . $instance->typo3Major,
                 package: 'typo3/cms-core',
                 installedVersion: $instance->typo3Version,
@@ -70,10 +72,10 @@ final class Typo3VersionFindings implements EvaluatorInterface
             )];
         }
 
-        if ($status['status'] === Typo3MajorVersions::STATUS_UNSUPPORTED) {
+        if ($status['status'] === Typo3Support::UNSUPPORTED) {
             return [new Finding(
                 type: Finding::TYPE_TYPO3_UNSUPPORTED,
-                severity: 'high',
+                severity: Severity::HIGH,
                 identifier: 'typo3-' . $instance->typo3Major,
                 package: 'typo3/cms-core',
                 installedVersion: $instance->typo3Version,

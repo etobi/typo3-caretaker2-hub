@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Caretaker2\Hub\Evaluation\Evaluator;
 
 use Caretaker2\Hub\Domain\Instance;
+use Caretaker2\Hub\Domain\PhpSupport;
 use Caretaker2\Hub\Domain\PhpVersions;
 use Caretaker2\Hub\Evaluation\EvaluatorInterface;
 use Caretaker2\Hub\Evaluation\Finding;
+use Caretaker2\Hub\Evaluation\Severity;
 
 final class PhpVersionFindings implements EvaluatorInterface
 {
@@ -27,10 +29,10 @@ final class PhpVersionFindings implements EvaluatorInterface
         }
 
         $status = $this->phpVersions->statusOf($instance->phpVersion);
-        if ($status['status'] === PhpVersions::STATUS_EOL) {
+        if ($status['status'] === PhpSupport::EOL) {
             return [new Finding(
                 type: Finding::TYPE_PHP_EOL,
-                severity: 'high',
+                severity: Severity::HIGH,
                 identifier: 'php-' . $status['cycle'],
                 package: 'php',
                 installedVersion: $instance->phpVersion,
@@ -45,10 +47,10 @@ final class PhpVersionFindings implements EvaluatorInterface
             )];
         }
 
-        if ($status['status'] === PhpVersions::STATUS_SECURITY) {
+        if ($status['status'] === PhpSupport::SECURITY) {
             return [new Finding(
                 type: Finding::TYPE_PHP_SECURITY_ONLY,
-                severity: 'medium',
+                severity: Severity::MEDIUM,
                 identifier: 'php-' . $status['cycle'],
                 package: 'php',
                 installedVersion: $instance->phpVersion,

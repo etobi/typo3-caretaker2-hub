@@ -16,17 +16,18 @@ final class Typo3MajorVersions implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    public const STATUS_STABLE = 'stable';
-    public const STATUS_OLDSTABLE = 'oldstable';
-    public const STATUS_ELTS = 'elts';
-    public const STATUS_ELTS_UNPATCHED = 'elts_unpatched';
-    public const STATUS_UNSUPPORTED = 'unsupported';
-    public const STATUS_UNKNOWN = 'unknown';
-
     private const ENDPOINT_MAJORS = 'https://get.typo3.org/api/v1/major/';
     private const ENDPOINT_RELEASES = 'https://get.typo3.org/api/v1/release/';
-    private const CACHE_KEY = 'typo3-major-versions-v2';
+    private const CACHE_KEY = 'typo3-major-versions-v3';
     private const TIMEOUT_SECONDS = 15;
+
+    /**
+     * The list is asked for several times per instance in the list. Once per
+     * request is enough.
+     *
+     * @var array<int, array{status: Typo3Support, maintainedUntil: ?int, eltsUntil: ?int, title: string, lastPublic: string, latest: string}>|null
+     */
+    private ?array $loaded = null;
 
     public function __construct(
         private readonly RequestFactory $requestFactory,
@@ -34,12 +35,12 @@ final class Typo3MajorVersions implements LoggerAwareInterface
     ) {}
 
     /**
-     * @return array{status: string, maintainedUntil: ?int, eltsUntil: ?int, title: string, lastPublic: string, latest: string}
+     * @return array{status: Typo3Support, maintainedUntil: ?int, eltsUntil: ?int, title: string, lastPublic: string, latest: string}
      */
     public function statusOf(string $version): array
     {
         $unknown = [
-            'status' => self::STATUS_UNKNOWN,
+            'status' => Typo3Support::UNKNOWN,
             'maintainedUntil' => null,
             'eltsUntil' => null,
             'title' => '',
@@ -59,21 +60,29 @@ final class Typo3MajorVersions implements LoggerAwareInterface
         // Inside the ELTS window the patch level decides: past the last public
         // release means ELTS is actually being applied, at or below it means
         // the installation gets nothing.
-        if ($entry['status'] === self::STATUS_ELTS
+        if ($entry['status'] === Typo3Support::ELTS
             && $entry['lastPublic'] !== ''
             && substr_count($version, '.') >= 2
             && version_compare($version, $entry['lastPublic'], '<=')
         ) {
-            $entry['status'] = self::STATUS_ELTS_UNPATCHED;
+            $entry['status'] = Typo3Support::ELTS_UNPATCHED;
         }
 
         return $entry;
     }
 
     /**
-     * @return array<int, array{status: string, maintainedUntil: ?int, eltsUntil: ?int, title: string}>
+     * @return array<int, array{status: Typo3Support, maintainedUntil: ?int, eltsUntil: ?int, title: string, lastPublic: string, latest: string}>
      */
     public function load(): array
+    {
+        return $this->loaded ??= $this->loadFromCacheOrApi();
+    }
+
+    /**
+     * @return array<int, array{status: Typo3Support, maintainedUntil: ?int, eltsUntil: ?int, title: string, lastPublic: string, latest: string}>
+     */
+    private function loadFromCacheOrApi(): array
     {
         $cached = $this->cache->get(self::CACHE_KEY);
         if (is_array($cached)) {
@@ -152,7 +161,7 @@ final class Typo3MajorVersions implements LoggerAwareInterface
     /**
      * @param list<array<string, mixed>> $raw
      * @param array<int, array{lastPublic: string, latest: string}> $boundaries
-     * @return array<int, array{status: string, maintainedUntil: ?int, eltsUntil: ?int, title: string, lastPublic: string, latest: string}>
+     * @return array<int, array{status: Typo3Support, maintainedUntil: ?int, eltsUntil: ?int, title: string, lastPublic: string, latest: string}>
      */
     private function classify(array $raw, array $boundaries): array
     {
@@ -175,11 +184,11 @@ final class Typo3MajorVersions implements LoggerAwareInterface
             }
 
             if ($maintained !== null && $maintained >= $now) {
-                $status = self::STATUS_OLDSTABLE;
+                $status = Typo3Support::OLDSTABLE;
             } elseif ($elts !== null && $elts >= $now) {
-                $status = self::STATUS_ELTS;
+                $status = Typo3Support::ELTS;
             } else {
-                $status = self::STATUS_UNSUPPORTED;
+                $status = Typo3Support::UNSUPPORTED;
             }
 
             $entries[$major] = [
@@ -196,11 +205,11 @@ final class Typo3MajorVersions implements LoggerAwareInterface
         // the others in maintenance are old stable.
         $inMaintenance = array_keys(array_filter(
             $entries,
-            static fn(array $e): bool => $e['status'] === self::STATUS_OLDSTABLE
+            static fn(array $e): bool => $e['status'] === Typo3Support::OLDSTABLE
         ));
 
         if ($inMaintenance !== []) {
-            $entries[max($inMaintenance)]['status'] = self::STATUS_STABLE;
+            $entries[max($inMaintenance)]['status'] = Typo3Support::STABLE;
         }
 
         return $entries;

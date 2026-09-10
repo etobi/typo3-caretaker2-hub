@@ -12,17 +12,6 @@ final class FindingRepository
 {
     public const TABLE = 'tx_caretaker2_finding';
 
-    private const SEVERITY_ORDER = ['critical', 'high', 'unknown', 'medium', 'low', 'info'];
-
-    private const EMPTY_SEVERITIES = [
-        'critical' => 0,
-        'high' => 0,
-        'unknown' => 0,
-        'medium' => 0,
-        'low' => 0,
-        'info' => 0,
-    ];
-
     public function __construct(
         private readonly ConnectionPool $connectionPool,
     ) {}
@@ -53,7 +42,7 @@ final class FindingRepository
             if (isset($existing[$key])) {
                 $previous = $existing[$key];
 
-                if ($this->isMoreSevere($finding->severity, (string)$previous['severity'])) {
+                if ($finding->severity->outranks(Severity::fromStored((string)$previous['severity']))) {
                     $row['acknowledged'] = 0;
                     $row['ack_note'] = null;
                     $row['ack_user'] = '';
@@ -154,14 +143,9 @@ final class FindingRepository
         return $row === false ? null : $row;
     }
 
-    private function isMoreSevere(string $candidate, string $current): bool
-    {
-        $order = array_flip(self::SEVERITY_ORDER);
-
-        return ($order[$candidate] ?? 99) < ($order[$current] ?? 99);
-    }
-
     /**
+     * Most severe first, then by package.
+     *
      * @return list<array<string, mixed>>
      */
     public function findForInstance(int $instance, int $tenant = 1): array
@@ -169,41 +153,13 @@ final class FindingRepository
         $rows = $this->rowsForInstance($instance, $tenant);
 
         usort($rows, static function (array $a, array $b): int {
-            $order = array_flip(self::SEVERITY_ORDER);
-            $sa = $order[$a['severity']] ?? 99;
-            $sb = $order[$b['severity']] ?? 99;
+            $rank = Severity::fromStored((string)$a['severity'])->getRank()
+                <=> Severity::fromStored((string)$b['severity'])->getRank();
 
-            return $sa <=> $sb ?: strcmp((string)$a['package'], (string)$b['package']);
+            return $rank ?: strcmp((string)$a['package'], (string)$b['package']);
         });
 
         return $rows;
-    }
-
-    /**
-     * @return array<string, int>
-     */
-    public function countsForInstance(int $instance, int $tenant = 1): array
-    {
-        $counts = ['security' => 0, 'update_safe' => 0, 'update_major' => 0, 'abandoned' => 0, 'unassessable' => 0, 'report' => 0];
-        $counts['severities'] = self::EMPTY_SEVERITIES;
-        $counts['total'] = 0;
-
-        foreach ($this->rowsForInstance($instance, $tenant) as $row) {
-            if ((int)$row['acknowledged'] === 1) {
-                continue;
-            }
-            $type = (string)$row['finding_type'];
-            if (isset($counts[$type])) {
-                $counts[$type]++;
-            }
-            $severity = (string)$row['severity'];
-            if (isset($counts['severities'][$severity])) {
-                $counts['severities'][$severity]++;
-            }
-            $counts['total']++;
-        }
-
-        return $counts;
     }
 
     /**
@@ -235,11 +191,7 @@ final class FindingRepository
         $counts = [];
         foreach ($rows as $row) {
             $uid = (int)$row['instance'];
-            $counts[$uid] ??= [
-                'security' => 0, 'securityHigh' => 0, 'typo3Unsupported' => 0, 'phpUnsupported' => 0,
-                'update_safe' => 0, 'update_major' => 0, 'abandoned' => 0, 'unassessable' => 0, 'report' => 0,
-                'severities' => self::EMPTY_SEVERITIES, 'total' => 0, 'acknowledged' => 0,
-            ];
+            $counts[$uid] ??= self::emptyCounts();
 
             $type = (string)$row['finding_type'];
             $amount = (int)$row['amount'];
@@ -258,7 +210,7 @@ final class FindingRepository
             }
             $counts[$uid]['total'] += $amount;
 
-            if ($type === 'security' && in_array($row['severity'], ['critical', 'high', 'unknown'], true)) {
+            if ($type === Finding::TYPE_SECURITY && Severity::fromStored($severity)->isSerious()) {
                 $counts[$uid]['securityHigh'] += $amount;
             }
 
@@ -272,6 +224,23 @@ final class FindingRepository
         }
 
         return $counts;
+    }
+
+    /**
+     * @return array<string, int|array<string, int>>
+     */
+    public static function emptyCounts(): array
+    {
+        $severities = [];
+        foreach (Severity::cases() as $severity) {
+            $severities[$severity->value] = 0;
+        }
+
+        return [
+            'security' => 0, 'securityHigh' => 0, 'typo3Unsupported' => 0, 'phpUnsupported' => 0,
+            'update_safe' => 0, 'update_major' => 0, 'abandoned' => 0, 'unassessable' => 0, 'report' => 0,
+            'severities' => $severities, 'total' => 0, 'acknowledged' => 0,
+        ];
     }
 
     /**

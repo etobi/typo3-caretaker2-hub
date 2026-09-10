@@ -87,15 +87,19 @@ final readonly class Instance
         return $this->lastSeen === 0 || ($now - $this->lastSeen) > $toleranceSeconds;
     }
 
-    public function healthState(int $now): string
+    /**
+     * What the instance says about itself. The findings may still overrule
+     * this, see InstancePresenter.
+     */
+    public function healthState(int $now): InstanceState
     {
         if ($this->isStale($now)) {
-            return 'stale';
+            return InstanceState::STALE;
         }
         if ($this->worstProviderStatus === 'unavailable' || $this->worstProviderStatus === 'degraded') {
-            return 'incomplete';
+            return InstanceState::INCOMPLETE;
         }
 
-        return 'ok';
+        return InstanceState::OK;
     }
 }
