@@ -49,7 +49,7 @@ final class Typo3VersionFindings implements EvaluatorInterface
                     : 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.typo3.eltsUnpatchedUndated',
                 link: '',
                 titleArguments: $status['eltsUntil'] !== null
-                    ? [(string)$instance->typo3Major, $status['lastPublic'], date('d.m.Y', $status['eltsUntil'])]
+                    ? [(string)$instance->typo3Major, $status['lastPublic'], Finding::date($status['eltsUntil'])]
                     : [(string)$instance->typo3Major, $status['lastPublic']],
             )];
         }
@@ -67,7 +67,7 @@ final class Typo3VersionFindings implements EvaluatorInterface
                     : 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.typo3.eltsUndated',
                 link: '',
                 titleArguments: $status['eltsUntil'] !== null
-                    ? [(string)$instance->typo3Major, date('d.m.Y', $status['eltsUntil'])]
+                    ? [(string)$instance->typo3Major, Finding::date($status['eltsUntil'])]
                     : [(string)$instance->typo3Major],
             )];
         }
@@ -85,7 +85,7 @@ final class Typo3VersionFindings implements EvaluatorInterface
                     : 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.typo3.unsupportedUndated',
                 link: 'https://typo3.org/cms/roadmap',
                 titleArguments: $status['eltsUntil'] !== null
-                    ? [(string)$instance->typo3Major, date('d.m.Y', $status['eltsUntil'])]
+                    ? [(string)$instance->typo3Major, Finding::date($status['eltsUntil'])]
                     : [(string)$instance->typo3Major],
             )];
         }

@@ -11,7 +11,7 @@
             <div class="callout-content">
                 <div class="callout-title"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.historic.title"/></div>
                 <div class="callout-body">
-                    <p><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.historic.body" arguments="{0: '{f:format.date(format: \'d.m.Y H:i:s\', date: historicAt)}'}"/></p>
+                    <p><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.historic.body" arguments="{0: '{f:format.date(format: dateTimeFormat, date: historicAt)}'}"/></p>
                     <p class="mb-0"><a href="{currentUri}" class="btn btn-default btn-sm"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.historic.toCurrent"/></a></p>
                 </div>
             </div>
@@ -24,7 +24,7 @@
                 <div class="callout-title"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.pending.title"/></div>
                 <div class="callout-body">
                     <f:if condition="{evaluatedAt}">
-                        <f:then><p class="mb-0"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.pending.changed" arguments="{0: '{f:format.date(format: \'d.m.Y H:i\', date: evaluatedAt)}'}"/></p></f:then>
+                        <f:then><p class="mb-0"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.pending.changed" arguments="{0: '{f:format.date(format: dateTimeFormat, date: evaluatedAt)}'}"/></p></f:then>
                         <f:else><p class="mb-0"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.pending.never"/></p></f:else>
                     </f:if>
                 </div>
@@ -142,20 +142,20 @@
                 </f:if>
                 <tr><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.lastSeen"/></th><td>
                     <f:if condition="{instance.lastSeen}">
-                        <f:then><f:format.date format="d.m.Y H:i:s">@{instance.lastSeen}</f:format.date></f:then>
+                        <f:then><f:format.date format="{dateTimeFormat}">@{instance.lastSeen}</f:format.date></f:then>
                         <f:else><span class="text-body-secondary"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.neverReported"/></span></f:else>
                     </f:if>
                 </td></tr>
                 <tr><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.knownSince"/></th><td>
                     <f:if condition="{generatedAt}">
-                        <f:then><f:format.date format="d.m.Y H:i:s">@{generatedAt}</f:format.date></f:then>
+                        <f:then><f:format.date format="{dateTimeFormat}">@{generatedAt}</f:format.date></f:then>
                         <f:else><span class="text-body-secondary"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.unknown"/></span></f:else>
                     </f:if>
                 </td></tr>
                 <tr><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.agentVersion"/></th><td>{instance.agentVersion}</td></tr>
                 <tr><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.schemaVersion"/></th><td>{schemaVersion}</td></tr>
                 <tr><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.inventorySize"/></th><td>
-                    <f:format.bytes value="{inventorySize}" decimals="1" decimalSeparator="," thousandsSeparator="."/>
+                    <f:format.bytes value="{inventorySize}" decimals="1"/>
                 </td></tr>
                 <tr><th><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.changeCount"/></th><td>{snapshotCount}</td></tr>
             </tbody>
@@ -182,7 +182,7 @@
                                         <f:else><em class="text-body-secondary"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.acknowledged.noReason"/></em></f:else>
                                     </f:if>
                                     <div class="text-body-secondary">
-                                        {finding.ackUser}, <f:format.date format="d.m.Y H:i:s">@{finding.ackAt}</f:format.date>
+                                        {finding.ackUser}, <f:format.date format="{dateTimeFormat}">@{finding.ackAt}</f:format.date>
                                     </div>
                                 </td>
                                 <td class="col-nowrap">
@@ -228,7 +228,7 @@
                         <f:if condition="{provider.omitted}">
                             <p class="text-body-secondary">
                                 <f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:detail.providers.omitted"/>
-                                <f:for each="{provider.omitted}" as="o" iteration="i"><code>{o.key}</code> (<f:format.bytes value="{o.bytes}" decimals="1" decimalSeparator="," thousandsSeparator="."/>)<f:if condition="!{i.isLast}">, </f:if></f:for>
+                                <f:for each="{provider.omitted}" as="o" iteration="i"><code>{o.key}</code> (<f:format.bytes value="{o.bytes}" decimals="1"/>)<f:if condition="!{i.isLast}">, </f:if></f:for>
                             </p>
                         </f:if>
 
@@ -257,7 +257,7 @@
                                 <tr>
                                     <td class="col-nowrap">
                                         <a href="{entry.uri}">
-                                            <f:format.date format="d.m.Y H:i:s">@{entry.crdate}</f:format.date>
+                                            <f:format.date format="{dateTimeFormat}">@{entry.crdate}</f:format.date>
                                         </a>
                                     </td>
                                     <td class="col-nowrap">

@@ -30,9 +30,20 @@ final readonly class Finding
         public string $latestVersion,
         public string $title,
         public string $link,
-        /** @var list<string> */
+        /** @var list<string|array{date: int}> */
         public array $titleArguments = [],
     ) {}
+
+    /**
+     * A title argument that is a date. Stored as the timestamp and formatted
+     * only when shown, so the display follows the backend's date format.
+     *
+     * @return array{date: int}
+     */
+    public static function date(int $timestamp): array
+    {
+        return ['date' => $timestamp];
+    }
 
     /**
      * @return array<string, mixed>

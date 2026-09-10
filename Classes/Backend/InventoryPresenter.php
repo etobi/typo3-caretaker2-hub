@@ -148,7 +148,7 @@ final class InventoryPresenter
                     $omitted[] = ['key' => (string)$key, 'bytes' => $size];
                     $data[$key] = $this->labels->get(
                         'detail.providers.omittedValue',
-                        number_format($size, 0, ',', '.')
+                        number_format($size)
                     );
                 }
             }

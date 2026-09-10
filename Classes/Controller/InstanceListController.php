@@ -132,6 +132,7 @@ final class InstanceListController
             'missingTasks' => implode(', ', $this->tasks->missing()),
             'message' => $message,
             'messageSeverity' => $messageSeverity,
+            'dateTimeFormat' => $this->dateTimeFormat(),
         ]);
 
         return $view->renderResponse('InstanceList/Index');
@@ -303,6 +304,7 @@ final class InstanceListController
             'acknowledgedFindings' => $this->findingPresenter->present($acknowledged),
             'findingsBySeverity' => $this->instancePresenter->severityBadges($counts['severities'] ?? []),
             'hasUnrated' => array_filter($open, static fn(array $r): bool => $r['severity'] === 'unknown') !== [],
+            'dateTimeFormat' => $this->dateTimeFormat(),
         ]);
 
         return $view->renderResponse('InstanceList/Detail');
@@ -458,6 +460,14 @@ final class InstanceListController
                 ),
             ];
         }, $history);
+    }
+
+    /**
+     * Date and time the way the backend is configured to show them.
+     */
+    private function dateTimeFormat(): string
+    {
+        return $GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'] . ' ' . $GLOBALS['TYPO3_CONF_VARS']['SYS']['hhmm'];
     }
 
     private function currentUser(ServerRequestInterface $request): string

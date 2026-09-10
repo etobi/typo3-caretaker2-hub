@@ -182,7 +182,7 @@
                                     </td>
                                     <td class="col-nowrap">
                                         <f:if condition="{instance.lastSeen}">
-                                            <f:then><f:format.date format="d.m.Y H:i">@{instance.lastSeen}</f:format.date></f:then>
+                                            <f:then><f:format.date format="{dateTimeFormat}">@{instance.lastSeen}</f:format.date></f:then>
                                             <f:else><span class="text-body-secondary"><f:translate key="LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:list.neverReported"/></span></f:else>
                                         </f:if>
                                     </td>

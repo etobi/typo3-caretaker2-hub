@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Caretaker2\Hub\Backend;
 
 use Caretaker2\Hub\Evaluation\Severity;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
 
 /**
  * Finding rows as the detail view shows them.
@@ -51,12 +52,24 @@ final class FindingPresenter
         }
 
         $args = $arguments === '' ? [] : json_decode($arguments, true);
-        $args = is_array($args) ? array_map('strval', $args) : [];
+        $args = is_array($args) ? array_map([$this, 'argument'], $args) : [];
 
         try {
             return $this->labels->translate($title, ...$args);
         } catch (\Throwable $e) {
             return $this->labels->translate($title);
         }
+    }
+
+    /**
+     * Dates are stored as timestamps, see Finding::date().
+     */
+    private function argument(mixed $argument): string
+    {
+        if (is_array($argument) && isset($argument['date'])) {
+            return BackendUtility::date((int)$argument['date']);
+        }
+
+        return (string)$argument;
     }
 }

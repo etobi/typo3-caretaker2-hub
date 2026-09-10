@@ -42,7 +42,7 @@ final class PhpVersionFindings implements EvaluatorInterface
                     : 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.php.eolUndated',
                 link: 'https://www.php.net/supported-versions.php',
                 titleArguments: $status['eolUntil'] !== null
-                    ? [$status['cycle'], date('d.m.Y', $status['eolUntil'])]
+                    ? [$status['cycle'], Finding::date($status['eolUntil'])]
                     : [$status['cycle']],
             )];
         }
@@ -60,7 +60,7 @@ final class PhpVersionFindings implements EvaluatorInterface
                     : 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:finding.title.php.securityOnlyUndated',
                 link: 'https://www.php.net/supported-versions.php',
                 titleArguments: $status['eolUntil'] !== null
-                    ? [$status['cycle'], date('d.m.Y', $status['eolUntil'])]
+                    ? [$status['cycle'], Finding::date($status['eolUntil'])]
                     : [$status['cycle']],
             )];
         }
