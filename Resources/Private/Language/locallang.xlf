@@ -571,7 +571,7 @@
                 <source>The scheduler extension is not installed.</source>
             </trans-unit>
             <trans-unit id="scheduler.taskFailed">
-                <source>The task could not be created.</source>
+                <source>The task for %s could not be created: %s</source>
             </trans-unit>
             <trans-unit id="detail.providers.omittedValue">
                 <source>… %s bytes, not shown here</source>

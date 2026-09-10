@@ -17,6 +17,7 @@ services:
       - '../Classes/Domain/PhpSupport.php'
       - '../Classes/Domain/EnrollmentException.php'
       - '../Classes/Domain/IngestException.php'
+      - '../Classes/Domain/TriggerException.php'
       - '../Classes/Domain/TokenGenerator.php'
       - '../Classes/Evaluation/Finding.php'
       - '../Classes/Evaluation/Severity.php'

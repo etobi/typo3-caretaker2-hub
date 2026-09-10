@@ -16,6 +16,7 @@ use Caretaker2\Hub\Domain\InstanceRepository;
 use Caretaker2\Hub\Domain\InstanceState;
 use Caretaker2\Hub\Domain\SnapshotRepository;
 use Caretaker2\Hub\Domain\TriggerClient;
+use Caretaker2\Hub\Domain\TriggerException;
 use Caretaker2\Hub\Evaluation\FindingRepository;
 use Caretaker2\Hub\Http\Origin;
 use Caretaker2\Hub\Scheduler\HubTaskInstaller;
@@ -154,7 +155,7 @@ final class InstanceListController
             try {
                 $created = $this->tasks->installMissing();
             } catch (SchedulerTaskException $e) {
-                return [null, $e->getMessage(), 'danger'];
+                return [null, $this->labels->get($e->labelKey, ...$e->labelArguments), 'danger'];
             }
 
             return [
@@ -358,9 +359,17 @@ final class InstanceListController
         }
 
         if (isset($body['trigger'])) {
-            [$ok, $message] = $this->triggerClient->trigger($instance);
+            try {
+                $stored = $this->triggerClient->trigger($instance);
+            } catch (TriggerException $e) {
+                return [$this->labels->get($e->labelKey, ...$e->labelArguments), 'warning', $instance];
+            }
 
-            return [$message, $ok ? 'success' : 'warning', $this->reload($instance)];
+            return [
+                $this->labels->get($stored ? 'trigger.changed' : 'trigger.unchanged'),
+                'success',
+                $this->reload($instance),
+            ];
         }
 
         return [null, 'info', $instance];

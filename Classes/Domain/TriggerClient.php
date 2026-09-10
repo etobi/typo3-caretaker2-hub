@@ -11,8 +11,6 @@ use TYPO3\CMS\Core\Http\RequestFactory;
  */
 final class TriggerClient
 {
-    private const LL = 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:';
-
     private const PATH = '/caretaker2/trigger';
     private const TIMEOUT_SECONDS = 25;
 
@@ -21,12 +19,13 @@ final class TriggerClient
     ) {}
 
     /**
-     * @return array{0: bool, 1: string} success and a message for the user
+     * @return bool whether the hub stored a change
+     * @throws TriggerException
      */
-    public function trigger(Instance $instance): array
+    public function trigger(Instance $instance): bool
     {
         if ($instance->instanceUrl === '') {
-            return [false, $this->ll('trigger.noUrl')];
+            throw TriggerException::noUrl();
         }
 
         $url = rtrim($instance->instanceUrl, '/') . self::PATH;
@@ -38,39 +37,21 @@ final class TriggerClient
                 'headers' => ['Accept' => 'application/json'],
             ]);
         } catch (\Throwable $e) {
-            return [false, $this->ll('trigger.unreachable', $e->getMessage())];
+            throw TriggerException::unreachable($url, $e->getMessage());
         }
 
         $status = $response->getStatusCode();
         $body = json_decode((string)$response->getBody(), true);
+        $body = is_array($body) ? $body : [];
 
         if ($status === 429) {
-            $wait = is_array($body) ? (int)($body['retryAfter'] ?? 0) : 0;
-
-            return [false, $this->ll('trigger.cooldown', $wait)];
+            throw TriggerException::cooldown((int)($body['retryAfter'] ?? 0));
         }
 
         if ($status >= 400) {
-            $detail = is_array($body) && isset($body['error']) ? (string)$body['error'] : 'HTTP ' . $status;
-
-            return [false, $this->ll('trigger.refused', $detail)];
+            throw TriggerException::refused((string)($body['error'] ?? 'HTTP ' . $status));
         }
 
-        return [
-            true,
-            (is_array($body) && ($body['stored'] ?? false))
-                ? $this->ll('trigger.changed')
-                : $this->ll('trigger.unchanged'),
-        ];
-    }
-
-    /**
-     * @param string|int ...$args
-     */
-    private function ll(string $key, ...$args): string
-    {
-        $text = $GLOBALS['LANG']->sL(self::LL . $key);
-
-        return $args === [] ? $text : vsprintf($text, $args);
+        return (bool)($body['stored'] ?? false);
     }
 }

@@ -760,8 +760,8 @@
                 <target>Die Extension scheduler ist nicht installiert.</target>
             </trans-unit>
             <trans-unit id="scheduler.taskFailed" approved="yes">
-                <source>The task could not be created.</source>
-                <target>Der Task ließ sich nicht anlegen.</target>
+                <source>The task for %s could not be created: %s</source>
+                <target>Der Task für %s ließ sich nicht anlegen: %s</target>
             </trans-unit>
             <trans-unit id="detail.providers.omittedValue" approved="yes">
                 <source>… %s bytes, not shown here</source>

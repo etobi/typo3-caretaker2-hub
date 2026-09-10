@@ -21,8 +21,6 @@ final class HubTaskInstaller
 
     private const TABLE = 'tx_scheduler_task';
 
-    private const LL = 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:';
-
     public function __construct(
         private readonly ConnectionPool $connectionPool,
     ) {}
@@ -70,7 +68,7 @@ final class HubTaskInstaller
     public function installMissing(): int
     {
         if (!$this->isAvailable()) {
-            throw new SchedulerTaskException($this->ll('scheduler.notInstalled'));
+            throw SchedulerTaskException::schedulerMissing();
         }
 
         $created = 0;
@@ -96,16 +94,11 @@ final class HubTaskInstaller
         try {
             $saved = GeneralUtility::makeInstance(SchedulerTaskRepository::class)->add($task);
         } catch (\Throwable $e) {
-            throw new SchedulerTaskException($e->getMessage(), 0, $e);
+            throw SchedulerTaskException::saveFailed($command, $e);
         }
 
         if ($saved === false) {
-            throw new SchedulerTaskException($this->ll('scheduler.taskFailed'));
+            throw SchedulerTaskException::saveFailed($command);
         }
-    }
-
-    private function ll(string $key): string
-    {
-        return $GLOBALS['LANG']->sL(self::LL . $key);
     }
 }
