@@ -94,9 +94,9 @@ final class ApiMiddleware implements MiddlewareInterface, LoggerAwareInterface
      */
     private function handleInventory(ServerRequestInterface $request, array $payload): ResponseInterface
     {
-        $token = $this->bearerToken($request);
+        $token = $this->token($request);
         if ($token === null) {
-            return $this->error('Authorization: Bearer <token> is missing.', 401);
+            return $this->error('The token is missing: Authorization: Bearer <token>, or X-Caretaker2-Token behind Basic Auth.', 401);
         }
 
         $instance = $this->instances->findByToken($token);
@@ -117,14 +117,20 @@ final class ApiMiddleware implements MiddlewareInterface, LoggerAwareInterface
         ]);
     }
 
-    private function bearerToken(ServerRequestInterface $request): ?string
+    /**
+     * Normally a bearer token. A hub behind HTTP Basic Auth has the
+     * Authorization header taken, so the agent sends the token in a header
+     * of its own then.
+     */
+    private function token(ServerRequestInterface $request): ?string
     {
-        $header = $request->getHeaderLine('Authorization');
-        if (!preg_match('/^Bearer\s+(\S+)$/i', $header, $matches)) {
-            return null;
+        if (preg_match('/^Bearer\s+(\S+)$/i', $request->getHeaderLine('Authorization'), $matches)) {
+            return $matches[1];
         }
 
-        return $matches[1];
+        $own = trim($request->getHeaderLine('X-Caretaker2-Token'));
+
+        return $own === '' ? null : $own;
     }
 
     private function error(string $message, int $status): ResponseInterface
