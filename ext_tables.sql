@@ -7,6 +7,8 @@ CREATE TABLE tx_caretaker2_instance (
     title varchar(255) DEFAULT '' NOT NULL,
     instance_url varchar(2048) DEFAULT '' NOT NULL,
     token_hash varchar(64) DEFAULT '' NOT NULL,
+    trigger_user varchar(255) DEFAULT '' NOT NULL,
+    trigger_password text,
     tenant int(11) unsigned DEFAULT 1 NOT NULL,
     instance_group int(11) unsigned DEFAULT 0 NOT NULL,
     agent_version varchar(32) DEFAULT '' NOT NULL,

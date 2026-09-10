@@ -36,6 +36,17 @@ final class TriggerException extends \RuntimeException
         return new self(sprintf('The instance has just reported, %d seconds to wait.', $seconds), 'trigger.cooldown', [$seconds]);
     }
 
+    /**
+     * The instance sits behind HTTP Basic Auth and either got no credentials
+     * or the wrong ones.
+     */
+    public static function unauthorized(bool $credentialsWereSent): self
+    {
+        return $credentialsWereSent
+            ? new self('The instance rejected the Basic Auth credentials.', 'trigger.unauthorizedWrong')
+            : new self('The instance asks for HTTP Basic Auth.', 'trigger.unauthorizedMissing');
+    }
+
     public static function refused(string $detail): self
     {
         return new self('The instance refused: ' . $detail, 'trigger.refused', [$detail]);

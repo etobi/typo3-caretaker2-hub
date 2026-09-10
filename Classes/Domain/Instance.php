@@ -39,6 +39,9 @@ final readonly class Instance
         public ?array $lastInventory,
         public bool $needsEvaluation,
         public int $evaluatedAt,
+        public string $triggerUser,
+        /** The password as stored, see TriggerSecret. */
+        public string $triggerPassword,
     ) {}
 
     /**
@@ -70,6 +73,8 @@ final readonly class Instance
             lastInventory: self::decodeInventory($row['last_inventory'] ?? null),
             needsEvaluation: (bool)($row['needs_evaluation'] ?? false),
             evaluatedAt: (int)($row['evaluated_at'] ?? 0),
+            triggerUser: (string)($row['trigger_user'] ?? ''),
+            triggerPassword: (string)($row['trigger_password'] ?? ''),
         );
     }
 

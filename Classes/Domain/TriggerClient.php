@@ -16,6 +16,7 @@ final class TriggerClient
 
     public function __construct(
         private readonly RequestFactory $requestFactory,
+        private readonly TriggerSecret $secret,
     ) {}
 
     /**
@@ -30,12 +31,18 @@ final class TriggerClient
 
         $url = rtrim($instance->instanceUrl, '/') . self::PATH;
 
+        $options = [
+            'timeout' => self::TIMEOUT_SECONDS,
+            'http_errors' => false,
+            'headers' => ['Accept' => 'application/json'],
+        ];
+        if ($instance->triggerUser !== '') {
+            // Instances behind HTTP Basic Auth, staging systems mostly.
+            $options['auth'] = [$instance->triggerUser, $this->secret->open($instance->triggerPassword)];
+        }
+
         try {
-            $response = $this->requestFactory->request($url, 'POST', [
-                'timeout' => self::TIMEOUT_SECONDS,
-                'http_errors' => false,
-                'headers' => ['Accept' => 'application/json'],
-            ]);
+            $response = $this->requestFactory->request($url, 'POST', $options);
         } catch (\Throwable $e) {
             throw TriggerException::unreachable($url, $e->getMessage());
         }
@@ -46,6 +53,10 @@ final class TriggerClient
 
         if ($status === 429) {
             throw TriggerException::cooldown((int)($body['retryAfter'] ?? 0));
+        }
+
+        if ($status === 401) {
+            throw TriggerException::unauthorized($instance->triggerUser !== '');
         }
 
         if ($status >= 400) {

@@ -10,6 +10,8 @@ use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
 
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processCmdmapClass'][]
     = DataHandlerHook::class;
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processDatamapClass'][]
+    = DataHandlerHook::class;
 
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['caretaker2'] ??= [
     'frontend' => VariableFrontend::class,

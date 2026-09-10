@@ -891,6 +891,34 @@
                 <source>This domain is also claimed by %s.</source>
                 <target>Diese Domain beansprucht auch %s.</target>
             </trans-unit>
+            <trans-unit id="tca.instance.tab.trigger" approved="yes">
+                <source>Trigger</source>
+                <target>Trigger</target>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.triggerUser" approved="yes">
+                <source>Basic Auth user</source>
+                <target>Basic-Auth-Benutzer</target>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.triggerUser.description" approved="yes">
+                <source>Only for instances behind HTTP Basic Auth, staging systems mostly. The hub sends these credentials when it asks the instance to report.</source>
+                <target>Nur für Instanzen hinter HTTP Basic Auth, meist Staging-Systeme. Der Hub schickt diese Zugangsdaten mit, wenn er die Instanz zum Melden auffordert.</target>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.triggerPassword" approved="yes">
+                <source>Basic Auth password</source>
+                <target>Basic-Auth-Passwort</target>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.triggerPassword.description" approved="yes">
+                <source>Stored encrypted with the encryption key of this installation.</source>
+                <target>Wird mit dem Encryption Key dieser Installation verschlüsselt gespeichert.</target>
+            </trans-unit>
+            <trans-unit id="trigger.unauthorizedMissing" approved="yes">
+                <source>The instance asks for HTTP Basic Auth. Enter the credentials on the instance record.</source>
+                <target>Die Instanz verlangt HTTP Basic Auth. Zugangsdaten am Instanz-Datensatz hinterlegen.</target>
+            </trans-unit>
+            <trans-unit id="trigger.unauthorizedWrong" approved="yes">
+                <source>The instance rejected the Basic Auth credentials. Check them on the instance record.</source>
+                <target>Die Instanz hat die Basic-Auth-Zugangsdaten abgelehnt. Am Instanz-Datensatz prüfen.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

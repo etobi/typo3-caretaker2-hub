@@ -65,6 +65,17 @@ return [
             'label' => 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:tca.instance.field.hosts',
             'config' => ['type' => 'text', 'rows' => 4, 'readOnly' => true],
         ],
+        'trigger_user' => [
+            'label' => 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:tca.instance.field.triggerUser',
+            'description' => 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:tca.instance.field.triggerUser.description',
+            'config' => ['type' => 'input', 'size' => 40, 'eval' => 'trim', 'autocomplete' => false],
+        ],
+        'trigger_password' => [
+            'label' => 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:tca.instance.field.triggerPassword',
+            'description' => 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:tca.instance.field.triggerPassword.description',
+            // Not hashed: the hub has to send it. The DataHandler hook seals it instead.
+            'config' => ['type' => 'password', 'hashed' => false, 'size' => 40, 'autocomplete' => false],
+        ],
         'tenant' => [
             'label' => 'LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:tca.tenant',
             'config' => ['type' => 'number', 'default' => 1, 'readOnly' => true],
@@ -74,7 +85,8 @@ return [
         '0' => [
             'showitem' => 'title, instance_group,
                 --div--;LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:tca.instance.tab.reported, instance_url, typo3_version, php_version, db_version,
-                application_context, agent_version, last_seen, site_hosts',
+                application_context, agent_version, last_seen, site_hosts,
+                --div--;LLL:EXT:caretaker2_hub/Resources/Private/Language/locallang.xlf:tca.instance.tab.trigger, trigger_user, trigger_password',
         ],
     ],
 ];

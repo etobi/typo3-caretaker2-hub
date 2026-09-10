@@ -669,6 +669,27 @@
             <trans-unit id="finding.title.domainContested">
                 <source>This domain is also claimed by %s.</source>
             </trans-unit>
+            <trans-unit id="tca.instance.tab.trigger">
+                <source>Trigger</source>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.triggerUser">
+                <source>Basic Auth user</source>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.triggerUser.description">
+                <source>Only for instances behind HTTP Basic Auth, staging systems mostly. The hub sends these credentials when it asks the instance to report.</source>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.triggerPassword">
+                <source>Basic Auth password</source>
+            </trans-unit>
+            <trans-unit id="tca.instance.field.triggerPassword.description">
+                <source>Stored encrypted with the encryption key of this installation.</source>
+            </trans-unit>
+            <trans-unit id="trigger.unauthorizedMissing">
+                <source>The instance asks for HTTP Basic Auth. Enter the credentials on the instance record.</source>
+            </trans-unit>
+            <trans-unit id="trigger.unauthorizedWrong">
+                <source>The instance rejected the Basic Auth credentials. Check them on the instance record.</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>
