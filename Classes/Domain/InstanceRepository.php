@@ -114,6 +114,32 @@ final class InstanceRepository
     }
 
     /**
+     * Forgets everything the agent ever reported. The record itself, its
+     * title, group and token stay.
+     */
+    public function clearReported(int $uid): void
+    {
+        $this->update($uid, [
+            'agent_version' => '',
+            'schema_version' => 0,
+            'typo3_version' => '',
+            'typo3_major' => 0,
+            'application_context' => '',
+            'php_version' => '',
+            'db_platform' => '',
+            'db_version' => '',
+            'worst_provider_status' => '',
+            'site_hosts' => '',
+            'site_count' => 0,
+            'last_seen' => 0,
+            'last_fingerprint' => '',
+            'last_inventory' => '',
+            'needs_evaluation' => 0,
+            'evaluated_at' => 0,
+        ]);
+    }
+
+    /**
      * @param array<string, mixed> $values
      */
     public function update(int $uid, array $values): void

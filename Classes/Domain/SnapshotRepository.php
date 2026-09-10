@@ -20,6 +20,21 @@ final class SnapshotRepository
     ) {}
 
     /**
+     * @param array<string, mixed> $inventory as the agent sent it
+     */
+    public function add(Instance $instance, string $fingerprint, array $inventory): void
+    {
+        $this->connectionPool->getConnectionForTable(self::TABLE)->insert(self::TABLE, [
+            'pid' => 0,
+            'crdate' => time(),
+            'instance' => $instance->uid,
+            'tenant' => $instance->tenant,
+            'fingerprint' => $fingerprint,
+            'payload' => (string)json_encode($inventory, JSON_UNESCAPED_SLASHES),
+        ]);
+    }
+
+    /**
      * @return array{crdate: int, inventory: array<string, mixed>}|null
      */
     public function findInventoryByUid(int $snapshotUid, int $instanceId): ?array

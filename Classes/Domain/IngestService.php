@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Caretaker2\Hub\Domain;
 
-use TYPO3\CMS\Core\Database\ConnectionPool;
-
 /**
  * Takes an inventory in, stores it and pulls out the figures the instance
  * list shows.
@@ -46,8 +44,8 @@ final class IngestService
     ];
 
     public function __construct(
-        private readonly ConnectionPool $connectionPool,
         private readonly InstanceRepository $instances,
+        private readonly SnapshotRepository $snapshots,
     ) {}
 
     /**
@@ -75,17 +73,7 @@ final class IngestService
         $changed = $fingerprint !== $instance->lastFingerprint;
 
         if ($changed) {
-            $this->connectionPool->getConnectionForTable(SnapshotRepository::TABLE)->insert(
-                SnapshotRepository::TABLE,
-                [
-                    'pid' => 0,
-                    'crdate' => time(),
-                    'instance' => $instance->uid,
-                    'tenant' => $instance->tenant,
-                    'fingerprint' => $fingerprint,
-                    'payload' => (string)json_encode($inventory, JSON_UNESCAPED_SLASHES),
-                ]
-            );
+            $this->snapshots->add($instance, $fingerprint, $inventory);
         }
 
         $this->instances->update($instance->uid, array_merge(
