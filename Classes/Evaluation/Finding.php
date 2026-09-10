@@ -24,6 +24,9 @@ final readonly class Finding
     public const TYPE_SCHEDULER_STALE = 'scheduler_stale';
     public const TYPE_SCHEDULER_TASK_FAILED = 'scheduler_task_failed';
     public const TYPE_SCHEDULER_TASK_OVERDUE = 'scheduler_task_overdue';
+    public const TYPE_DATABASE_CHARSET = 'database_charset';
+    public const TYPE_DATABASE_ENGINE = 'database_engine';
+    public const TYPE_DATABASE_HOUSEKEEPING = 'database_housekeeping';
 
     public function __construct(
         public string $type,

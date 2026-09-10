@@ -684,6 +684,15 @@
             <trans-unit id="finding.type.scheduler_task_overdue">
                 <source>Task overdue</source>
             </trans-unit>
+            <trans-unit id="finding.type.database_charset">
+                <source>Character set</source>
+            </trans-unit>
+            <trans-unit id="finding.type.database_engine">
+                <source>Table engine</source>
+            </trans-unit>
+            <trans-unit id="finding.type.database_housekeeping">
+                <source>Database housekeeping</source>
+            </trans-unit>
             <trans-unit id="finding.title.scheduler.incomplete">
                 <source>The scheduler could not be looked at: %s</source>
             </trans-unit>
@@ -698,6 +707,24 @@
             </trans-unit>
             <trans-unit id="finding.title.scheduler.taskOverdue">
                 <source>The task "%s" was due on %s and has not run since, although the scheduler itself is running.</source>
+            </trans-unit>
+            <trans-unit id="finding.title.database.incomplete">
+                <source>The database tables could not be looked at: %s</source>
+            </trans-unit>
+            <trans-unit id="finding.title.database.charsetLegacy">
+                <source>%s tables use the %s character set, which cannot store most non-Latin text; TYPO3 expects utf8mb4: %s</source>
+            </trans-unit>
+            <trans-unit id="finding.title.database.charsetUtf8mb3">
+                <source>%s tables still use %s, the three-byte UTF-8 that cannot store emoji and other four-byte characters; TYPO3 expects utf8mb4: %s</source>
+            </trans-unit>
+            <trans-unit id="finding.title.database.defaultCharset">
+                <source>New tables get the %s character set by default; TYPO3 expects utf8mb4.</source>
+            </trans-unit>
+            <trans-unit id="finding.title.database.engine">
+                <source>%s tables use the %s engine instead of InnoDB, without transactions and row-level locking: %s</source>
+            </trans-unit>
+            <trans-unit id="finding.title.database.housekeeping">
+                <source>The table %s holds about %s rows in %s. TYPO3 can clean it up on a schedule.</source>
             </trans-unit>
             <trans-unit id="tca.instance.tab.trigger">
                 <source>Trigger</source>

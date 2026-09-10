@@ -911,6 +911,18 @@
                 <source>Task overdue</source>
                 <target>Task überfällig</target>
             </trans-unit>
+            <trans-unit id="finding.type.database_charset" approved="yes">
+                <source>Character set</source>
+                <target>Zeichensatz</target>
+            </trans-unit>
+            <trans-unit id="finding.type.database_engine" approved="yes">
+                <source>Table engine</source>
+                <target>Tabellen-Engine</target>
+            </trans-unit>
+            <trans-unit id="finding.type.database_housekeeping" approved="yes">
+                <source>Database housekeeping</source>
+                <target>Datenbank aufräumen</target>
+            </trans-unit>
             <trans-unit id="finding.title.scheduler.incomplete" approved="yes">
                 <source>The scheduler could not be looked at: %s</source>
                 <target>Der Scheduler konnte nicht geprüft werden: %s</target>
@@ -930,6 +942,30 @@
             <trans-unit id="finding.title.scheduler.taskOverdue" approved="yes">
                 <source>The task "%s" was due on %s and has not run since, although the scheduler itself is running.</source>
                 <target>Der Task "%s" war am %s fällig und ist seitdem nicht gelaufen, obwohl der Scheduler selbst läuft.</target>
+            </trans-unit>
+            <trans-unit id="finding.title.database.incomplete" approved="yes">
+                <source>The database tables could not be looked at: %s</source>
+                <target>Die Datenbanktabellen konnten nicht geprüft werden: %s</target>
+            </trans-unit>
+            <trans-unit id="finding.title.database.charsetLegacy" approved="yes">
+                <source>%s tables use the %s character set, which cannot store most non-Latin text; TYPO3 expects utf8mb4: %s</source>
+                <target>%s Tabellen verwenden den Zeichensatz %s, der die meisten nicht-lateinischen Texte nicht speichern kann; TYPO3 erwartet utf8mb4: %s</target>
+            </trans-unit>
+            <trans-unit id="finding.title.database.charsetUtf8mb3" approved="yes">
+                <source>%s tables still use %s, the three-byte UTF-8 that cannot store emoji and other four-byte characters; TYPO3 expects utf8mb4: %s</source>
+                <target>%s Tabellen verwenden noch %s, das Drei-Byte-UTF-8, das Emoji und andere Vier-Byte-Zeichen nicht speichern kann; TYPO3 erwartet utf8mb4: %s</target>
+            </trans-unit>
+            <trans-unit id="finding.title.database.defaultCharset" approved="yes">
+                <source>New tables get the %s character set by default; TYPO3 expects utf8mb4.</source>
+                <target>Neue Tabellen bekommen standardmäßig den Zeichensatz %s; TYPO3 erwartet utf8mb4.</target>
+            </trans-unit>
+            <trans-unit id="finding.title.database.engine" approved="yes">
+                <source>%s tables use the %s engine instead of InnoDB, without transactions and row-level locking: %s</source>
+                <target>%s Tabellen verwenden die Engine %s statt InnoDB, ohne Transaktionen und zeilenweises Sperren: %s</target>
+            </trans-unit>
+            <trans-unit id="finding.title.database.housekeeping" approved="yes">
+                <source>The table %s holds about %s rows in %s. TYPO3 can clean it up on a schedule.</source>
+                <target>Die Tabelle %s enthält rund %s Zeilen in %s. TYPO3 kann sie per Scheduler aufräumen.</target>
             </trans-unit>
             <trans-unit id="tca.instance.tab.trigger" approved="yes">
                 <source>Trigger</source>

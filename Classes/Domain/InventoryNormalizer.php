@@ -36,6 +36,7 @@ final class InventoryNormalizer
         ],
         'reports' => ['*'],
         'scheduler' => ['runs'],
+        'database' => ['sizes'],
     ];
 
     /**
