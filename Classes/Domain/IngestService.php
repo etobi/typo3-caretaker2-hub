@@ -18,6 +18,33 @@ final class IngestService
      */
     public const SCHEMA_MIN_SUPPORTED = 1;
 
+    /**
+     * Values that depend on which PHP runtime collected the inventory rather
+     * than on the instance itself. A scheduler push runs under CLI, a
+     * hub-triggered pull under FPM, and they disagree about all of these.
+     * Left in, every alternation between the two would look like a change.
+     *
+     * The data still reaches the hub and is shown — it just does not decide
+     * whether a snapshot is stored.
+     */
+    private const VOLATILE_PATHS = [
+        ['providers', 'platform', 'data', 'php', 'sapi'],
+        ['providers', 'platform', 'data', 'php', 'settings'],
+        // TYPO3's own checks judge the runtime they happen to run in, so a
+        // scheduler push and a hub-triggered pull disagree about two of them.
+        // They describe the current state, not a change to the installation,
+        // and are always available in full from last_inventory.
+        ['providers', 'reports'],
+    ];
+
+    private const SAPI_BOUND_EXTENSIONS = [
+        'ext-pcntl',
+        'ext-posix',
+        'ext-readline',
+        'ext-cgi-fcgi',
+        'ext-litespeed',
+    ];
+
     public function __construct(
         private readonly ConnectionPool $connectionPool,
         private readonly InstanceRepository $instances,
@@ -172,33 +199,6 @@ final class IngestService
 
         return $worst;
     }
-
-    /**
-     * Values that depend on which PHP runtime collected the inventory rather
-     * than on the instance itself. A scheduler push runs under CLI, a
-     * hub-triggered pull under FPM, and they disagree about all of these.
-     * Left in, every alternation between the two would look like a change.
-     *
-     * The data still reaches the hub and is shown — it just does not decide
-     * whether a snapshot is stored.
-     */
-    private const VOLATILE_PATHS = [
-        ['providers', 'platform', 'data', 'php', 'sapi'],
-        ['providers', 'platform', 'data', 'php', 'settings'],
-        // TYPO3's own checks judge the runtime they happen to run in, so a
-        // scheduler push and a hub-triggered pull disagree about two of them.
-        // They describe the current state, not a change to the installation,
-        // and are always available in full from last_inventory.
-        ['providers', 'reports'],
-    ];
-
-    private const SAPI_BOUND_EXTENSIONS = [
-        'ext-pcntl',
-        'ext-posix',
-        'ext-readline',
-        'ext-cgi-fcgi',
-        'ext-litespeed',
-    ];
 
     /**
      * @param array<string, mixed> $inventory
