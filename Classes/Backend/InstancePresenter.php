@@ -71,7 +71,7 @@ final class InstancePresenter
     /**
      * @param array<string, mixed> $findingCounts
      */
-    public function stateOf(Instance $instance, int $now, array $findingCounts): InstanceState
+    private function stateOf(Instance $instance, int $now, array $findingCounts): InstanceState
     {
         $state = $instance->healthState($now);
         if ($state === InstanceState::STALE) {
